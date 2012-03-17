@@ -1,0 +1,146 @@
+﻿Build started 2/22/2012 5:47:13 PM.
+     1>Project "C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\fasmdll_managed_Source\fasmdll_managed\fasmdll_managed.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "bin\Release\fasmdll_managed.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         All outputs are up-to-date.
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /clr /nologo /W3 /WX- /O2 /Oy- /GL /D WIN32 /D NDEBUG /D _WINDLL /D _MBCS /EHa /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"bin\Release\\" /Fd"bin\Release\vc100.pdb" /TP /analyze- /errorReport:prompt "C:\Users\Mr. Nukealizer\AppData\Local\Temp\.NETFramework,Version=v4.0.AssemblyAttributes.cpp"
+         .NETFramework,Version=v4.0.AssemblyAttributes.cpp
+       Link:
+         c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"..\..\bin\Release\fasmdll_managed.dll" /INCREMENTAL:NO /NOLOGO FASM.OBJ /MANIFEST /ManifestFile:"bin\Release\fasmdll_managed.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\bin\Release\fasmdll_managed.pdb" /LTCG /TLBID:1 /DYNAMICBASE /FIXED:NO /NXCOMPAT /MACHINE:X86 /DLL bin\Release\AssemblyInfo.obj
+         bin\Release\fasmdll_managed.obj
+         "bin\Release\.NETFramework,Version=v4.0.AssemblyAttributes.obj"
+         LINK : /LTCG specified but no code generation required; remove /LTCG from the link command line to improve linker performance
+         fasmdll_managed.vcxproj -> C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\fasmdll_managed_Source\fasmdll_managed\..\..\bin\Release\fasmdll_managed.dll
+       Manifest:
+         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"..\..\bin\Release\fasmdll_managed.dll;#2" /manifest bin\Release\fasmdll_managed.dll.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "bin\Release\fasmdll_managed.unsuccessfulbuild".
+         Touching "bin\Release\fasmdll_managed.lastbuildstate".
+     1>Done Building Project "C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\fasmdll_managed_Source\fasmdll_managed\fasmdll_managed.vcxproj" (build target(s)).
+
+Project Performance Summary:
+     3752 ms  C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\fasmdll_managed_Source\fasmdll_managed\fasmdll_managed.vcxproj   1 calls
+               3752 ms  build                                      1 calls
+
+Target Performance Summary:
+        0 ms  _Midl                                      1 calls
+        0 ms  ComputeMetaGenInputs                       1 calls
+        0 ms  SelectCustomBuild                          1 calls
+        0 ms  CreateCustomManifestResourceNames          1 calls
+        0 ms  _ClCompile                                 1 calls
+        0 ms  MetaGenInputsOutputs                       1 calls
+        0 ms  _CheckForCompileOutputs                    1 calls
+        0 ms  ComputeMIDLGeneratedCompileInputs          1 calls
+        0 ms  _PrepareForBuild                           1 calls
+        0 ms  AfterResourceCompile                       1 calls
+        0 ms  AfterMidl                                  1 calls
+        0 ms  BeforeResourceCompile                      1 calls
+        0 ms  ComputeRCOutputs                           1 calls
+        0 ms  _XdcMake                                   1 calls
+        0 ms  _Deploy                                    1 calls
+        0 ms  ComputeLinkImportLibraryOutputsForClean    1 calls
+        0 ms  AfterBuild                                 1 calls
+        0 ms  _Manifest                                  1 calls
+        0 ms  AfterBuildCompileEvent                     1 calls
+        0 ms  PrepareResourceNames                       1 calls
+        0 ms  _GenerateSatelliteAssemblyInputs           1 calls
+        0 ms  ComputeLinkInputsFromProject               1 calls
+        0 ms  _Xsd                                       1 calls
+        0 ms  PostBuildEvent                             1 calls
+        0 ms  BuildLinkTraverse                          1 calls
+        0 ms  ComputeCLGeneratedLinkInputs               1 calls
+        0 ms  CreateSatelliteAssemblies                  1 calls
+        0 ms  ComputeCLCompileGeneratedSbrFiles          1 calls
+        0 ms  _ResourceCompile                           1 calls
+        0 ms  MakeDirsForResourceCompile                 1 calls
+        0 ms  AfterClCompile                             1 calls
+        0 ms  GetFrameworkPaths                          1 calls
+        0 ms  ComputeCLOutputs                           1 calls
+        0 ms  SelectClCompile                            1 calls
+        0 ms  ResolveReferences                          1 calls
+        0 ms  _DetermineManagedStateForLink              1 calls
+        0 ms  ComputeManifestGeneratedLinkerInputs       1 calls
+        0 ms  CopyFilesToOutputDirectory                 1 calls
+        0 ms  ResolvedXDCMake                            1 calls
+        0 ms  MakeDirsForManifest                        1 calls
+        0 ms  BeforeBuildGenerateSources                 1 calls
+        0 ms  AfterLink                                  1 calls
+        0 ms  BeforeResolveReferences                    1 calls
+        0 ms  MakeDirsForMidl                            1 calls
+        0 ms  PreBuildEvent                              1 calls
+        0 ms  _BscMake                                   1 calls
+        0 ms  AfterBuildGenerateSourcesEvent             1 calls
+        0 ms  AfterResolveReferences                     1 calls
+        0 ms  _SelectedFiles                             1 calls
+        0 ms  ComputeCLInputPDBName                      1 calls
+        0 ms  _Link                                      1 calls
+        0 ms  Build                                      1 calls
+        0 ms  _ALink                                     1 calls
+        0 ms  MakeDirsForBscMake                         1 calls
+        0 ms  BuildGenerateSources                       1 calls
+        0 ms  AfterBuildGenerateSources                  1 calls
+        0 ms  RegisterOutput                             1 calls
+        0 ms  _Appverifier                               1 calls
+        0 ms  PlatformPrepareForBuild                    1 calls
+        0 ms  BuildCompile                               1 calls
+        0 ms  ComputeRCGeneratedLinkInputs               1 calls
+        0 ms  MakeDirsForXdcMake                         1 calls
+        0 ms  MakeDirsForLink                            1 calls
+        0 ms  BeforeLink                                 1 calls
+        0 ms  _GenerateWebServiceProxy                   1 calls
+        0 ms  BuildLink                                  1 calls
+        0 ms  _CopySourceItemsToOutputDirectory          1 calls
+        0 ms  PreLinkEvent                               1 calls
+        0 ms  _SplitProjectReferencesByFileExistence     1 calls
+        0 ms  BeforeClCompile                            1 calls
+        0 ms  _GenerateXMLData                           1 calls
+        0 ms  AssignTargetPaths                          1 calls
+        1 ms  ComputeManifestInputsTargets               1 calls
+        1 ms  ComputeReferenceCLInput                    1 calls
+        1 ms  DoLinkOutputFilesMatch                     1 calls
+        1 ms  BuildGenerateSourcesTraverse               1 calls
+        1 ms  ResolveProjectReferences                   1 calls
+        1 ms  _DetermineManagedStateFromCL               1 calls
+        1 ms  GetCopyToOutputDirectoryItems              1 calls
+        1 ms  GetReferenceAssemblyPaths                  1 calls
+        1 ms  SplitResourcesByCulture                    1 calls
+        1 ms  ComputeCLCompileGeneratedXDCFiles          1 calls
+        1 ms  ComputeCustomBuildOutput                   1 calls
+        1 ms  BuildCompileTraverse                       1 calls
+        2 ms  GenerateTargetFrameworkMonikerAttribute    1 calls
+        2 ms  PrepareForBuild                            1 calls
+        2 ms  FinalizeBuildStatus                        1 calls
+        8 ms  ManagedIncrementalBuildPostProcessDependencyGraph   1 calls
+       15 ms  _CheckForInvalidConfigurationAndPlatform   1 calls
+       15 ms  ResolveAssemblyReferences                  1 calls
+       47 ms  InitializeBuildStatus                      1 calls
+       64 ms  ManagedIncrementalBuildPreProcessDependencyGraph   1 calls
+       83 ms  SetBuildDefaultEnvironmentVariables        1 calls
+      131 ms  MakeDirsForCl                              1 calls
+      221 ms  MetaGen                                    1 calls
+      263 ms  Manifest                                   1 calls
+     1004 ms  Link                                       1 calls
+     1882 ms  ClCompile                                  1 calls
+
+Task Performance Summary:
+        0 ms  AssignTargetPath                           5 calls
+        0 ms  ReadLinesFromFile                          1 calls
+        0 ms  Delete                                     1 calls
+        1 ms  AssignCulture                              1 calls
+        2 ms  WriteLinesToFile                           3 calls
+        2 ms  Message                                    3 calls
+        2 ms  MakeDir                                   10 calls
+        3 ms  SetEnv                                     4 calls
+        8 ms  MIBPostProcessDependencyGraph              1 calls
+       15 ms  ResolveAssemblyReference                   1 calls
+       45 ms  Touch                                      2 calls
+       64 ms  MIBPreProcessDependencyGraph               1 calls
+      220 ms  METAGEN                                    1 calls
+      262 ms  Mt                                         1 calls
+     1003 ms  Link                                       1 calls
+     1681 ms  CL                                         2 calls
+
+Build succeeded.
+
+Time Elapsed 00:00:03.73

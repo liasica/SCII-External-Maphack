@@ -1,0 +1,9 @@
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\BlackMagic_Source\BlackMagic\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\BlackMagic_Source\BlackMagic\bin\x86\Debug\BlackMagic.dll
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\BlackMagic_Source\BlackMagic\bin\x86\Debug\BlackMagic.pdb
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\BlackMagic_Source\BlackMagic\bin\x86\Debug\fasmdll_managed.dll
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\BlackMagic_Source\BlackMagic\bin\x86\Debug\fasmdll_managed.pdb
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\BlackMagic_Source\BlackMagic\obj\x86\Debug\BlackMagic.dll
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\BlackMagic_Source\BlackMagic\obj\x86\Debug\BlackMagic.pdb
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\bin\Debug\BlackMagic.dll
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\bin\Debug\BlackMagic.pdb

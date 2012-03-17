@@ -1,0 +1,5 @@
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\bin\Release\BlackMagic.dll
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\bin\Release\BlackMagic.pdb
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\BlackMagic_Source\BlackMagic\obj\x86\Release\ResolveAssemblyReference.cache
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\BlackMagic_Source\BlackMagic\obj\x86\Release\BlackMagic.dll
+C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\BlackMagic_Source\BlackMagic\obj\x86\Release\BlackMagic.pdb

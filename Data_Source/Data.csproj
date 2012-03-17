@@ -1,0 +1,451 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>8.0.30319</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7050E797-F628-46DA-9A76-8511BAE4184E}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon />
+    <AssemblyKeyContainerName />
+    <AssemblyName>Data</AssemblyName>
+    <AssemblyOriginatorKeyFile />
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Data</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject />
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <OldToolsVersion>0.0</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile />
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile />
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn />
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>..\bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile />
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile />
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn />
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <FileAlignment>4096</FileAlignment>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <BaseAddress>285212672</BaseAddress>
+    <Optimize>true</Optimize>
+    <FileAlignment>4096</FileAlignment>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
+    <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="mscorlib">
+      <Name>mscorlib</Name>
+      <HintPath>mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="PatternScan">
+      <Name>PatternScan</Name>
+      <HintPath>PatternScan.dll</HintPath>
+    </Reference>
+    <Reference Include="SC2RanksAPI">
+      <Name>SC2RanksAPI</Name>
+      <HintPath>SC2RanksAPI.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+      <HintPath>System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <Name>System.Core</Name>
+      <HintPath>System.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+      <HintPath>System.Drawing.dll</HintPath>
+    </Reference>
+    <Reference Include="System.XML" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Utilities">
+      <Name>Utilities</Name>
+      <HintPath>Utilities.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Data\Abil.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\AbilBuildable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\AbilQueue.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\AbilRally.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\AllianceId.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Beacon.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\build_grid_s.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\CameraDirection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\CameraMoveReason.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\CameraMoveType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\CameraPosition.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\CameraRotation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\CameraValue.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\camera_information_s.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\camera_s.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\MapData.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\MpqManager.cs" />
+    <Compile Include="Data\UnitIdToNameClasses.cs" />
+    <Compile Include="Data\ClassIdActor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\ClassIdValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\CmdAction.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\CmdFlags.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\CmdState.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\ControlGroup.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\control_group_s.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\CreepSpeed.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\DamageFatal.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\DamageKind.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\DamageType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\DataType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\DeathType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\EffectAmount.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\EffectLocation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\EffectPlayer.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\EffectUnit.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Environment.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\FlyerDisplay.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Game.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\GameData.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\GameOver.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\GameResult.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\GameSpeed.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\GameStatus.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\HeightMap.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Key.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\KeyModifierState.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Map.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\MapInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\map_information_s.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\MarkerMatch.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\MeleeOption.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\MouseButton.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\OrderQueue.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\OrderTarget.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Pathy.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Plane.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Player.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\PlayerColor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\PlayerDifficulty.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\PlayerGroup.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\PlayerProp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\PlayerSelections.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\PlayerStatus.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\PlayerType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\player_s.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\QueueItem.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Race.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\ResourceType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Scale.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\selected_units_s.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\SpendLocation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\start_locations_s.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\TargetFilter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\TeamColor.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\TechCount.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\Unit.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitAbilChargeCount.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitAbilStage.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitAlliance.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitAttribute.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitBehavior.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitCargo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitCost.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitCount.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitFlag.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitInventoryChange.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitInventoryCount.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitLastOrder.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitMoveState.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitProgressStage.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitProgressState.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitProgressType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitProp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitQueueProperty.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitQueueTime.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitState.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitStateOld.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitStatus.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitSubMoveState.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitTaunt.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitType.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\unit_button_s.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\unit_model_s.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\unit_s.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\VictoryStatus.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Data\UnitModelListTypes.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MpqTool_Source\MpqTool.csproj">
+      <Project>{976BC863-F142-4851-B78F-C59912893EC7}</Project>
+      <Name>MpqTool</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent />
+    <PostBuildEvent />
+  </PropertyGroup>
+</Project>
