@@ -12,10 +12,11 @@ namespace Data
 
 		public MpqManager(string mpqFile)
 		{
-			FileInfo info = new FileInfo(mpqFile);
-			string destFileName = Path.Combine(Path.GetTempPath(), info.Name);
-			File.Copy(mpqFile, destFileName, true);
-			this._mpqArchive = new Foole.Mpq.MpqArchive(destFileName);
+			//FileInfo info = new FileInfo(mpqFile);
+			//string destFileName = Path.Combine(Path.GetTempPath(), info.Name);
+			//File.Copy(mpqFile, destFileName, true);
+			//this._mpqArchive = new Foole.Mpq.MpqArchive(destFileName);
+			this._mpqArchive = new Foole.Mpq.MpqArchive(mpqFile);
 			this._mpqArchive.AddListfileFilenames();
 		}
 

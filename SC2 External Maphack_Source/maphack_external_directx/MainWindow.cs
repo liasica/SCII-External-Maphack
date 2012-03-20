@@ -101,7 +101,8 @@ namespace maphack_external_directx
 		private ToolStripLabel toolStripLabelStatus;
 		public static int total_units;
 
-		public static Dictionary<uint, int>[] unit_counts = new Dictionary<uint, int>[16];
+		public static Dictionary<string, int>[] unit_counts = new Dictionary<string, int>[16];
+		public static Dictionary<string, string> unit_pictures = new Dictionary<string, string>();
 
 		public static int[] unit_count_index = new int[] { 
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
@@ -380,7 +381,8 @@ namespace maphack_external_directx
 
 		public void GameStart()
 		{
-			//GameData.mapDat = new MapData(GameData.getMapData().mapInfo.filePath);
+			GameData.mapDat = new MapData(GameData.getMapData().mapInfo.filePath);
+			unit_pictures = new Dictionary<string, string>();
 			active_players = 0;
 			actual_players = 0;
 			this.UpdateMapSize();
@@ -457,22 +459,30 @@ namespace maphack_external_directx
 			List<Data.Player> source = GameData.getPlayersData();
 			if ((list.Count != 0) && (source.Count != 0))
 			{
-				Dictionary<uint, int>[] newUnitCounts = new Dictionary<uint, int>[16];
+				Dictionary<string, int>[] newUnitCounts = new Dictionary<string, int>[16];
 				for (int i = 0; i < newUnitCounts.Length; i++)
 				{
-					newUnitCounts[i] = new Dictionary<uint, int>();
+					newUnitCounts[i] = new Dictionary<string, int>();
 				}
 
 				total_units = list.Count;
 				foreach(Unit unit in list)
 				{
-					if (newUnitCounts[unit.playerNumber].ContainsKey((uint)unit.unitType))
+					if ((unit.targetFilterFlags & (TargetFilter.Missile | TargetFilter.Dead)) != 0)
+						continue;
+
+					if (!unit_pictures.ContainsKey(unit.textID))
 					{
-						newUnitCounts[unit.playerNumber][(uint)unit.unitType]++;
+						unit_pictures.Add(unit.textID, GameData.mapDat.GetUnitPictureFilename(unit.textID));
+					}
+
+					if (newUnitCounts[unit.playerNumber].ContainsKey(unit.textID))
+					{
+						newUnitCounts[unit.playerNumber][unit.textID]++;
 					}
 					else
 					{
-						newUnitCounts[unit.playerNumber].Add((uint)unit.unitType, 1);
+						newUnitCounts[unit.playerNumber].Add(unit.textID, 1);
 					}
 
 					if ((int)unit.unitType < unit_count_index.Length && unit_count_index[(int)unit.unitType] != -1)
@@ -487,6 +497,7 @@ namespace maphack_external_directx
 					}
 				}
 				unit_counter = numArray;
+				unit_counts = newUnitCounts;
 			}
 		}
 
@@ -768,7 +779,7 @@ namespace maphack_external_directx
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.Name = "MainWindow";
-			this.Text = "SCIIEMH v0.07";
+			this.Text = "SCIIEMH v0.08";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainWindow_FormClosed);
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewPlayerData)).EndInit();
 			this.toolStrip.ResumeLayout(false);

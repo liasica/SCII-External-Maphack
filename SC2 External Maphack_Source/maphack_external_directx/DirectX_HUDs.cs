@@ -584,9 +584,9 @@ namespace maphack_external_directx
 					{
 						this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), GameData.player_colors[i], false);
 						if (MoreMins)
-							this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, @"Assets\icon-highyieldmineral-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false);
+							this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-highyieldmineral-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
 						else
-							this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, @"Assets\icon-mineral-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false);
+							this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-mineral-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
 
 						//this.DrawRectangleOutline((float) x, (float) y, (float) resourceIconSize.Width, (float) resourceIconSize.Height, GameData.player_colors[i], false);
 						this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_minerals[i].ToString(), this.arial2, Color.White, false);
@@ -595,7 +595,7 @@ namespace maphack_external_directx
 					if (showGas)
 					{
 						this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), GameData.player_colors[i], false);
-						this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, @"Assets\icon-gas-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false);
+						this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-gas-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
 						//this.DrawRectangleOutline((float) x, (float) y, (float) resourceIconSize.Width, (float) resourceIconSize.Height, GameData.player_colors[i], false);
 						this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_vespene[i].ToString(), this.arial2, Color.White, false);
 						x += resouceColumnWidth + f2;
@@ -603,7 +603,7 @@ namespace maphack_external_directx
 					if (showTerrazine)
 					{
 						this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), GameData.player_colors[i], false);
-						this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, @"Assets\icon-energy-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false);
+						this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-energy-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
 						//this.DrawRectangleOutline((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, GameData.player_colors[i], false);
 						this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_terrazine[i].ToString(), this.arial2, Color.White, false);
 						x += resouceColumnWidth + f2;
@@ -611,7 +611,7 @@ namespace maphack_external_directx
 					if (showCustom)
 					{
 						this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), GameData.player_colors[i], false);
-						this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, @"Assets\icon-health-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false);
+						this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-health-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
 						//this.DrawRectangleOutline((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, GameData.player_colors[i], false);
 						this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_custom_resource[i].ToString(), this.arial2, Color.White, false);
 						x += resouceColumnWidth + f2;
@@ -619,7 +619,7 @@ namespace maphack_external_directx
 					if (showSupply)
 					{
 						this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), GameData.player_colors[i], false);
-						this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, @"Assets\icon-supply-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false);
+						this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-supply-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
 						//this.DrawRectangleOutline((float) x, (float) y, (float) resourceIconSize.Width, (float) resourceIconSize.Height, GameData.player_colors[i], false);
 						this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_supply[i], this.arial2, Color.White, false);
 					}
@@ -629,6 +629,69 @@ namespace maphack_external_directx
 		}
 
 		private void DrawPlayerUnitData(UnitDrawStyle drawStyle, int row, int p_no)
+		{
+			int num3 = 0;
+			int num4 = 0;
+			if (MainWindow.unit_counts == null || p_no < 0 || p_no >= MainWindow.unit_counts.Length)
+				return;
+
+
+			foreach(KeyValuePair<string, int> pair in MainWindow.unit_counts[p_no])
+			{
+				string picture = "";
+				if (pair.Value > 0 && MainWindow.unit_pictures.ContainsKey(pair.Key) && (picture = Database.GetItemFilename(MainWindow.unit_pictures[pair.Key], false)) != "")
+				{
+					
+					int count = pair.Value;
+					switch (CurrentObserverPanelTab)
+					{
+						case ObserverPanelTabs.Buildings_and_Units_Same_Line:
+						{
+							if (picture.Contains("building") || !picture.Contains("building"))
+							{
+								this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, observerPlayerLogoWidth, observerPlayerLogoHeight);
+							}
+							continue;
+						}
+						case ObserverPanelTabs.Buildings_and_Units_Different_Lines:
+						{
+							if (!picture.Contains("building"))
+							{
+								goto Label_0128;
+							}
+							this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, observerPlayerLogoWidth, observerPlayerLogoHeight);
+							continue;
+						}
+						case ObserverPanelTabs.Buildings:
+						{
+							if (picture.Contains("building"))
+							{
+								this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, observerPlayerLogoWidth, observerPlayerLogoHeight);
+							}
+							continue;
+						}
+						case ObserverPanelTabs.Units:
+						{
+							if (!picture.Contains("building"))
+							{
+								this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, observerPlayerLogoWidth, observerPlayerLogoHeight);
+							}
+							continue;
+						}
+					}
+
+					Label_0128:
+					if (!picture.Contains("building"))
+					{
+						this.DrawPlayerWindowIndividualUnit(drawStyle, row + 1, num4++, p_no, count, picture, observerPlayerLogoWidth, observerPlayerLogoHeight);
+					}
+				}
+				continue;
+			
+			}
+		}
+
+		/*private void DrawPlayerUnitData(UnitDrawStyle drawStyle, int row, int p_no)
 		{
 			int length = this.indexofindex.Length;
 			int num3 = 0;
@@ -692,9 +755,9 @@ namespace maphack_external_directx
 					this.DrawPlayerWindowIndividualUnit(drawStyle, row + 1, num4++, p_no, num2, observerPlayerLogoWidth, observerPlayerLogoHeight);
 				}
 			}
-		}
+		}*/
 
-		private void DrawPlayerWindowIndividualUnit(UnitDrawStyle drawStyle, int row, int column, int p_no, int unit_index, int width, int height)
+		private void DrawPlayerWindowIndividualUnit(UnitDrawStyle drawStyle, int row, int column, int p_no, int unit_count, string picture_filename, int width, int height)
 		{
 			if (drawStyle == UnitDrawStyle.ObserverPanel)
 			{
@@ -714,13 +777,13 @@ namespace maphack_external_directx
 				}
 				this.DrawRectangle((float) num, (float) num2, (float) width, (float) height, Color.Black, false);
 				this.DrawRectangleOutline((float) num, (float) num2, (float) width, (float) height, Color.DarkGreen, false);
-				this.DrawTexture((float) num, (float) num2, (float) width, (float) height, this.unit_textures[unit_index].Key, false);
+				this.DrawTexture((float) num, (float) num2, (float) width, (float) height, picture_filename, false);
 				if (!this.fonts.ContainsKey(this.arial2.GetHashCode()))
 				{
 					this.fonts.Add(this.arial2.GetHashCode(), new Microsoft.DirectX.Direct3D.Font(this.device, this.arial2));
 				}
-				Rectangle rectangle = this.fonts[this.arial2.GetHashCode()].MeasureString(this.textSprite, MainWindow.unit_counter[p_no, unit_index].ToString(), DrawTextFormat.None, Color.White);
-				this.DrawText((num + width) - rectangle.Width, (num2 + height) - rectangle.Height, MainWindow.unit_counter[p_no, unit_index].ToString(), this.arial2, Color.White, false);
+				Rectangle rectangle = this.fonts[this.arial2.GetHashCode()].MeasureString(this.textSprite, unit_count.ToString(), DrawTextFormat.None, Color.White);
+				this.DrawText((num + width) - rectangle.Width, (num2 + height) - rectangle.Height, unit_count.ToString(), this.arial2, Color.White, false);
 			}
 		}
 

@@ -117,21 +117,21 @@ namespace Data
 		string _FileName;
 		List<Dependency> _Dependencies;
 		Dictionary<string, DataFile> _RawDataFiles;
-		Dictionary<string, DataFile> _ProcessedDataFiles;
+		Dictionary<string, List<DataFile>> _ProcessedDataFiles;
 
-		string FileName
+		public string FileName
 		{
 			get { return _FileName; }
 		}
-		List<Dependency> Dependencies
+		public List<Dependency> Dependencies
 		{
 			get { return _Dependencies; }
 		}
-		Dictionary<string, DataFile> RawDataFiles
+		public Dictionary<string, DataFile> RawDataFiles
 		{
 			get { return _RawDataFiles; }
 		}
-		Dictionary<string, DataFile> ProcessedDataFiles
+		public Dictionary<string, List<DataFile>> ProcessedDataFiles
 		{
 			get { return _ProcessedDataFiles; }
 		}
@@ -139,7 +139,7 @@ namespace Data
 		public MapData()
 		{
 			_RawDataFiles = new Dictionary<string, DataFile>();
-			_ProcessedDataFiles = new Dictionary<string, DataFile>();
+			_ProcessedDataFiles = new Dictionary<string, List<DataFile>>();
 			_Dependencies = new List<Dependency>();
 			_FileName = "";
 		}
@@ -172,25 +172,26 @@ namespace Data
 			}
 
 			manager.Close();
-
-			foreach (Dependency dependency in _Dependencies)
-			{
-				foreach (KeyValuePair<string, DataFile> dataFile in dependency.DataFiles)
-				{
-					if (!_ProcessedDataFiles.ContainsKey(dataFile.Key))
-						_ProcessedDataFiles.Add(dataFile.Key, dataFile.Value);
-					else
-						_ProcessedDataFiles[dataFile.Key] = MergeData(_ProcessedDataFiles[dataFile.Key], dataFile.Value);
-				}
-			}
-
 			foreach (KeyValuePair<string, DataFile> dataFile in _RawDataFiles)
 			{
 				if (!_ProcessedDataFiles.ContainsKey(dataFile.Key))
-					_ProcessedDataFiles.Add(dataFile.Key, dataFile.Value);
-				else
-					_ProcessedDataFiles[dataFile.Key] = MergeData(_ProcessedDataFiles[dataFile.Key], dataFile.Value);
+					_ProcessedDataFiles.Add(dataFile.Key, new List<DataFile>());
+
+				_ProcessedDataFiles[dataFile.Key].Add(dataFile.Value);
 			}
+
+			for(int i = _Dependencies.Count - 1; i >= 0; i--)
+			{
+				foreach (KeyValuePair<string, DataFile> dataFile in _Dependencies[i].DataFiles)
+				{
+					if (!_ProcessedDataFiles.ContainsKey(dataFile.Key))
+						_ProcessedDataFiles.Add(dataFile.Key, new List<DataFile>());
+
+					_ProcessedDataFiles[dataFile.Key].Add(dataFile.Value);
+				}
+			}
+
+			
 		}
 
 		private static bool SameElement(XElement a, XElement b, bool checkAttributeValues)
@@ -262,22 +263,39 @@ namespace Data
 		
 		public string GetUnitPictureFilename(string unit)
 		{
+			string parent = "";
+			string id = "";
 			if (_ProcessedDataFiles.ContainsKey("ActorData"))
 			{
-				foreach (XElement element in _ProcessedDataFiles["ActorData"].Data)
+				foreach (DataFile dataFile in _ProcessedDataFiles["ActorData"])
 				{
-					if (element.Name == "CActorUnit" && element.HasAttributes && element.Attribute("unitName") != null && element.Attribute("unitName").Value == unit)
+					foreach (XElement element in dataFile.Data)
 					{
-						if (element.HasElements && element.Element("UnitIcon") != null && element.Element("UnitIcon").HasAttributes && element.Element("UnitIcon").Attribute("value") != null)
-							return element.Element("UnitIcon").Attribute("value").Value;
-						/*else if (element.HasElements && element.Element("GroupIcon") != null && element.Element("GroupIcon").HasElements && element.Element("GroupIcon").Element("Image") != null)
+						if (element.Name == "CActorUnit" && element.HasAttributes 
+							&& (id != "" && element.Attribute("id") != null && element.Attribute("id").Value == id
+							|| element.Attribute("unitName") != null && element.Attribute("unitName").Value == unit))
 						{
-							if (element.Element("GroupIcon").Element("Image").HasAttributes && element.Element("GroupIcon").Element("Image").Attribute("value") != null)
-								return element.Element("GroupIcon").Element("Image").Attribute("value").Value;
-						}*/
+							if (id == "" && element.Attribute("id") != null)
+								id = element.Attribute("id").Value;
+
+							if (parent == "" && element.Attribute("parent") != null)
+								parent = element.Attribute("parent").Value;
+
+							if (element.HasElements && element.Element("UnitIcon") != null && element.Element("UnitIcon").HasAttributes && element.Element("UnitIcon").Attribute("value") != null)
+								return element.Element("UnitIcon").Attribute("value").Value;
+							/*else if (element.HasElements && element.Element("GroupIcon") != null && element.Element("GroupIcon").HasElements && element.Element("GroupIcon").Element("Image") != null)
+							{
+								if (element.Element("GroupIcon").Element("Image").HasAttributes && element.Element("GroupIcon").Element("Image").Attribute("value") != null)
+									return element.Element("GroupIcon").Element("Image").Attribute("value").Value;
+							}*/
+						}
 					}
 				}
 			}
+
+			if (parent != "")
+				return GetUnitPictureFilename(parent);
+
 			return "Assets\\Textures\\btn-missing-kaeo.dds";
 		}
 	}

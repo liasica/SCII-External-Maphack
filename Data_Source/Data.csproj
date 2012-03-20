@@ -169,6 +169,7 @@
     <Compile Include="Data\camera_s.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Data\Database.cs" />
     <Compile Include="Data\MapData.cs">
       <SubType>Code</SubType>
     </Compile>
