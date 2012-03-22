@@ -173,9 +173,9 @@ namespace Data
 			p.unitsLost = (int) _s.units_lost;
 			p.buildingQueueLength = (int) _s.building_queue_length;
 			p.slotNumber = (int) _s.slot_number;
-			p.supply = (int) (_s.supply_current >> 12);
-			p.supplyCap = (int) (_s.supply_cap >> 12);
-			p.supplyLimit = (int) (_s.supply_limit >> 12);
+			p.supply = _s.supply_current / 4096f;
+			p.supplyCap = _s.supply_cap / 4096f;
+			p.supplyLimit = _s.supply_limit / 4096f;
 			uint num = (uint) mem.ReadMemory((uint) (_s.racePointer + 4), typeof(uint));
 			mem.ReadMemory((uint) (num + 8), 4, out buffer);
 			if (buffer[0] == 0)
@@ -362,6 +362,7 @@ namespace Data
 			unit_model_s ums = (unit_model_s)mem.ReadMemory((uint) (us.unit_model << 5), typeof(unit_model_s));
 
 			string NameAsText = null;
+			string UINameAsText = null;
 			if (ums.pName_address != 0)
 			{
 				uint NameDataAddress = (uint)mem.ReadMemory(ums.pName_address, typeof(uint));
@@ -371,13 +372,34 @@ namespace Data
 					byte[] NameAsBytes = new byte[NameLength];
 					mem.ReadMemory((IntPtr)NameDataAddress + 0x24, (int)NameLength, out NameAsBytes);
 					NameAsText = System.Text.Encoding.UTF8.GetString(NameAsBytes).Remove(0, 10);
+
+					uint pUINameAddress = (uint)mem.ReadMemory(NameDataAddress + 0x1c, typeof(uint));
+					if (pUINameAddress != 0)
+					{
+						uint UINameLength = (uint)mem.ReadMemory(pUINameAddress + 0x8, typeof(uint));
+						uint UINameAddress = pUINameAddress + 0x10;
+
+						if ((uint)mem.ReadMemory(pUINameAddress + 0xc, typeof(uint)) != 0x43) //sometimes the string is right in this struct, other times it's a pointer.
+							UINameAddress = (uint)mem.ReadMemory(pUINameAddress + 0x10, typeof(uint));
+
+						if (UINameAddress != 0 && UINameLength > 0)
+						{
+							byte[] UINameAsBytes = new byte[UINameLength];
+							mem.ReadMemory((IntPtr)UINameAddress, (int)UINameLength, out UINameAsBytes);
+							UINameAsText = System.Text.Encoding.UTF8.GetString(UINameAsBytes);
+						}
+					}
+
 				}
 			}
 			if (NameAsText == null)
 				NameAsText = string.Empty;
+			if (UINameAsText == null)
+				UINameAsText = string.Empty;
 
 
 			Unit unit = new Unit { 
+				name = UINameAsText,
 				textID = NameAsText,
 				minimapRadius = (float)ums.minimap_radius / 4096f,
 				timeScale = us.time_scale / 4096f,
@@ -440,6 +462,9 @@ namespace Data
 				memoryLocation = StructStarts.Units + ((uint) StructSizes.Units * (us.token / 4u)),
 				commandQueuePointer = us.commandQueue_pointer
 			 };
+			if (unit.textID.Contains("Beacon"))
+			{
+			}
 
 			return unit;
 		}

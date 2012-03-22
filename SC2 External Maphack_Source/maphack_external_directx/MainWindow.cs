@@ -23,7 +23,9 @@ namespace maphack_external_directx
 		public static int active_players = 0;
 		public static byte[] actual_player = new byte[0x10];
 		public static byte actual_players = 0;
+
 		public static List<Unit> units = new List<Unit>();
+		public static List<Player> players = new List<Player>();
 		private ToolStripButton btnOptions;
 		private IContainer components;
 		private ContextMenuStrip contextMenuStrip;
@@ -103,6 +105,7 @@ namespace maphack_external_directx
 
 		public static Dictionary<string, int>[] unit_counts = new Dictionary<string, int>[16];
 		public static Dictionary<string, string> unit_pictures = new Dictionary<string, string>();
+		public static Dictionary<string, string> unit_names = new Dictionary<string, string>();
 
 		public static int[] unit_count_index = new int[] { 
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
@@ -383,6 +386,7 @@ namespace maphack_external_directx
 		{
 			GameData.mapDat = new MapData(GameData.getMapData().mapInfo.filePath);
 			unit_pictures = new Dictionary<string, string>();
+			unit_names = new Dictionary<string, string>();
 			active_players = 0;
 			actual_players = 0;
 			this.UpdateMapSize();
@@ -447,6 +451,7 @@ namespace maphack_external_directx
 				}
 			}
 			active_players = num;
+			players = list;
 		}
 
 		private void GetUnits()
@@ -468,12 +473,17 @@ namespace maphack_external_directx
 				total_units = list.Count;
 				foreach(Unit unit in list)
 				{
-					if ((unit.targetFilterFlags & (TargetFilter.Missile | TargetFilter.Dead)) != 0)
+					if ((unit.targetFilterFlags & (TargetFilter.Missile | TargetFilter.Dead | TargetFilter.Hidden)) != 0)
 						continue;
 
 					if (!unit_pictures.ContainsKey(unit.textID))
 					{
 						unit_pictures.Add(unit.textID, GameData.mapDat.GetUnitPictureFilename(unit.textID));
+					}
+					
+					if (!unit_names.ContainsKey(unit.textID))
+					{
+						unit_names.Add(unit.textID, unit.name);
 					}
 
 					if (newUnitCounts[unit.playerNumber].ContainsKey(unit.textID))
@@ -779,7 +789,7 @@ namespace maphack_external_directx
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.Name = "MainWindow";
-			this.Text = "SCIIEMH v0.08";
+			this.Text = "SCIIEMH v0.09";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainWindow_FormClosed);
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewPlayerData)).EndInit();
 			this.toolStrip.ResumeLayout(false);

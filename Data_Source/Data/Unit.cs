@@ -61,6 +61,7 @@ namespace Data
 		public int trueCostOfProduction;
 
 		public string textID;
+		public string name;
 		public float minimapRadius;
 
 		public override string ToString()

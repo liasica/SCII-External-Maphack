@@ -21,7 +21,7 @@ namespace Data
 		public int nameLength;
 		public string rank_texture;
 		public int slotNumber;
-		public int apmCurrent;
+		public float apmCurrent;
 		public int actionsTotal;
 		public int unitsKilled;
 		public int unitsLost;
@@ -58,17 +58,17 @@ namespace Data
 		public int armyVespeneWorth2;
 		public int technologyMineralWorth2;
 		public int technologyVespeneWorth2;
-		public int supply;
-		public int supplyCap;
-		public int supplyLimit;
+		public float supply;
+		public float supplyCap;
+		public float supplyLimit;
 		public int unitCount;
 		public int team;
 		public PlayerType playerType;
-		public int cameraX;
-		public int cameraY;
-		public int cameraDistance;
-		public int cameraPitch;
-		public int cameraRotation;
+		public float cameraX;
+		public float cameraY;
+		public float cameraDistance;
+		public float cameraPitch;
+		public float cameraRotation;
 
 		public override string ToString()
 		{

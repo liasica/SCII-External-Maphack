@@ -246,13 +246,6 @@ namespace MpqTool
 
         private void Run(string[] args)
         {
-            if (args.Length < 1)
-            {
-				args = new string[2];
-				args[0] = "-l";
-				args[1] = "battlecraft.sc2map";
-                //throw new ArgumentException(this.BuildUsage());
-            }
             string str = args[0].ToLower();
             if (str != null)
             {

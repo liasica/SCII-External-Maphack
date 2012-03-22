@@ -23,6 +23,8 @@ namespace maphack_external_directx
 
 	public class DirectX_HUDs : Form
 	{
+		private List<KeyValuePair<Rectangle, string>> Tooltips = new List<KeyValuePair<Rectangle, string>>();
+
 		private HUDType _HUDType;
 		private List<Abil> abilities = new List<Abil>();
 		private System.Drawing.Font arial = new System.Drawing.Font("Arial", 12f, FontStyle.Bold);
@@ -193,7 +195,7 @@ namespace maphack_external_directx
 			this._HUDType = hudType;
 			this.initWindow();
 			this.initDirectX();
-			this.initVariables();			
+			this.initVariables();
 			this.initFrame();
 			this.LoadSettings();
 
@@ -235,8 +237,8 @@ namespace maphack_external_directx
 
 			this.tmrRefreshRate.Interval = MainWindow.HUDRefreshRate;
 			this.tmrRefreshRate.Enabled = true;
-			
-			
+
+
 		}
 
 		private void DirectX_HUDs_FormClosed(object sender, FormClosedEventArgs e)
@@ -269,7 +271,7 @@ namespace maphack_external_directx
 		private void DirectX_HUDs_Shown(object sender, EventArgs e)
 		{
 			this.frame.Show();
-			if(this._HUDType != HUDType.Map)
+			if (this._HUDType != HUDType.Map)
 				this.frame.loadHUDLocation();
 		}
 
@@ -334,9 +336,9 @@ namespace maphack_external_directx
 				x = (x - MainWindow.playable_map_left) * MainWindow.minimap_scale + MainWindow.minimap_offset_x;
 				y = (y - (MainWindow.map_height - MainWindow.playable_map_top)) * MainWindow.minimap_scale + MainWindow.minimap_offset_y;
 			}
-			int num3 = (int) w;
-			int num4 = (int) h;
-			int num5 = (int) (10f * (w / h));
+			int num3 = (int)w;
+			int num4 = (int)h;
+			int num5 = (int)(10f * (w / h));
 			this.device.VertexFormat = VertexFormats.Diffuse | VertexFormats.Transformed;
 			CustomVertex.TransformedColored[] vertexStreamZeroData = new CustomVertex.TransformedColored[] { new CustomVertex.TransformedColored(x - num5, y, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored((x + num3) + num5, y, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored((x + num3) + num5, y, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x + num3, y + num4, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x + num3, y + num4, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x, y + num4, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x, y + num4, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x - num5, y, 0f, 0f, col.ToArgb()) };
 			this.device.DrawUserPrimitives(PrimitiveType.LineList, 4, vertexStreamZeroData);
@@ -375,7 +377,7 @@ namespace maphack_external_directx
 				int num3 = i / mapFullWidth;
 				int num4 = i - (num3 * mapFullWidth);
 				int num5 = 4;
-				this.DrawRectangle((float) (num4 * num5), (float) ((base.Height - num5) - (num3 * num5)), (float) num5, (float) num5, pink, true);
+				this.DrawRectangle((float)(num4 * num5), (float)((base.Height - num5) - (num3 * num5)), (float)num5, (float)num5, pink, true);
 			}
 			this.pause = true;
 		}
@@ -395,7 +397,7 @@ namespace maphack_external_directx
 				int num3 = (i / 2) / mapFullWidth;
 				int num4 = (i / 2) - (num3 * mapFullWidth);
 				int num5 = 4;
-				this.DrawRectangle((float) (num4 * num5), (float) ((base.Height - num5) - (num3 * num5)), (float) num5, (float) num5, col, true);
+				this.DrawRectangle((float)(num4 * num5), (float)((base.Height - num5) - (num3 * num5)), (float)num5, (float)num5, col, true);
 			}
 			this.pause = true;
 		}
@@ -477,13 +479,13 @@ namespace maphack_external_directx
 				int column = (i / 2) % mapFullWidth;
 				heights[column, row] = new { x = column, y = row, h = color.R };
 			}
-			
+
 			for (int j = 1; j < (mapFullWidth - 1); j++)
 			{
 				for (int k = 1; k < (mapFullHeight - 1); k++)
 				{
 					dynamic baseCell = heights[j, k];
-					
+
 					if (baseCell.h % 64 != 0)
 					{
 						this.DrawRectangle(baseCell.x * scale, (base.Height - scale) - (baseCell.y * scale), scale, scale, Color.Blue);
@@ -568,7 +570,7 @@ namespace maphack_external_directx
 				{
 					int x = f;
 					int y = (index * (resourceIconSize.Height + f2)) + f;
-					int textY = (int) (y + (resourceIconSize.Height - this.arial2.GetHeight()) / 2);
+					int textY = (int)(y + (resourceIconSize.Height - this.arial2.GetHeight()) / 2);
 
 					bool MoreMins = true;
 					for (int j = 0; j < 16; j++)
@@ -590,6 +592,7 @@ namespace maphack_external_directx
 
 						//this.DrawRectangleOutline((float) x, (float) y, (float) resourceIconSize.Width, (float) resourceIconSize.Height, GameData.player_colors[i], false);
 						this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_minerals[i].ToString(), this.arial2, Color.White, false);
+						this.Tooltips.Add(new KeyValuePair<Rectangle,string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), MainWindow.players[i].name + "'s minerals: " + MainWindow.player_minerals[i].ToString()));
 						x += resouceColumnWidth + f2;
 					}
 					if (showGas)
@@ -598,6 +601,7 @@ namespace maphack_external_directx
 						this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-gas-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
 						//this.DrawRectangleOutline((float) x, (float) y, (float) resourceIconSize.Width, (float) resourceIconSize.Height, GameData.player_colors[i], false);
 						this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_vespene[i].ToString(), this.arial2, Color.White, false);
+						this.Tooltips.Add(new KeyValuePair<Rectangle,string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), MainWindow.players[i].name + "'s vespene: " + MainWindow.player_vespene[i].ToString()));
 						x += resouceColumnWidth + f2;
 					}
 					if (showTerrazine)
@@ -606,6 +610,7 @@ namespace maphack_external_directx
 						this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-energy-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
 						//this.DrawRectangleOutline((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, GameData.player_colors[i], false);
 						this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_terrazine[i].ToString(), this.arial2, Color.White, false);
+						this.Tooltips.Add(new KeyValuePair<Rectangle,string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), MainWindow.players[i].name + "'s terrazine: " + MainWindow.player_terrazine[i].ToString()));
 						x += resouceColumnWidth + f2;
 					}
 					if (showCustom)
@@ -614,6 +619,7 @@ namespace maphack_external_directx
 						this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-health-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
 						//this.DrawRectangleOutline((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, GameData.player_colors[i], false);
 						this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_custom_resource[i].ToString(), this.arial2, Color.White, false);
+						this.Tooltips.Add(new KeyValuePair<Rectangle,string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), MainWindow.players[i].name + "'s custom: " + MainWindow.player_custom_resource[i].ToString()));
 						x += resouceColumnWidth + f2;
 					}
 					if (showSupply)
@@ -622,6 +628,7 @@ namespace maphack_external_directx
 						this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-supply-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
 						//this.DrawRectangleOutline((float) x, (float) y, (float) resourceIconSize.Width, (float) resourceIconSize.Height, GameData.player_colors[i], false);
 						this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_supply[i], this.arial2, Color.White, false);
+						this.Tooltips.Add(new KeyValuePair<Rectangle,string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), MainWindow.players[i].name + "'s supply: " + MainWindow.player_supply[i]));
 					}
 					index++;
 				}
@@ -636,58 +643,59 @@ namespace maphack_external_directx
 				return;
 
 
-			foreach(KeyValuePair<string, int> pair in MainWindow.unit_counts[p_no])
+			foreach (KeyValuePair<string, int> pair in MainWindow.unit_counts[p_no])
 			{
 				string picture = "";
+				string tooltip = "";
 				if (pair.Value > 0 && MainWindow.unit_pictures.ContainsKey(pair.Key) && (picture = Database.GetItemFilename(MainWindow.unit_pictures[pair.Key], false)) != "")
 				{
-					
+					tooltip = MainWindow.unit_names[pair.Key];
 					int count = pair.Value;
 					switch (CurrentObserverPanelTab)
 					{
 						case ObserverPanelTabs.Buildings_and_Units_Same_Line:
-						{
-							if (picture.Contains("building") || !picture.Contains("building"))
 							{
-								this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, observerPlayerLogoWidth, observerPlayerLogoHeight);
+								if (picture.Contains("building") || !picture.Contains("building"))
+								{
+									this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
+								}
+								continue;
 							}
-							continue;
-						}
 						case ObserverPanelTabs.Buildings_and_Units_Different_Lines:
-						{
-							if (!picture.Contains("building"))
 							{
-								goto Label_0128;
+								if (!picture.Contains("building"))
+								{
+									goto Label_0128;
+								}
+								this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
+								continue;
 							}
-							this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, observerPlayerLogoWidth, observerPlayerLogoHeight);
-							continue;
-						}
 						case ObserverPanelTabs.Buildings:
-						{
-							if (picture.Contains("building"))
 							{
-								this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, observerPlayerLogoWidth, observerPlayerLogoHeight);
+								if (picture.Contains("building"))
+								{
+									this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
+								}
+								continue;
 							}
-							continue;
-						}
 						case ObserverPanelTabs.Units:
-						{
-							if (!picture.Contains("building"))
 							{
-								this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, observerPlayerLogoWidth, observerPlayerLogoHeight);
+								if (!picture.Contains("building"))
+								{
+									this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
+								}
+								continue;
 							}
-							continue;
-						}
 					}
 
-					Label_0128:
+				Label_0128:
 					if (!picture.Contains("building"))
 					{
-						this.DrawPlayerWindowIndividualUnit(drawStyle, row + 1, num4++, p_no, count, picture, observerPlayerLogoWidth, observerPlayerLogoHeight);
+						this.DrawPlayerWindowIndividualUnit(drawStyle, row + 1, num4++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
 					}
 				}
 				continue;
-			
+
 			}
 		}
 
@@ -757,7 +765,7 @@ namespace maphack_external_directx
 			}
 		}*/
 
-		private void DrawPlayerWindowIndividualUnit(UnitDrawStyle drawStyle, int row, int column, int p_no, int unit_count, string picture_filename, int width, int height)
+		private void DrawPlayerWindowIndividualUnit(UnitDrawStyle drawStyle, int row, int column, int p_no, int unit_count, string picture_filename, string tooltip, int width, int height)
 		{
 			if (drawStyle == UnitDrawStyle.ObserverPanel)
 			{
@@ -775,9 +783,11 @@ namespace maphack_external_directx
 						num2 = row * height;
 						break;
 				}
-				this.DrawRectangle((float) num, (float) num2, (float) width, (float) height, Color.Black, false);
-				this.DrawRectangleOutline((float) num, (float) num2, (float) width, (float) height, Color.DarkGreen, false);
-				this.DrawTexture((float) num, (float) num2, (float) width, (float) height, picture_filename, false);
+				this.Tooltips.Add(new KeyValuePair<Rectangle, string>(new Rectangle(num, num2, width, height), tooltip));
+
+				this.DrawRectangle((float)num, (float)num2, (float)width, (float)height, Color.Black, false);
+				this.DrawRectangleOutline((float)num, (float)num2, (float)width, (float)height, Color.DarkGreen, false);
+				this.DrawTexture((float)num, (float)num2, (float)width, (float)height, picture_filename, false);
 				if (!this.fonts.ContainsKey(this.arial2.GetHashCode()))
 				{
 					this.fonts.Add(this.arial2.GetHashCode(), new Microsoft.DirectX.Direct3D.Font(this.device, this.arial2));
@@ -804,7 +814,7 @@ namespace maphack_external_directx
 			{
 				if (MainWindow.show_window[index])
 				{
-					Data.Player player = GameData.GetPlayer((uint) index);
+					Data.Player player = GameData.GetPlayer((uint)index);
 					int row = num2++;
 					if (CurrentObserverPanelTab == ObserverPanelTabs.Buildings_and_Units_Different_Lines)
 					{
@@ -824,16 +834,34 @@ namespace maphack_external_directx
 							num5 = row * observerPlayerLogoHeight;
 							break;
 					}
-					this.DrawRectangle((float) num4, (float) num5, (float) observerPlayerLogoWidth, (float) observerPlayerLogoHeight, player.drawingColor, false);
-					this.DrawRectangle((float) (num4 + 2), (float) (num5 + 2), (float) (observerPlayerLogoWidth - 4), (float) (observerPlayerLogoHeight - 4), black, false);
+					this.DrawRectangle((float)num4, (float)num5, (float)observerPlayerLogoWidth, (float)observerPlayerLogoHeight, player.drawingColor, false);
+					this.DrawRectangle((float)(num4 + 2), (float)(num5 + 2), (float)(observerPlayerLogoWidth - 4), (float)(observerPlayerLogoHeight - 4), black, false);
 					if (this.drawRanks && (MainWindow.rank_textures[index] != null))
 					{
-						this.DrawTexture((float) num4, (float) num5, (float) observerPlayerLogoWidth, (float) observerPlayerLogoHeight, MainWindow.rank_textures[index], false);
+						this.DrawTexture((float)num4, (float)num5, (float)observerPlayerLogoWidth, (float)observerPlayerLogoHeight, MainWindow.rank_textures[index], false);
 					}
+					this.Tooltips.Add(new KeyValuePair<Rectangle,string>(new Rectangle(num4, num5, observerPlayerLogoWidth, observerPlayerLogoHeight), player.name + " (" + player.number + ")"));
+
 					this.DrawPlayerUnitData(UnitDrawStyle.ObserverPanel, row, index);
 				}
 				index++;
 			}
+			
+		}
+
+		private void DrawTooltip(string Text, int X, int Y)
+		{
+			int BorderSize = 2;
+
+			if (!this.fonts.ContainsKey(this.arial2.GetHashCode()))
+			{
+				this.fonts.Add(this.arial2.GetHashCode(), new Microsoft.DirectX.Direct3D.Font(this.device, this.arial2));
+			}
+			Rectangle rectangle = this.fonts[this.arial2.GetHashCode()].MeasureString(this.textSprite, Text, DrawTextFormat.None, Color.White);
+
+			this.DrawRectangle(X, Y - (rectangle.Height + BorderSize * 2), rectangle.Width + BorderSize * 4, rectangle.Height + BorderSize * 2, Color.Black, false, false, 0);
+			this.DrawRectangleOutline(X, Y - (rectangle.Height + BorderSize * 2), rectangle.Width + BorderSize * 4, rectangle.Height + BorderSize * 2, Color.DarkGray, false, false, 0);
+			this.DrawText(X + BorderSize * 2, Y - (rectangle.Height + BorderSize), Text, this.arial2, Color.White, false);
 		}
 
 		private void drawRamps()
@@ -853,7 +881,7 @@ namespace maphack_external_directx
 					int num3 = (i / 2) / mapFullWidth;
 					int num4 = (i / 2) - (num3 * mapFullWidth);
 					int num5 = 4;
-					this.DrawRectangle((float) (num4 * num5), (float) ((base.Height - num5) - (num3 * num5)), (float) num5, (float) num5, col, true);
+					this.DrawRectangle((float)(num4 * num5), (float)((base.Height - num5) - (num3 * num5)), (float)num5, (float)num5, col, true);
 				}
 			}
 			this.pause = true;
@@ -864,7 +892,7 @@ namespace maphack_external_directx
 			if (SizeRatio == null)
 				SizeRatio = PositionRatio;
 
-			if((bool) SizeRatio)
+			if ((bool)SizeRatio)
 			{
 				width *= MainWindow.minimap_scale;
 				height *= MainWindow.minimap_scale;
@@ -969,37 +997,51 @@ namespace maphack_external_directx
 
 		private void DrawStuff()
 		{
+			this.Tooltips = new List<KeyValuePair<Rectangle, string>>();
 			if (GameData.SC2Opened)
 			{
 				switch (this._HUDType)
 				{
 					case HUDType.Map:
 						this.DrawMap();
-						return;
+						break;
 
 					case HUDType.Observer:
 						this.DrawPlayerWindows();
-						return;
+						break;
 
 					case HUDType.Resources:
 						this.drawPlayerResources();
-						return;
+						break;
 
 					case HUDType.CellFlags:
 						this.drawCellFlags();
-						return;
+						break;
 
 					case HUDType.CliffLevel:
 						this.drawCliffLevel();
-						return;
+						break;
 
 					case HUDType.Ramps:
 						this.drawRamps();
-						return;
+						break;
 
 					case HUDType.PerimeterWithRamp:
 						this.drawPerimeterWithRamps();
-						return;
+						break;
+				}
+				if (RectangleToScreen(this.ClientRectangle).Contains(Cursor.Position))
+				{
+					Point ClientMousePos = PointToClient(Cursor.Position);
+
+					foreach (KeyValuePair<Rectangle, string> pair in this.Tooltips)
+					{
+						if (pair.Key.Contains(ClientMousePos))
+						{
+							DrawTooltip(pair.Value, ClientMousePos.X, ClientMousePos.Y);
+							break;
+						}
+					}
 				}
 			}
 		}
@@ -1008,10 +1050,10 @@ namespace maphack_external_directx
 		{
 			if (PositionRatio)
 			{
-				float num = ((float) base.ClientRectangle.Width) / MainWindow.map_width;
-				float num2 = ((float) base.ClientRectangle.Height) / MainWindow.map_height;
-				x = (int) (x * num);
-				y = (int) (y * num2);
+				float num = ((float)base.ClientRectangle.Width) / MainWindow.map_width;
+				float num2 = ((float)base.ClientRectangle.Height) / MainWindow.map_height;
+				x = (int)(x * num);
+				y = (int)(y * num2);
 			}
 			this.textSprite.Begin(SpriteFlags.AlphaBlend);
 			if (!this.fonts.ContainsKey(font.GetHashCode()))
@@ -1062,7 +1104,7 @@ namespace maphack_external_directx
 
 		private void DrawUnitDestinations(float radiusFactor)
 		{
-			foreach(Unit unit in MainWindow.units)
+			foreach (Unit unit in MainWindow.units)
 			{
 				if (!unit.isAlive)
 				{
@@ -1123,7 +1165,7 @@ namespace maphack_external_directx
 			float MinimumRadius = 1f / MainWindow.minimap_scale;
 			float AddToRadius = 1f / MainWindow.minimap_scale;
 
-			foreach(Unit unit in MainWindow.units)
+			foreach (Unit unit in MainWindow.units)
 			{
 				if (!unit.isAlive || (unit.targetFilterFlags & TargetFilter.Missile) != 0)
 				{
@@ -1180,34 +1222,34 @@ namespace maphack_external_directx
 				if (Radius < MinimumRadius)
 					Radius = MinimumRadius;
 				Radius += AddToRadius;
-				
+
 
 				if (unit.cloaked)
 				{
 					if (unit.detector)
 					{
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius + AddToRadius * 2) * 2, (Radius + AddToRadius * 2) * 2, Color.Black, true, true, 108.4f + (unit.playerNumber ==  MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Gold, true, true, 108.9f + (unit.playerNumber ==  MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, Radius * 2, Radius * 2, Color.Gray, true, true, 109.4f + (unit.playerNumber ==  MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, GameData.player_colors[unit.playerNumber], true, true, 109.9f + (unit.playerNumber ==  MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius + AddToRadius * 2) * 2, (Radius + AddToRadius * 2) * 2, Color.Black, true, true, 108.4f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Gold, true, true, 108.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, Radius * 2, Radius * 2, Color.Gray, true, true, 109.4f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, GameData.player_colors[unit.playerNumber], true, true, 109.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
 					}
 					else
 					{
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Black, true, true, 98.9f + (unit.playerNumber ==  MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, Radius * 2, Radius * 2, Color.Gray, true, true, 99.4f + (unit.playerNumber ==  MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, GameData.player_colors[unit.playerNumber], true, true, 99.9f + (unit.playerNumber ==  MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Black, true, true, 98.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, Radius * 2, Radius * 2, Color.Gray, true, true, 99.4f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, GameData.player_colors[unit.playerNumber], true, true, 99.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
 					}
 				}
 				else if (unit.detector)
 				{
-					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Black, true, true, 48.9f + (unit.playerNumber ==  MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, Radius * 2, Radius * 2, Color.Gold, true, true, 49.4f + (unit.playerNumber ==  MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, GameData.player_colors[unit.playerNumber], true, true, 49.9f + (unit.playerNumber ==  MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Black, true, true, 48.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, Radius * 2, Radius * 2, Color.Gold, true, true, 49.4f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, GameData.player_colors[unit.playerNumber], true, true, 49.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
 				}
 				else
 				{
-					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, Radius * 2, Radius * 2, Color.Black, true, true, 0.9f + (unit.playerNumber ==  MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, GameData.player_colors[unit.playerNumber], true, true, 1.9f + (unit.playerNumber ==  MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, Radius * 2, Radius * 2, Color.Black, true, true, 0.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, GameData.player_colors[unit.playerNumber], true, true, 1.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
 				}
 			}
 		}
@@ -1219,13 +1261,13 @@ namespace maphack_external_directx
 			{
 				for (int i = 0; i < MainWindow.total_units; i++)
 				{
-					Point point = instance.Game2Screen((double) MainWindow.x_coords[i], (double) MainWindow.y_coords[i]);
-					Point point2 = instance.Game2Screen((double) MainWindow.x_coordsDest[i], (double) MainWindow.y_coordsDest[i]);
+					Point point = instance.Game2Screen((double)MainWindow.x_coords[i], (double)MainWindow.y_coords[i]);
+					Point point2 = instance.Game2Screen((double)MainWindow.x_coordsDest[i], (double)MainWindow.y_coordsDest[i]);
 					if ((((MainWindow.player_teams[MainWindow.p_owner[i]] != MainWindow.localteam) && (point.X > instance.Margins.left)) && ((point.X < instance.Margins.right) && (point.Y > instance.Margins.top))) && ((point.Y < instance.Margins.bot) && !this.IsUnitVisible(i)))
 					{
 						for (int j = 0; (j < this.unit_textures.Length) && this.drawUnitEnemiesScreen; j++)
 						{
-							if (((long) this.unit_textures[j].Value) == (long) MainWindow.units[i].unitType)
+							if (((long)this.unit_textures[j].Value) == (long)MainWindow.units[i].unitType)
 							{
 								int num3 = 0x23;
 								for (int k = 0; k < this.unit_textures_sizes.Length; k++)
@@ -1235,13 +1277,13 @@ namespace maphack_external_directx
 										num3 = this.unit_textures_sizes[k].Value;
 									}
 								}
-								this.DrawTexture((float) (point.X - (num3 / 2)), (float) (point.Y - (num3 / 2)), (float) num3, (float) num3, this.unit_textures[j].Key, true);
+								this.DrawTexture((float)(point.X - (num3 / 2)), (float)(point.Y - (num3 / 2)), (float)num3, (float)num3, this.unit_textures[j].Key, true);
 								break;
 							}
 						}
 						if (((point2.X >= instance.Margins.left) || (point2.Y <= instance.Margins.bot)) && this.drawUnitEnemiesDestinationScreen)
 						{
-							this.DrawLine((float) point.X, (float) point.Y, (float) point2.X, (float) point2.Y, Color.Yellow, true);
+							this.DrawLine((float)point.X, (float)point.Y, (float)point2.X, (float)point2.Y, Color.Yellow, true);
 						}
 					}
 				}
@@ -1260,11 +1302,11 @@ namespace maphack_external_directx
 			{
 				if (this.abilities[i].ClassName == Abil.AbilClass.CAbilBuildable)
 				{
-					AbilBuildable ability = (AbilBuildable) this.abilities[i].Ability;
+					AbilBuildable ability = (AbilBuildable)this.abilities[i].Ability;
 					Unit unit = ability.Unit;
-					if (MainWindow.unit_show[(int) unit.unitType])
+					if (MainWindow.unit_show[(int)unit.unitType])
 					{
-						this.unit_queue_counter[(int) ((IntPtr) unit.playerNumber), (int) ((IntPtr) MainWindow.unit_count_index[(int) unit.unitType])]++;
+						this.unit_queue_counter[(int)((IntPtr)unit.playerNumber), (int)((IntPtr)MainWindow.unit_count_index[(int)unit.unitType])]++;
 					}
 				}
 			}
@@ -1285,8 +1327,8 @@ namespace maphack_external_directx
 			source.Add(heights[column + 1, row - 1]);
 
 			IEnumerable<object> enumerable = from height in source
-				orderby ((dynamic) height).h descending
-				select height;
+											 orderby ((dynamic)height).h descending
+											 select height;
 
 			if (enumerable.First<dynamic>().h == enumerable.Last<dynamic>().h)
 			{
@@ -1295,11 +1337,12 @@ namespace maphack_external_directx
 			return source.First<object>();
 		}
 
-		[DllImport("user32.dll", SetLastError=true)]
+		[DllImport("user32.dll", SetLastError = true)]
 		private static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
 		private void initDirectX()
 		{
-			PresentParameters parameters = new PresentParameters {
+			PresentParameters parameters = new PresentParameters
+			{
 				EnableAutoDepthStencil = true,
 				AutoDepthStencilFormat = DepthFormat.D16,
 				Windowed = true,
@@ -1375,7 +1418,7 @@ namespace maphack_external_directx
 
 		private void initWindow()
 		{
-			SetWindowLong(base.Handle, -20, (IntPtr) (((GetWindowLong(base.Handle, -20) ^ 0x80000) ^ 0x20) | 8L));
+			SetWindowLong(base.Handle, -20, (IntPtr)(((GetWindowLong(base.Handle, -20) ^ 0x80000) ^ 0x20) | 8L));
 			if (AeroEnabled)
 			{
 				SetLayeredWindowAttributes(base.Handle, 0, 0xff, 2);
@@ -1392,9 +1435,9 @@ namespace maphack_external_directx
 			{
 				if ((j != i) && (MainWindow.player_teams[MainWindow.p_owner[i]] == MainWindow.localteam))
 				{
-					int num2 = (int) Math.Pow((double) (MainWindow.x_coords[j] - MainWindow.x_coords[i]), 2.0);
-					int num3 = (int) Math.Pow((double) (MainWindow.y_coords[j] - MainWindow.y_coords[i]), 2.0);
-					int num4 = (int) Math.Sqrt((double) (num2 + num3));
+					int num2 = (int)Math.Pow((double)(MainWindow.x_coords[j] - MainWindow.x_coords[i]), 2.0);
+					int num3 = (int)Math.Pow((double)(MainWindow.y_coords[j] - MainWindow.y_coords[i]), 2.0);
+					int num4 = (int)Math.Sqrt((double)(num2 + num3));
 					if (num4 < 15)
 					{
 						return true;
@@ -1423,6 +1466,7 @@ namespace maphack_external_directx
 			}
 		}
 
+
 		public void LoadOptionSettings()
 		{
 			IniFile file = new IniFile("settings.ini");
@@ -1431,7 +1475,7 @@ namespace maphack_external_directx
 				file.Load();
 				try
 				{
-					ObserverPanelDrawDirection = (ObserverPanelDirection) Enum.Parse(typeof(ObserverPanelDirection), file["OptionsDrawing"]["cbObserverPanelDrawDirection"]);
+					ObserverPanelDrawDirection = (ObserverPanelDirection)Enum.Parse(typeof(ObserverPanelDirection), file["OptionsDrawing"]["cbObserverPanelDrawDirection"]);
 				}
 				catch
 				{
@@ -1531,7 +1575,7 @@ namespace maphack_external_directx
 				{
 					if (this._HUDType == HUDType.Observer)
 					{
-						Keys key = (Keys) Enum.Parse(typeof(Keys), file["OptionsHotkeys"]["cbPreviousPanelHotkey"]);
+						Keys key = (Keys)Enum.Parse(typeof(Keys), file["OptionsHotkeys"]["cbPreviousPanelHotkey"]);
 						if (this.previousObserverPanelHotkey.HotKey != key)
 						{
 							this.previousObserverPanelHotkey.RegisterHotKey(key);
@@ -1546,7 +1590,7 @@ namespace maphack_external_directx
 				{
 					if (this._HUDType == HUDType.Observer)
 					{
-						Keys keys2 = (Keys) Enum.Parse(typeof(Keys), file["OptionsHotkeys"]["cbNextPanelHotkey"]);
+						Keys keys2 = (Keys)Enum.Parse(typeof(Keys), file["OptionsHotkeys"]["cbNextPanelHotkey"]);
 						if (this.nextObserverPanelHotkey.HotKey != keys2)
 						{
 							this.nextObserverPanelHotkey.RegisterHotKey(keys2);
@@ -1576,7 +1620,7 @@ namespace maphack_external_directx
 
 		private void nextObserverPanelHotkey_KeyPressed(object sender, KeyPressedEventArgs e)
 		{
-			ComboBox box = (ComboBox) this.frame.Controls["cbObserverPanel"];
+			ComboBox box = (ComboBox)this.frame.Controls["cbObserverPanel"];
 			if ((box.SelectedIndex - 1) > -1)
 			{
 				box.SelectedIndex--;
@@ -1585,7 +1629,7 @@ namespace maphack_external_directx
 
 		private void previousObserverPanelHotkey_KeyPressed(object sender, KeyPressedEventArgs e)
 		{
-			ComboBox box = (ComboBox) this.frame.Controls["cbObserverPanel"];
+			ComboBox box = (ComboBox)this.frame.Controls["cbObserverPanel"];
 			if ((box.SelectedIndex + 1) < box.Items.Count)
 			{
 				box.SelectedIndex++;
@@ -1747,6 +1791,7 @@ namespace maphack_external_directx
 		}
 
 		public delegate void updateFrameSizeDelegate();
+
 	}
 }
 
