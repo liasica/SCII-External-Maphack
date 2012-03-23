@@ -413,7 +413,6 @@ namespace Data
 			if (UINameAsText == null)
 				UINameAsText = string.Empty;
 
-
 			Unit unit = new Unit { 
 				name = UINameAsText,
 				textID = NameAsText,
@@ -478,9 +477,6 @@ namespace Data
 				memoryLocation = StructStarts.Units + ((uint) StructSizes.Units * (us.token / 4u)),
 				commandQueuePointer = us.commandQueue_pointer
 			 };
-			if (unit.textID.Contains("Beacon"))
-			{
-			}
 
 			return unit;
 		}

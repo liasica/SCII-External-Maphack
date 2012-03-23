@@ -473,7 +473,7 @@ namespace maphack_external_directx
 				total_units = list.Count;
 				foreach(Unit unit in list)
 				{
-					if ((unit.targetFilterFlags & (TargetFilter.Missile | TargetFilter.Dead | TargetFilter.Hidden)) != 0)
+					if ((unit.targetFilterFlags & (TargetFilter.Missile | TargetFilter.Dead)) != 0 || unit.textID.StartsWith("Beacon"))
 						continue;
 
 					if (!unit_pictures.ContainsKey(unit.textID))
@@ -800,7 +800,7 @@ namespace maphack_external_directx
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.Name = "MainWindow";
-			this.Text = "SCIIEMH v0.09";
+			this.Text = "SCIIEMH v0.10";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainWindow_FormClosed);
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewPlayerData)).EndInit();
 			this.toolStrip.ResumeLayout(false);

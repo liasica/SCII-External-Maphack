@@ -250,6 +250,7 @@ namespace PatternScanner
 			else
 			{
 				this.Process = new BlackMagic();
+				this.Process.SetDebugPrivileges = false;
 				this.Process.OpenProcessAndThread(hWnd);
 			}
 		}

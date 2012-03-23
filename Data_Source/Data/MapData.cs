@@ -271,7 +271,7 @@ namespace Data
 				{
 					foreach (XElement element in dataFile.Data)
 					{
-						if (element.Name == "CActorUnit" && element.HasAttributes 
+						if (element.HasAttributes 
 							&& (id != "" && element.Attribute("id") != null && element.Attribute("id").Value == id
 							|| id == "" && element.Attribute("unitName") != null && element.Attribute("unitName").Value == unit))
 						{
@@ -292,6 +292,9 @@ namespace Data
 					}
 				}
 			}
+
+			if(unit.Contains("Burrowed"))
+				return GetUnitPictureFilename(unit.Replace("Burrowed", ""));
 
 			if (parent != "")
 				return GetUnitPictureFilename(parent);

@@ -47,11 +47,11 @@ namespace maphack_external_directx
 
 		private static void runApplication()
 		{
-			if (!IsAdministrator)
+			/*if (!IsAdministrator)
 			{
-				MessageOk("This program requires to be ran as Administrator.", MessageBoxIcon.Exclamation);
+				MessageOk("This program needs to be run as Administrator.", MessageBoxIcon.Exclamation);
 			}
-			else
+			else*/
 			{
 				Application.EnableVisualStyles();
 				Application.SetCompatibleTextRenderingDefault(false);
