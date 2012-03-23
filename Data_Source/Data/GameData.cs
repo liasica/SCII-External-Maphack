@@ -140,6 +140,22 @@ namespace Data
 				memoryAddress = StructStarts.Players + ((uint)StructSizes.Player * numplayer)
 			};
 			player_s _s = (player_s) mem.ReadMemory(p.memoryAddress, typeof(player_s));
+
+			string AccountNumber = "";
+			if (numplayer < 16)
+			{
+				byte[] rawAccountNumber = new byte[0x18];
+				mem.ReadMemory(StructStarts.BnetIDs + (numplayer - 1) * (uint)StructSizes.BnetID, rawAccountNumber.Length, out rawAccountNumber);
+				AccountNumber = Encoding.ASCII.GetString(rawAccountNumber);
+				int removeIndex = AccountNumber.IndexOf('\0');
+				if(removeIndex > 0)
+					AccountNumber = AccountNumber.Remove(removeIndex);
+				removeIndex = AccountNumber.IndexOf('\\');
+				if (removeIndex > 0)
+					AccountNumber = AccountNumber.Remove(removeIndex);
+			}
+
+			p.accountNumber = AccountNumber;
 			p.number = numplayer;
 			p.playerStatus = (PlayerStatus) _s.active;
 			p.victoryStatus = (VictoryStatus) _s.status;
@@ -883,7 +899,7 @@ namespace Data
 		public static class StructStarts
 		{
 			public static uint Abilities;
-			public static uint BnetIDs = 0x3165c08;
+			public static uint BnetIDs = 0x016CA8B8; //0x3165c08;
 			public static uint CameraInfo;
 
 			public static uint LocalSelection

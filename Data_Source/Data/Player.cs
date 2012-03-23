@@ -70,6 +70,8 @@ namespace Data
 		public float cameraPitch;
 		public float cameraRotation;
 
+		public string accountNumber;
+
 		public override string ToString()
 		{
 			return name;

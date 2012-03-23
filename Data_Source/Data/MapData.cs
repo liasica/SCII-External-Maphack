@@ -273,7 +273,7 @@ namespace Data
 					{
 						if (element.Name == "CActorUnit" && element.HasAttributes 
 							&& (id != "" && element.Attribute("id") != null && element.Attribute("id").Value == id
-							|| element.Attribute("unitName") != null && element.Attribute("unitName").Value == unit))
+							|| id == "" && element.Attribute("unitName") != null && element.Attribute("unitName").Value == unit))
 						{
 							if (id == "" && element.Attribute("id") != null)
 								id = element.Attribute("id").Value;

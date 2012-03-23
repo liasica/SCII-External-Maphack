@@ -51,7 +51,7 @@ namespace PatternScanner
 
 		public List<uint> FindDataRegionPatterns(uint startAddress, byte[] pattern, string mask)
 		{
-			uint num = 0x3630000;
+			uint num = 0x03630000;
 			return this.FindPatterns(startAddress, (int) (num - startAddress), pattern, mask);
 		}
 
@@ -90,9 +90,11 @@ namespace PatternScanner
 			list.Add(dwStart++);
 			searchLength -= (int) (dwStart - num2);
 			num2 = dwStart;
-		Label_0044:
+		
 			num3++;
 			goto Label_0016;
+		Label_0044:
+			return list;
 		}
 
 		public uint LocalPlayerNumber()

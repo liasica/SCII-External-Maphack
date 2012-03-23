@@ -60,7 +60,6 @@ namespace maphack_external_directx
 		public static int neutralplayer = -1;
 		public static int no_showing = 0;
 		public static DirectX_HUDs ObserverHUD;
-		private DataGridViewImageColumn p_color;
 		public static uint[] p_owner = new uint[0x4000];
 		public static bool pending = false;
 		public static byte[] player_active = new byte[0x10];
@@ -80,22 +79,14 @@ namespace maphack_external_directx
 		public static string[] player_supply = new string[0x10];
 		public static uint[] player_teams = new uint[0x10];
 		public static PlayerType[] player_types = new PlayerType[0x10];
-		
-		private DataGridViewTextBoxColumn PlayerName;
-		private DataGridViewTextBoxColumn PlayerNumber;
-		private DataGridViewTextBoxColumn Race;
-		private DataGridViewImageColumn rank;
 		public static string[] rank_textures = new string[0x10];
 		private Thread readMemory;
 		private ToolStripMenuItem resetToolStripMenuItem;
 		public static DirectX_HUDs ResourcesHUD;
 		public static bool[] show = new bool[0x10];
 		public static bool[] show_window = new bool[0x10];
-		private DataGridViewTextBoxColumn Status;
 		private ToolStripMenuItem stopToolStripMenuItem;
-		private DataGridViewTextBoxColumn TeamNumber;
 		private System.Windows.Forms.Timer tmrMain;
-		private DataGridViewCheckBoxColumn Toggle;
 		private ToolStrip toolStrip;
 		public ToolStripButton toolStripButtonMap;
 		public ToolStripButton toolStripButtonObserver;
@@ -284,6 +275,15 @@ namespace maphack_external_directx
 		public static float[] x_coords = new float[0x4000];
 		public static float[] x_coordsDest = new float[0x4000];
 		public static float[] y_coords = new float[0x4000];
+		private DataGridViewTextBoxColumn PlayerNumber;
+		private DataGridViewImageColumn p_color;
+		private DataGridViewImageColumn rank;
+		private DataGridViewTextBoxColumn TeamNumber;
+		private DataGridViewTextBoxColumn PlayerName;
+		private DataGridViewTextBoxColumn PlayerAccountNumber;
+		private DataGridViewTextBoxColumn Status;
+		private DataGridViewTextBoxColumn Race;
+		private DataGridViewCheckBoxColumn Toggle;
 		public static float[] y_coordsDest = new float[0x4000];
 
 		public MainWindow()
@@ -545,6 +545,7 @@ namespace maphack_external_directx
 			this.rank = new System.Windows.Forms.DataGridViewImageColumn();
 			this.TeamNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.PlayerName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+			this.PlayerAccountNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Status = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Race = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.Toggle = new System.Windows.Forms.DataGridViewCheckBoxColumn();
@@ -572,6 +573,7 @@ namespace maphack_external_directx
 			this.dataGridViewPlayerData.AllowUserToResizeRows = false;
 			this.dataGridViewPlayerData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
 			this.dataGridViewPlayerData.BackgroundColor = System.Drawing.Color.Black;
+			this.dataGridViewPlayerData.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
 			dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
 			dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
 			dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -587,6 +589,7 @@ namespace maphack_external_directx
             this.rank,
             this.TeamNumber,
             this.PlayerName,
+            this.PlayerAccountNumber,
             this.Status,
             this.Race,
             this.Toggle});
@@ -598,6 +601,7 @@ namespace maphack_external_directx
 			dataGridViewCellStyle5.SelectionForeColor = System.Drawing.Color.DodgerBlue;
 			dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
 			this.dataGridViewPlayerData.DefaultCellStyle = dataGridViewCellStyle5;
+			this.dataGridViewPlayerData.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
 			this.dataGridViewPlayerData.GridColor = System.Drawing.Color.Black;
 			this.dataGridViewPlayerData.Location = new System.Drawing.Point(0, 0);
 			this.dataGridViewPlayerData.Name = "dataGridViewPlayerData";
@@ -612,7 +616,7 @@ namespace maphack_external_directx
 			this.dataGridViewPlayerData.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
 			this.dataGridViewPlayerData.RowHeadersWidth = 24;
 			this.dataGridViewPlayerData.ScrollBars = System.Windows.Forms.ScrollBars.None;
-			this.dataGridViewPlayerData.Size = new System.Drawing.Size(409, 24);
+			this.dataGridViewPlayerData.Size = new System.Drawing.Size(535, 24);
 			this.dataGridViewPlayerData.TabIndex = 2;
 			this.dataGridViewPlayerData.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewPlayerData_CellContentClick);
 			// 
@@ -653,6 +657,13 @@ namespace maphack_external_directx
 			this.PlayerName.HeaderText = "Name";
 			this.PlayerName.Name = "PlayerName";
 			this.PlayerName.ReadOnly = true;
+			// 
+			// PlayerAccountNumber
+			// 
+			this.PlayerAccountNumber.FillWeight = 155.6321F;
+			this.PlayerAccountNumber.HeaderText = "Account Number";
+			this.PlayerAccountNumber.Name = "PlayerAccountNumber";
+			this.PlayerAccountNumber.ReadOnly = true;
 			// 
 			// Status
 			// 
@@ -699,7 +710,7 @@ namespace maphack_external_directx
 			this.toolStrip.Location = new System.Drawing.Point(0, 23);
 			this.toolStrip.Name = "toolStrip";
 			this.toolStrip.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-			this.toolStrip.Size = new System.Drawing.Size(409, 25);
+			this.toolStrip.Size = new System.Drawing.Size(535, 25);
 			this.toolStrip.TabIndex = 3;
 			this.toolStrip.Text = "toolStrip";
 			// 
@@ -709,19 +720,19 @@ namespace maphack_external_directx
             this.resetToolStripMenuItem,
             this.stopToolStripMenuItem});
 			this.contextMenuStrip.Name = "contextMenuStrip1";
-			this.contextMenuStrip.Size = new System.Drawing.Size(153, 70);
+			this.contextMenuStrip.Size = new System.Drawing.Size(103, 48);
 			// 
 			// resetToolStripMenuItem
 			// 
 			this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-			this.resetToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.resetToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
 			this.resetToolStripMenuItem.Text = "Reset";
 			this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
 			// 
 			// stopToolStripMenuItem
 			// 
 			this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
-			this.stopToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.stopToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
 			this.stopToolStripMenuItem.Text = "Stop";
 			this.stopToolStripMenuItem.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
 			// 
@@ -782,7 +793,7 @@ namespace maphack_external_directx
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.Black;
-			this.ClientSize = new System.Drawing.Size(409, 48);
+			this.ClientSize = new System.Drawing.Size(535, 48);
 			this.Controls.Add(this.toolStrip);
 			this.Controls.Add(this.dataGridViewPlayerData);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
@@ -840,6 +851,9 @@ namespace maphack_external_directx
 					DataGridViewTextBoxCell cell6 = new DataGridViewTextBoxCell();
 					DataGridViewTextBoxCell cell7 = new DataGridViewTextBoxCell();
 					DataGridViewCheckBoxCell cell8 = new DataGridViewCheckBoxCell();
+
+					DataGridViewTextBoxCell cellAN = new DataGridViewTextBoxCell();
+
 					dataGridViewCell.Value = number;
 					dataGridViewRow.Cells.Add(dataGridViewCell);
 					Bitmap image = new Bitmap(10, 10);
@@ -856,6 +870,10 @@ namespace maphack_external_directx
 					dataGridViewRow.Cells.Add(cell4);
 					cell5.Value = player.name;
 					dataGridViewRow.Cells.Add(cell5);
+
+					cellAN.Value = player.accountNumber;
+					dataGridViewRow.Cells.Add(cellAN);
+
 					cell6.Value = player.victoryStatus;
 					dataGridViewRow.Cells.Add(cell6);
 					cell7.Value = player.race;
@@ -979,6 +997,14 @@ namespace maphack_external_directx
 				else
 				{
 					List<Data.Player> actualPlayers = _2csAPI.Player.ActualPlayers;
+					actualPlayers.Sort(delegate (Player a1, Player a2)
+						{
+							if (a1.team != a2.team)
+								return a1.team - a2.team;
+							return (int)a1.number - (int)a2.number;
+						});
+
+
 					for (int i = 0; i < actualPlayers.Count; i++)
 					{
 						Data.Player player = actualPlayers[i];
@@ -991,8 +1017,25 @@ namespace maphack_external_directx
 						{
 							this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["rank"].Index].Value = Image.FromFile(@"Leagues\none.png");
 						}
+						
+
+						this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["PlayerAccountNumber"].Index].Value = player.accountNumber;
 						this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["Status"].Index].Value = player.victoryStatus;
-						this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["Race"].Index].Value = player.race;
+						this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["TeamNumber"].Index].Value = "Team " + (player.team + 1);
+						Color oldColor = ((Bitmap)this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["p_color"].Index].Value).GetPixel(0, 0);
+						Color newColor = player.drawingColor;
+
+						if (((Bitmap)this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["p_color"].Index].Value).GetPixel(0, 0) != player.drawingColor)
+						{
+							Bitmap image = new Bitmap(10, 10);
+							Graphics graphics = Graphics.FromImage(image);
+							Brush brush = new SolidBrush(player.drawingColor);
+							graphics.FillRectangle(brush, 0, 0, 10, 10);
+							
+							this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["p_color"].Index].Value = image;
+						}
+						this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["PlayerName"].Index].Value = player.name;
+						this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["PlayerNumber"].Index].Value = player.number;
 					}
 				}
 			}
