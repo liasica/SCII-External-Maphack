@@ -801,7 +801,7 @@ namespace maphack_external_directx
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.Name = "MainWindow";
-			this.Text = "SCIIEMH v0.10";
+			this.Text = "SCIIEMH v0.11";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainWindow_FormClosed);
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewPlayerData)).EndInit();
 			this.toolStrip.ResumeLayout(false);

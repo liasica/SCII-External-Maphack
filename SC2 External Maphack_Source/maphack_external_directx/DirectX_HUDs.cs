@@ -639,12 +639,16 @@ namespace maphack_external_directx
 		{
 			int num3 = 0;
 			int num4 = 0;
-			if (MainWindow.unit_counts == null || p_no < 0 || p_no >= MainWindow.unit_counts.Length)
+			if (MainWindow.unit_counts == null || p_no < 0 || p_no >= MainWindow.unit_counts.Length && MainWindow.unit_counts[p_no] != null
+				|| MainWindow.unit_pictures == null || MainWindow.unit_names == null)
 				return;
 
 
 			foreach (KeyValuePair<string, int> pair in MainWindow.unit_counts[p_no])
 			{
+				if (pair.Key == null)
+					continue;
+
 				string picture = "";
 				string tooltip = "";
 				if (pair.Value > 0 && MainWindow.unit_pictures.ContainsKey(pair.Key) && (picture = Database.GetItemFilename(MainWindow.unit_pictures[pair.Key], false)) != "")
