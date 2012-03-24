@@ -785,6 +785,7 @@ namespace maphack_external_directx
 			// 
 			// tmrMain
 			// 
+			this.tmrMain.Enabled = true;
 			this.tmrMain.Interval = 1000;
 			this.tmrMain.Tick += new System.EventHandler(this.tmrMain_Tick);
 			// 
