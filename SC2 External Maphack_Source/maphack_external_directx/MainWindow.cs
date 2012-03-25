@@ -80,6 +80,7 @@ namespace maphack_external_directx
 		public static uint[] player_teams = new uint[0x10];
 		public static PlayerType[] player_types = new PlayerType[0x10];
 		public static string[] rank_textures = new string[0x10];
+		public static string[] rank_tooltips = new string[0x10];
 		private Thread readMemory;
 		private ToolStripMenuItem resetToolStripMenuItem;
 		public static DirectX_HUDs ResourcesHUD;
@@ -284,6 +285,7 @@ namespace maphack_external_directx
 		private DataGridViewTextBoxColumn Status;
 		private DataGridViewTextBoxColumn Race;
 		private DataGridViewCheckBoxColumn Toggle;
+		private ToolTip toolTip1;
 		public static float[] y_coordsDest = new float[0x4000];
 
 		public MainWindow()
@@ -559,6 +561,7 @@ namespace maphack_external_directx
 			this.btnOptions = new System.Windows.Forms.ToolStripButton();
 			this.toolStripLabelStatus = new System.Windows.Forms.ToolStripLabel();
 			this.tmrMain = new System.Windows.Forms.Timer(this.components);
+			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewPlayerData)).BeginInit();
 			this.toolStrip.SuspendLayout();
 			this.contextMenuStrip.SuspendLayout();
@@ -801,7 +804,7 @@ namespace maphack_external_directx
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.Name = "MainWindow";
-			this.Text = "SCIIEMH v0.11";
+			this.Text = "SCIIEMH v0.12";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainWindow_FormClosed);
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewPlayerData)).EndInit();
 			this.toolStrip.ResumeLayout(false);
@@ -946,6 +949,7 @@ namespace maphack_external_directx
 				}
 			}
 			rank_textures = new string[0x10];
+			rank_tooltips = new string[0x10];
 			string path = "settings.ini";
 			if (File.Exists(path))
 			{
@@ -1010,15 +1014,22 @@ namespace maphack_external_directx
 					{
 						Data.Player player = actualPlayers[i];
 						uint number = player.number;
+						Image NewRankTexture = null;
 						if (rank_textures[number] != null)
 						{
-							this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["rank"].Index].Value = Image.FromFile(rank_textures[number]);
+							NewRankTexture = Image.FromFile(rank_textures[number]);
+							NewRankTexture.Tag = rank_textures[number];
 						}
 						else
 						{
-							this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["rank"].Index].Value = Image.FromFile(@"Leagues\none.png");
+							NewRankTexture = Image.FromFile(@"Leagues\none.png");
+							NewRankTexture.Tag = @"Leagues\none.png";
 						}
-						
+
+						if (((Bitmap)this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["rank"].Index].Value).Tag != NewRankTexture.Tag)
+							this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["rank"].Index].Value = NewRankTexture;
+
+						this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["rank"].Index].ToolTipText = rank_tooltips[number];
 
 						this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["PlayerAccountNumber"].Index].Value = player.accountNumber;
 						this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["Status"].Index].Value = player.victoryStatus;
@@ -1181,6 +1192,7 @@ namespace maphack_external_directx
 				{
 					p.UpdateRankTexture();
 					rank_textures[p.number] = p.rank_texture;
+					rank_tooltips[p.number] = p.rankIconTooltip;
 				}
 				catch (ThreadAbortException)
 				{

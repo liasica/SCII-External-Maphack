@@ -156,6 +156,8 @@ namespace Data
 			}
 
 			p.accountNumber = AccountNumber;
+			p.rankIconTooltip = "Unranked";
+
 			p.number = numplayer;
 			p.playerStatus = (PlayerStatus) _s.active;
 			p.victoryStatus = (VictoryStatus) _s.status;
