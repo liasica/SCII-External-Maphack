@@ -8,6 +8,13 @@ namespace Data
 
 	public static class Database
 	{
+		static HashSet<string> IgnoreList = new HashSet<string>();
+
+		public static void Reset()
+		{
+			IgnoreList = new HashSet<string>();
+		}
+
 		public static string GetItemFilename(string DatabaseItem, bool GetNew)
 		{
 			string Filename = "Database\\" + DatabaseItem.Replace('/', '\\');
@@ -17,6 +24,9 @@ namespace Data
 
 			if (File.Exists(Filename) && !GetNew)
 				return Filename;
+
+			if (IgnoreList.Contains(DatabaseItem))
+				return "";
 
 			if (GameData.mapDat == null)
 				GameData.mapDat = new MapData(GameData.getMapData().mapInfo.filePath);
@@ -55,6 +65,7 @@ namespace Data
 				manager.Close();
 			}
 
+			IgnoreList.Add(DatabaseItem);
 			return "";
 		}
 	}

@@ -391,6 +391,7 @@ namespace maphack_external_directx
 			actual_players = 0;
 			this.UpdateMapSize();
 			this.GetPlayers(true);
+			Database.Reset();
 		}
 
 		private void GetLocalPlayer()
@@ -417,7 +418,6 @@ namespace maphack_external_directx
 
 		private void GetPlayers(bool atGameStart = false)
 		{
-			actual_players = 0;
 			actual_player = new byte[0x10];
 
 			List<Data.Player> list = GameData.getPlayersData();

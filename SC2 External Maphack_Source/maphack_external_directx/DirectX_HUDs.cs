@@ -683,7 +683,7 @@ namespace maphack_external_directx
 					}
 					picture = Database.GetItemFilename(picture, false);
 
-					if(!string.IsNullOrWhiteSpace(picture))
+					if(picture != null) //it's acceptable if picture == ""
 					{
 						int count = pair.Value;
 						switch (CurrentObserverPanelTab)
