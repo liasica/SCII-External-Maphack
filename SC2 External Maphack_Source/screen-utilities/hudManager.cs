@@ -34,7 +34,17 @@ namespace maphack_external_directx.screen_utilities
         }
 
 
+        //set position code
 
+        public void setPosition()
+        {
+            setPosition_();
+        }
+
+        private void setPosition_()
+        {
+
+        }
 
 
     }
