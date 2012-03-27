@@ -72,7 +72,7 @@ namespace maphack_external_directx
 		{
 			if (this.hud != null)
 			{
-				//this.saveHUDLocation(this.hud);
+				this.saveHUDLocation(this.hud);
 				this.hud.Close();
 			}
 		}
@@ -83,7 +83,7 @@ namespace maphack_external_directx
 			base.SendToBack();
 			if (this._hasMoved)
 			{
-				//this.saveHUDLocation(this.hud);
+				this.saveHUDLocation(this.hud);
 				this._hasMoved = false;
 			}
 			this._hasMoved = true;
@@ -91,7 +91,9 @@ namespace maphack_external_directx
 
 		private void HUDFrame_Resize(object sender, EventArgs e)
 		{
+            this.saveHUDLocation(this.hud);
 			this.updateSize();
+
 		}
 
 		private void InitializeComponent()
@@ -131,7 +133,18 @@ namespace maphack_external_directx
 					string str = this.hud.ContentHUDType.ToString() + " HUD";
 					int x = int.Parse(file[str]["X"]);
 					int y = int.Parse(file[str]["Y"]);
-					base.Location = new Point(x, y);
+
+                    if (x < 0 || y < 0)
+                    {
+                        MessageBox.Show("Error",
+                            "Settings.ini contains negative position for HUD",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Exclamation,
+                            MessageBoxDefaultButton.Button1);
+                    }
+
+                    base.Location = new Point(x, y);
+
 				}
 				catch
 				{
