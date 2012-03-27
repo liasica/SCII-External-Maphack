@@ -697,7 +697,7 @@ namespace maphack_external_directx
 
 		private void LoadSettings()
 		{
-			IniFile file = new IniFile("settings.ini");
+			IniFile file = new IniFile(MainWindow.settings_path);
 			if (file.Exists())
 			{
 				file.Load();
@@ -846,20 +846,18 @@ namespace maphack_external_directx
 
 		private void SaveSettings()
 		{
-			string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"SC2 External Maphack\");
-			string str2 = "settings.ini";
-			IniFile file = new IniFile(str2);
+			IniFile file = new IniFile(MainWindow.settings_path);
 			if (file.Exists())
 			{
 				file.Load();
 			}
 			else
 			{
-				if (!Directory.Exists(path))
+				if (!Directory.Exists(MainWindow.settings_folder))
 				{
-					Directory.CreateDirectory(path);
+					Directory.CreateDirectory(MainWindow.settings_folder);
 				}
-				File.Create(str2).Close();
+				File.Create(MainWindow.settings_path).Close();
 			}
 			IniSection section = new IniSection();
 			if (file.HasSection("OptionsDrawing"))

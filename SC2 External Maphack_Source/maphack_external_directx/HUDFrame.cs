@@ -122,7 +122,7 @@ namespace maphack_external_directx
 
 		public void loadHUDLocation()
 		{
-			IniFile file = new IniFile("settings.ini");
+			IniFile file = new IniFile(MainWindow.settings_path);
 			if (file.Exists())
 			{
 				file.Load();
@@ -143,7 +143,7 @@ namespace maphack_external_directx
 		{
 			if (hud != null)
 			{
-				IniFile file = new IniFile("settings.ini");
+				IniFile file = new IniFile(MainWindow.settings_path);
 				if (file.Exists())
 				{
 					file.Load();

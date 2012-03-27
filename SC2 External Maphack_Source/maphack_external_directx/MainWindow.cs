@@ -17,7 +17,8 @@ namespace maphack_external_directx
 
 	public class MainWindow : Form
 	{
-		public static Dictionary<UnitType, float> radii = new Dictionary<UnitType,float>();
+		public static string settings_folder = Application.ExecutablePath.Remove(Application.ExecutablePath.LastIndexOf('\\'));
+		public static string settings_path = settings_folder + "\\settings.ini";
 
 		private static DirectX_HUDs[] _HUDs;
 		public static int active_players = 0;
@@ -291,16 +292,13 @@ namespace maphack_external_directx
 		public MainWindow()
 		{
 			this.InitializeComponent();
-			string path = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "SC2 External Maphack");
-			if (!Directory.Exists(path))
-			{
-				Directory.CreateDirectory(path);
-				path = "settings.ini";
-				if (!File.Exists(path))
-				{
-					File.Create(path);
-				}
-			}
+
+			if (!Directory.Exists(settings_folder))
+				Directory.CreateDirectory(settings_folder);
+
+			if (!File.Exists(settings_path))
+				File.Create(settings_path);
+
 			draw = true;
 			this.initThreads();
 			this.updateTimers();
@@ -419,6 +417,9 @@ namespace maphack_external_directx
 
 		private void GetPlayers(bool atGameStart = false)
 		{
+			actual_players = 0;
+			actual_player = new byte[0x10];
+
 			List<Data.Player> list = GameData.getPlayersData();
 			int num = 0;
 			for (byte i = 0; i < list.Count; i = (byte) (i + 1))
@@ -453,13 +454,15 @@ namespace maphack_external_directx
 				}
 			}
 			active_players = num;
-			players = list;
+			lock (players)
+			{
+				players = list;
+			}
 		}
 
 		private void GetUnits()
 		{
 			List<Unit> list = GameData.getUnitData();
-			units = list;
 
 			int[,] numArray = new int[0x10, 130];
 
@@ -477,15 +480,21 @@ namespace maphack_external_directx
 				{
 					if ((unit.targetFilterFlags & (TargetFilter.Missile | TargetFilter.Dead)) != 0 || unit.textID.StartsWith("Beacon"))
 						continue;
-
-					if (!unit_pictures.ContainsKey(unit.textID))
-					{
-						unit_pictures.Add(unit.textID, GameData.mapDat.GetUnitPictureFilename(unit.textID));
-					}
 					
-					if (!unit_names.ContainsKey(unit.textID))
+					lock (unit_pictures)
 					{
-						unit_names.Add(unit.textID, unit.name);
+						if (!unit_pictures.ContainsKey(unit.textID))
+						{
+							unit_pictures.Add(unit.textID, GameData.mapDat.GetUnitPictureFilename(unit.textID));
+						}
+					}
+
+					lock (unit_names)
+					{
+						if (!unit_names.ContainsKey(unit.textID))
+						{
+							unit_names.Add(unit.textID, unit.name);
+						}
 					}
 
 					if (newUnitCounts[unit.playerNumber].ContainsKey(unit.textID))
@@ -508,8 +517,18 @@ namespace maphack_external_directx
 						}
 					}
 				}
-				unit_counter = numArray;
-				unit_counts = newUnitCounts;
+				lock(unit_counter)
+				{
+					unit_counter = numArray;
+				}
+				lock (unit_counts)
+				{
+					unit_counts = newUnitCounts;
+				}
+				lock (units)
+				{
+					units = list;
+				}
 			}
 		}
 
@@ -723,19 +742,19 @@ namespace maphack_external_directx
             this.resetToolStripMenuItem,
             this.stopToolStripMenuItem});
 			this.contextMenuStrip.Name = "contextMenuStrip1";
-			this.contextMenuStrip.Size = new System.Drawing.Size(103, 48);
+			this.contextMenuStrip.Size = new System.Drawing.Size(153, 70);
 			// 
 			// resetToolStripMenuItem
 			// 
 			this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-			this.resetToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
-			this.resetToolStripMenuItem.Text = "Reset";
+			this.resetToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.resetToolStripMenuItem.Text = "Reset Settings";
 			this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
 			// 
 			// stopToolStripMenuItem
 			// 
 			this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
-			this.stopToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
+			this.stopToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
 			this.stopToolStripMenuItem.Text = "Stop";
 			this.stopToolStripMenuItem.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
 			// 
@@ -950,10 +969,9 @@ namespace maphack_external_directx
 			}
 			rank_textures = new string[0x10];
 			rank_tooltips = new string[0x10];
-			string path = "settings.ini";
-			if (File.Exists(path))
+			if (File.Exists(settings_path))
 			{
-				File.Delete(path);
+				File.Delete(settings_path);
 			}
 		}
 
@@ -1239,7 +1257,7 @@ namespace maphack_external_directx
 
 		private void updateTimers()
 		{
-			IniFile file = new IniFile("settings.ini");
+			IniFile file = new IniFile(settings_path);
 			if (file.Exists())
 			{
 				file.Load();
