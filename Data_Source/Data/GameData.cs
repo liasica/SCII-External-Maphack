@@ -155,6 +155,9 @@ namespace Data
 					AccountNumber = AccountNumber.Remove(removeIndex);
 			}
 
+			if (!AccountNumber.Contains("-S2-"))
+				AccountNumber = "(none)";
+
 			p.accountNumber = AccountNumber;
 			p.rankIconTooltip = "Unranked";
 

@@ -72,7 +72,7 @@ namespace maphack_external_directx
 		{
 			if (this.hud != null)
 			{
-				this.saveHUDLocation(this.hud);
+				//this.saveHUDLocation(this.hud); //this will mess up the real position.
 				this.hud.Close();
 			}
 		}
@@ -83,7 +83,7 @@ namespace maphack_external_directx
 			base.SendToBack();
 			if (this._hasMoved)
 			{
-				this.saveHUDLocation(this.hud);
+				//this.saveHUDLocation(this.hud); //this will overwrite the real position before it can even load it.
 				this._hasMoved = false;
 			}
 			this._hasMoved = true;
@@ -91,7 +91,7 @@ namespace maphack_external_directx
 
 		private void HUDFrame_Resize(object sender, EventArgs e)
 		{
-            this.saveHUDLocation(this.hud);
+			//this.saveHUDLocation(this.hud); //this will overwrite the real position before it can even load it.
 			this.updateSize();
 
 		}
@@ -165,10 +165,20 @@ namespace maphack_external_directx
 				string str = hud.ContentHUDType.ToString() + " HUD";
 				if (file.HasSection(str))
 				{
+					section = file[str];
 					file.Remove(str);
 				}
-				section.Add("X", base.Location.X.ToString());
-				section.Add("Y", base.Location.Y.ToString());
+
+				if (section.ContainsKey("X"))
+					section["X"] = base.Location.X.ToString();
+				else
+					section.Add("X", base.Location.X.ToString());
+
+				if (section.ContainsKey("Y"))
+					section["Y"] = base.Location.Y.ToString();
+				else
+					section.Add("Y", base.Location.Y.ToString());	
+
 				file.Add(str, section);
 				file.Save();
 			}

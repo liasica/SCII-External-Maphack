@@ -24,6 +24,8 @@ namespace maphack_external_directx
 	public class DirectX_HUDs : Form
 	{
 		private List<KeyValuePair<Rectangle, string>> Tooltips = new List<KeyValuePair<Rectangle, string>>();
+		private Rectangle DesiredClientRect = new Rectangle(0,0,0,0);
+		private Rectangle DefaultClientRect = new Rectangle(0, 0, 0, 0);
 
 		private HUDType _HUDType;
 		private List<Abil> abilities = new List<Abil>();
@@ -191,6 +193,24 @@ namespace maphack_external_directx
 
 		public DirectX_HUDs(HUDType hudType)
 		{
+			switch(hudType)
+			{
+				case HUDType.Map:
+					this.DefaultClientRect = new Rectangle(50, 50, 150, 150); // Totally arbitrary.
+					break;
+				case HUDType.Observer:
+					this.DefaultClientRect = new Rectangle(200, 200, 800, 800); // I think this is the default size...
+					break;
+				case HUDType.Resources:
+					this.DefaultClientRect = new Rectangle(200, 200,
+						(DirectX_HUDs.resouceColumnWidth + DirectX_HUDs.resourceIconFrameSize * 2) * 5,   // I Haven't looked at this much, but that's about what HUDFrame.updateSize() does,
+						(DirectX_HUDs.resourceIconSize.Height + DirectX_HUDs.resourceIconFrameSize * 2)); // except that it's for 1 player instead of the current number.
+					break;
+				default:
+					this.DefaultClientRect = new Rectangle(50, 50, 150, 150); // Same as map.
+					break;
+			}
+
 			this.InitializeComponent();
 			this._HUDType = hudType;
 			this.initWindow();
@@ -246,8 +266,9 @@ namespace maphack_external_directx
 			if (this._HUDType == HUDType.Map)
 			{
 				Rectangle MinimapRect = base.RectangleToScreen(base.ClientRectangle);
-				SaveMapSettings(MinimapRect.X, MinimapRect.Y, MinimapRect.Width, MinimapRect.Height);
+				//SaveMapSettings(MinimapRect.X, MinimapRect.Y, MinimapRect.Width, MinimapRect.Height); //SavePositionAndSize() below should cover it.
 			}
+			this.SavePositionAndSize();
 			this.device.Dispose();
 			base.Dispose();
 			this.frame.Close();
@@ -271,8 +292,8 @@ namespace maphack_external_directx
 		private void DirectX_HUDs_Shown(object sender, EventArgs e)
 		{
 			this.frame.Show();
-			if (this._HUDType != HUDType.Map)
-				this.frame.loadHUDLocation();
+			//if (this._HUDType != HUDType.Map)
+				//this.frame.loadHUDLocation();
 		}
 
 		private void DirectX_HUDs_SizeChanged(object sender, EventArgs e)
@@ -546,7 +567,7 @@ namespace maphack_external_directx
 			bool showCustom = false;
 			bool showSupply = false;
 
-			for (int i = 0; i < MainWindow.actual_player.Length; i++)
+			for (int i = 0; i < MainWindow.actual_players && i < MainWindow.actual_player.Length; i++)
 			{
 				if (MainWindow.actual_player[i] < 0 || MainWindow.actual_player[i] >= 16)
 					continue;
@@ -559,6 +580,8 @@ namespace maphack_external_directx
 					showTerrazine = true;
 				if (MainWindow.player_custom_resource[MainWindow.actual_player[i]] != 0)
 					showCustom = true;
+				if (string.IsNullOrWhiteSpace(MainWindow.player_supply[MainWindow.actual_player[i]]))
+					MainWindow.player_supply[MainWindow.actual_player[i]] = "?/?";
 
 				string[] splitSupply = MainWindow.player_supply[MainWindow.actual_player[i]].Split('/');
 				float currentSupply = 0;
@@ -1483,6 +1506,92 @@ namespace maphack_external_directx
 			return false;
 		}
 
+		private void LoadPositionAndSize()
+		{	
+			IniFile ini = new IniFile(MainWindow.settings_path);
+			if (ini.Exists())
+			{
+				ini.Load();
+			}
+			else
+				return;
+
+			try
+			{
+				this.DesiredClientRect = this.DefaultClientRect;
+
+				string SectionName = this._HUDType.ToString() + " HUD";
+
+				if (ini.ContainsKey(SectionName))
+				{
+					if (ini[SectionName].ContainsKey("X"))
+						this.DesiredClientRect.X = int.Parse(ini[SectionName]["X"]);
+					if (ini[SectionName].ContainsKey("Y"))
+						this.DesiredClientRect.Y = int.Parse(ini[SectionName]["Y"]);
+					if (ini[SectionName].ContainsKey("SizeX"))
+						this.DesiredClientRect.Width = int.Parse(ini[SectionName]["SizeX"]);
+					if (ini[SectionName].ContainsKey("SizeY"))
+						this.DesiredClientRect.Height = int.Parse(ini[SectionName]["SizeY"]);
+				}
+			}
+			catch (Exception)
+			{
+			}
+			finally
+			{
+				Rectangle ScreenRect = Screen.GetBounds(new Point(0, 0));
+				if (this.DesiredClientRect.X <= ScreenRect.Left)
+					this.DesiredClientRect.X = ScreenRect.Left + 5;
+				if (this.DesiredClientRect.Y <= ScreenRect.Top)
+					this.DesiredClientRect.Y = ScreenRect.Top + 5;
+				if (this.DesiredClientRect.Left >= ScreenRect.Right)
+					this.DesiredClientRect.X = ScreenRect.Right - 5;
+				if (this.DesiredClientRect.Top >= ScreenRect.Bottom)
+					this.DesiredClientRect.Y = ScreenRect.Bottom - 5;	
+			}
+		}
+
+		private void SavePositionAndSize()
+		{
+			this.DesiredClientRect = this.RectangleToScreen(this.ClientRectangle);	
+			IniFile file = new IniFile(MainWindow.settings_path);
+			if (file.Exists())
+			{
+				file.Load();
+			}
+			IniSection section = new IniSection();
+
+			string SectionName = this.ContentHUDType.ToString() + " HUD";
+			if (file.HasSection(SectionName))
+			{
+				section = file[SectionName];
+				file.Remove(SectionName);
+			}
+
+			if (section.ContainsKey("X"))
+				section["X"] = this.DesiredClientRect.X.ToString();
+			else
+				section.Add("X", this.DesiredClientRect.X.ToString());
+
+			if (section.ContainsKey("Y"))
+				section["Y"] = this.DesiredClientRect.Y.ToString();
+			else
+				section.Add("Y", this.DesiredClientRect.Y.ToString());
+
+			if (section.ContainsKey("SizeX"))
+				section["SizeX"] = this.DesiredClientRect.Width.ToString();
+			else
+				section.Add("SizeX", this.DesiredClientRect.Width.ToString());
+
+			if (section.ContainsKey("SizeY"))
+				section["SizeY"] = this.DesiredClientRect.Height.ToString();
+			else
+				section.Add("SizeY", this.DesiredClientRect.Height.ToString());
+
+			file.Add(SectionName, section);
+			file.Save();
+		}
+
 		private void loadMapSettings(IniFile ini)
 		{
 			try
@@ -1647,9 +1756,16 @@ namespace maphack_external_directx
 			if (ini.Exists())
 			{
 				ini.Load();
+				this.LoadPositionAndSize();
+				Rectangle WindowRect = this.frame.DesktopBounds;
+				Rectangle ClientRect = this.frame.RectangleToScreen(this.frame.ClientRectangle);
+
+				this.frame.Location = new Point(this.DesiredClientRect.X - (ClientRect.X - WindowRect.X), this.DesiredClientRect.Y - (ClientRect.Y - WindowRect.Y));
+				this.frame.ClientSize = this.DesiredClientRect.Size;
+				
 				if (this._HUDType == HUDType.Map)
 				{
-					this.loadMapSettings(ini);
+					//this.loadMapSettings(ini); // This shouldn't be needed anymore, now that we have LoadPositionAndSize().
 				}
 			}
 		}

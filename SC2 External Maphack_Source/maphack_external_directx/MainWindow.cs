@@ -1295,7 +1295,7 @@ namespace maphack_external_directx
 					_HUDs = new DirectX_HUDs[] { ResourcesHUD, MapHUD, ObserverHUD };
 					foreach (DirectX_HUDs ds in _HUDs)
 					{
-						if (ds != null)
+						if (ds != null && !ds.IsDisposed)
 						{
 							ds.Show();
 						}
