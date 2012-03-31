@@ -219,7 +219,7 @@ namespace maphack_external_directx
 			this.initFrame();
 			this.LoadSettings();
 
-			if (_HUDType == HUDType.Map)
+			/*if (_HUDType == HUDType.Map)
 			{
 				Rectangle ScreenRect = Screen.GetBounds(new Point(MainWindow.minimap_location_x, MainWindow.minimap_location_y));
 				if (MainWindow.minimap_location_x >= ScreenRect.Right
@@ -253,7 +253,7 @@ namespace maphack_external_directx
 
 				this.frame.Location = new Point(MainWindow.minimap_location_x - (ClientRect.Left - WindowRect.Left), MainWindow.minimap_location_y - (ClientRect.Top - WindowRect.Top));
 				this.frame.ClientSize = new Size(MainWindow.minimap_size_x, MainWindow.minimap_size_y);
-			}
+			}*/
 
 			this.tmrRefreshRate.Interval = MainWindow.HUDRefreshRate;
 			this.tmrRefreshRate.Enabled = true;

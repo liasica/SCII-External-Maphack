@@ -49,7 +49,9 @@ namespace SC2RanksAPI
 			str = char.ToUpper(str[0]) + str.Substring(1);
 			SC2League league = (SC2League) System.Enum.Parse(typeof(SC2League), str);
 			int num2 = rawProfile.IndexOf(rankIdentifier, startIndex) + rankIdentifier.Length;
-			int rank = int.Parse(rawProfile.Substring(num2, rawProfile.IndexOf("<", num2) - num2));
+			int rank = 0;
+			if (!int.TryParse(rawProfile.Substring(num2, rawProfile.IndexOf("<", num2) - num2).Trim(), out rank))
+				rank = -1;
 			int num4 = rawProfile.IndexOf(totalsIdentifier, num2) + totalsIdentifier.Length;
 			string[] strArray = rawProfile.Substring(num4, (rawProfile.IndexOf(" ", num4) - num4) + 2).Split(new char[] { ' ' });
 			strArray[0] = strArray[0].Replace(",", "");
@@ -121,6 +123,7 @@ namespace SC2RanksAPI
 			bool flag3 = rawProfile[num3] == 'e';
 			bool flag4 = rawProfile[num4] == 'e';
 			bool flag5 = rawProfile[searchOffset] == 'e';
+
 			switch (gameType)
 			{
 				case SC2GameType.All:

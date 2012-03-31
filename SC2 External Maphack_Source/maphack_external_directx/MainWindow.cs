@@ -17,6 +17,9 @@ namespace maphack_external_directx
 
 	public class MainWindow : Form
 	{
+		public static Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+		public static string version_string = "v" + version.Major + "." + version.Minor + "." + version.Build;
+
 		public static string settings_folder = Application.ExecutablePath.Remove(Application.ExecutablePath.LastIndexOf('\\'));
 		public static string settings_path = settings_folder + "\\settings.ini";
 
@@ -291,13 +294,15 @@ namespace maphack_external_directx
 
 		public MainWindow()
 		{
+			throw new Exception("cheeZe");
 			this.InitializeComponent();
+			this.Text += " " + version_string;
 
 			if (!Directory.Exists(settings_folder))
 				Directory.CreateDirectory(settings_folder);
 
 			if (!File.Exists(settings_path))
-				File.Create(settings_path);
+				File.Create(settings_path).Close();
 
 			draw = true;
 			this.initThreads();
@@ -418,8 +423,6 @@ namespace maphack_external_directx
 
 		private void GetPlayers(bool atGameStart = false)
 		{
-			actual_player = new byte[0x10];
-
 			List<Data.Player> list = GameData.getPlayersData();
 			int num = 0;
 			for (byte i = 0; i < list.Count; i = (byte) (i + 1))
@@ -823,7 +826,7 @@ namespace maphack_external_directx
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.Name = "MainWindow";
-			this.Text = "SCIIEMH v0.12";
+			this.Text = "SCIIEMH";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainWindow_FormClosed);
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewPlayerData)).EndInit();
 			this.toolStrip.ResumeLayout(false);

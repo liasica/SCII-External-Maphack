@@ -114,6 +114,8 @@ namespace Data
 						if (rankArray != null)
 						{
 							this.rank_texture = rankArray[0].RankTexture;
+							if(this.rank_texture.Contains("none"))
+								this.rank_texture = null;
 							this.rankIconTooltip = rankArray[0].GameType.ToString() + ", League: " +  rankArray[0].League.ToString() + ", Rank: " + rankArray[0].Rank + ", Wins: " + rankArray[0].Wins;
 						}
 					}

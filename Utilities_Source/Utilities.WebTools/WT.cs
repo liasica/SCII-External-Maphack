@@ -131,7 +131,8 @@ namespace Utilities.WebTools
 
 		public static void ReportCrash(Exception ex, string appplicationTitle, IntPtr? handleToScreenShot = new IntPtr?(), Size? screenShotSize = new Size?(), bool messageBox = true)
 		{
-			throw ex;
+			ReportCrashToGitHub(ex, appplicationTitle, handleToScreenShot, screenShotSize, messageBox);
+			return;
 
 			Func<string, bool> predicate = null;
 			Attachment attachment = null;
@@ -156,7 +157,7 @@ namespace Utilities.WebTools
 			}
 			if (messageBox)
 			{
-				DialogResult result = MessageBox.Show("An unexpected error has occursed. This problem has been reported. Would you like to help debug this problem?", "Unexpected Crash", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
+				DialogResult result = MessageBox.Show("An unexpected error has occurred. This problem has been reported. Would you like to help debug this problem?", "Unexpected Crash", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2);
 				if (predicate == null)
 				{
 					predicate = f => f.ToLower() == dns.ToLower();
@@ -219,6 +220,62 @@ namespace Utilities.WebTools
 			}
 			catch
 			{
+			}
+		}
+
+		private static string Reformat(string original)
+		{
+			return original.Replace("\\", "\\\\").Replace("/", "\\/").Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"").Replace("\f", "\\f");
+		}
+
+		public static void CreateGitHubIssue(string title, string message)
+		{
+			try
+			{
+				Version Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
+				string VersionString = "v" + Version.Major + "." + Version.Minor + "." + Version.Build;
+				string FormattedTitle = Reformat(title);
+				string FormattedMessage = Reformat(message.Replace(@"C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\Git Repo\", ""));
+				string JsonBody = "{\n  \"title\": \"Auto-Reported crash " + VersionString + ": " + FormattedTitle + "\",\n  \"body\": \"" + FormattedMessage + "\",\n  \"state\": \"open\",\n  \"labels\": [\n    \"Bug-Crash\"\n  ]\n}";
+				byte[] JsonBodyAsBytes = Encoding.ASCII.GetBytes(JsonBody);
+
+				HttpWebRequest wr = (HttpWebRequest) WebRequest.Create("https://api.github.com/repos/MrNukealizer/SCII-External-Maphack/issues");
+
+				wr.Method = "POST";
+				wr.ContentLength = JsonBodyAsBytes.Length;
+
+				wr.Headers["Authorization"] = "Basic U0NJSUVNSDpCdWdzQnVnczEwMDBCdWdz";
+
+				wr.ContentType = "application/vnd.github.v3.text+json";
+				wr.Date = DateTime.Now;
+
+				Stream wrStream = wr.GetRequestStream();
+				wrStream.Write(JsonBodyAsBytes, 0, JsonBodyAsBytes.Length);
+				wrStream.Close();
+
+				WebResponse response = wr.GetResponse();
+				response.Close();
+			}
+			catch (WebException ex)
+			{
+			}
+		}
+
+		public static void ReportCrashToGitHub(Exception ex, string appplicationTitle, IntPtr? handleToScreenShot = new IntPtr?(), Size? screenShotSize = new Size?(), bool messageBox = true)
+		{
+		CheeZecake:
+			DialogResult result = MessageBox.Show("Uh oh... It appears we have a crash. Would you like to submit a report? This does not require you to do anyhting more after clicking Yes, and does not contain any information other than what the error was and where in the program it occurred.", "Unexpected Crash", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+			if (result == DialogResult.Yes)
+			{
+				CreateGitHubIssue(ex.Message, ex.ToString());
+			}
+			if (result == DialogResult.No)
+			{
+				result = MessageBox.Show("Are you sure? I can't fix a problem if I don't know what that problem is. Submitting the crash report is as easy as clicking Cancel and choosing Yes next time.", "Are you sure?", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+				if (result == DialogResult.Cancel)
+				{
+					goto CheeZecake;
+				}
 			}
 		}
 	}
