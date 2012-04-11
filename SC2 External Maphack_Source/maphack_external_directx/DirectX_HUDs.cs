@@ -1231,7 +1231,7 @@ namespace maphack_external_directx
 					continue;
 				}
 
-				if (MainWindow.player_teams[unit.playerNumber] != MainWindow.localteam)
+				if (MainWindow.player_teams[unit.playerNumber] != MainWindow.localteam && MainWindow.player_teams[unit.playerNumber] != 16)
 				{
 					if (this.drawUnitsEnemies)
 					{

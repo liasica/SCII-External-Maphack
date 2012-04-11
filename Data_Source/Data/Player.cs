@@ -97,7 +97,7 @@ namespace Data
 					if (bnetID != 0)
 					{
 						SC2GameType oNEvsONE;
-						SC2Region region = (SC2Region) Enum.Parse(typeof(SC2Region), GameData.SC2Language.Substring(2));
+						string region = GameData.SC2Language.Substring(2);
 						string str4 = GameData.SC2GameType;
 						switch (str4)
 						{

@@ -71,14 +71,14 @@ namespace SC2RanksAPI
 			return new SC2Rank(playerName, gameType, league, rank, wins, num5 - wins);
 		}
 
-		private static SC2Rank[] getPlayerProfile(SC2Region region, uint bnetID, string playerName, SC2GameType gameType)
+		private static SC2Rank[] getPlayerProfile(string region, uint bnetID, string playerName, SC2GameType gameType)
 		{
 			string URL = string.Concat(new object[] { "http://", region, ".battle.net/sc2/en/profile/", bnetID, "/1/", playerName, "/" });
 			string rawProfile = FetchPage(string.Concat(new object[] { "http://", region, ".battle.net/sc2/en/profile/", bnetID, "/1/", playerName, "/" }));
 			return parsePlayerProfile(playerName, gameType, ref rawProfile);
 		}
 
-		public static SC2Rank[] GetRanksForPlayer(SC2Region region, uint bnetID, string playerName, SC2GameType gameType)
+		public static SC2Rank[] GetRanksForPlayer(string region, uint bnetID, string playerName, SC2GameType gameType)
 		{
 			SC2Rank[] rankArray;
 			if ((bnetID == 0) || string.IsNullOrWhiteSpace(playerName))

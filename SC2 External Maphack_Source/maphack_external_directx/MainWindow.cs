@@ -294,7 +294,6 @@ namespace maphack_external_directx
 
 		public MainWindow()
 		{
-			throw new Exception("cheeZe");
 			this.InitializeComponent();
 			this.Text += " " + version_string;
 
