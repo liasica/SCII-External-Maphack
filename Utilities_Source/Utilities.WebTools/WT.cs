@@ -263,6 +263,18 @@ namespace Utilities.WebTools
 
 		public static void ReportCrashToGitHub(Exception ex, string appplicationTitle, IntPtr? handleToScreenShot = new IntPtr?(), Size? screenShotSize = new Size?(), bool messageBox = true)
 		{
+			if (ex is FileNotFoundException && ex.Message.Contains("fasmdll_managed.dll") && File.Exists("fasmdll_managed.dll"))
+			{
+				DialogResult ShowDownloadPage = MessageBox.Show("The module \"fasmdll_managed.dll\" could not be loaded. This is probably because you don't have the Microsoft Visual C++ 2010 Redistributable Package. Do you want to open the download page in a web browser?", "Missing File", MessageBoxButtons.YesNo, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
+				if (ShowDownloadPage == DialogResult.Yes)
+				{
+					Process.Start("http://www.microsoft.com/download/en/details.aspx?id=5555");
+				}
+				Application.Exit();
+				return;
+			}
+
+
 		CheeZecake:
 			DialogResult result = MessageBox.Show("Uh oh... It appears we have a crash. Would you like to submit a report? This does not require you to do anyhting more after clicking Yes, and does not contain any information other than what the error was and where in the program it occurred.", "Unexpected Crash", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
 			if (result == DialogResult.Yes)

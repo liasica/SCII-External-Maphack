@@ -47,7 +47,7 @@ namespace SC2RanksAPI
 			int startIndex = rawProfile.IndexOf(leagueIdentifier, searchOffset) + leagueIdentifier.Length;
 			string str = rawProfile.Substring(startIndex, rawProfile.IndexOf(" ", startIndex) - startIndex);
 			str = char.ToUpper(str[0]) + str.Substring(1);
-			SC2League league = (SC2League) System.Enum.Parse(typeof(SC2League), str);
+			string league = str;
 			int num2 = rawProfile.IndexOf(rankIdentifier, startIndex) + rankIdentifier.Length;
 			int rank = 0;
 			if (!int.TryParse(rawProfile.Substring(num2, rawProfile.IndexOf("<", num2) - num2).Trim(), out rank))
@@ -73,6 +73,11 @@ namespace SC2RanksAPI
 
 		private static SC2Rank[] getPlayerProfile(string region, uint bnetID, string playerName, SC2GameType gameType)
 		{
+			if(string.IsNullOrWhiteSpace(region) || (region.ToLower() != "us" && region.ToLower() != "kr" && region.ToLower() != "eu"))
+			{
+				region = "eu";
+			}
+
 			string URL = string.Concat(new object[] { "http://", region, ".battle.net/sc2/en/profile/", bnetID, "/1/", playerName, "/" });
 			string rawProfile = FetchPage(string.Concat(new object[] { "http://", region, ".battle.net/sc2/en/profile/", bnetID, "/1/", playerName, "/" }));
 			return parsePlayerProfile(playerName, gameType, ref rawProfile);
@@ -107,7 +112,7 @@ namespace SC2RanksAPI
 			}
 			string str = "class=\"module-body snapshot-";
 			int startIndex = rawProfile.IndexOf(str, 0) + str.Length;
-			if (rawProfile[startIndex] == 'e')
+			if (startIndex <= 0 || rawProfile[startIndex] == 'e')
 			{
 				return null;
 			}

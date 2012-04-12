@@ -5,14 +5,14 @@ namespace SC2RanksAPI
 	public class SC2Rank
 	{
 		private SC2GameType _gameType;
-		private SC2League _league;
+		private string _league;
 		private int _losses;
 		private string _name;
 		private int _rank;
 		private string _rankTexture;
 		private int _wins;
 
-		public SC2Rank(string name, SC2GameType gameType, SC2League league, int rank, int wins, int losses)
+		public SC2Rank(string name, SC2GameType gameType, string league, int rank, int wins, int losses)
 		{
 			this._name = name;
 			this._gameType = gameType;
@@ -38,7 +38,7 @@ namespace SC2RanksAPI
 			}
 		}
 
-		public SC2League League
+		public string League
 		{
 			get
 			{
@@ -76,23 +76,26 @@ namespace SC2RanksAPI
 			{
 				if (this._rankTexture == null)
 				{
-					string str = this._league.ToString();
+					string str = this._league;
 					str = char.ToLower(str[0]) + str.Substring(1) + "-";
-					if ((this.Rank >= 1) && (this.Rank <= 8))
+					if (str != "none")
 					{
-						str = str + 1;
-					}
-					else if ((this.Rank >= 9) && (this.Rank <= 0x19))
-					{
-						str = str + 2;
-					}
-					else if ((this.Rank >= 0x1a) && (this.Rank <= 50))
-					{
-						str = str + 3;
-					}
-					else if ((this.Rank >= 0x33) && (this.Rank <= 100))
-					{
-						str = str + 4;
+						if ((this.Rank >= 1) && (this.Rank <= 8))
+						{
+							str = str + 1;
+						}
+						else if ((this.Rank >= 9) && (this.Rank <= 25))
+						{
+							str = str + 2;
+						}
+						else if ((this.Rank >= 26) && (this.Rank <= 50))
+						{
+							str = str + 3;
+						}
+						else if ((this.Rank >= 51) && (this.Rank <= 100))
+						{
+							str = str + 4;
+						}
 					}
 					str = str + ".png";
 					this._rankTexture = @"Leagues\" + str;

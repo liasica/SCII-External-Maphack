@@ -1412,9 +1412,10 @@ namespace maphack_external_directx
 			{
 				this.device = new Device(0, DeviceType.Hardware, base.Handle, CreateFlags.HardwareVertexProcessing, new PresentParameters[] { parameters });
 			}
-			catch
+			catch(Exception ex)
 			{
-				Program.MessageOk("You didn't install the correct version of the DirectX that was supplied, or the installation is corrupt, or your OS isn't supported.", MessageBoxIcon.Exclamation);
+				Program.MessageOk("There was an error with Direct3D when creating the window. This can sometimes happen randomly, but if it always happens, there is a problem with your instalation of Direct3D, or your graphics card doesn't support something important.", MessageBoxIcon.Exclamation);
+				Utilities.WebTools.WT.ReportCrash(ex, "oops", null, null);
 				Process.GetCurrentProcess().Kill();
 				return;
 			}

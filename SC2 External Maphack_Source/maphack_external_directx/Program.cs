@@ -47,17 +47,10 @@ namespace maphack_external_directx
 
 		private static void runApplication()
 		{
-			/*if (!IsAdministrator)
-			{
-				MessageOk("This program needs to be run as Administrator.", MessageBoxIcon.Exclamation);
-			}
-			else*/
-			{
-				Application.EnableVisualStyles();
-				Application.SetCompatibleTextRenderingDefault(false);
-				_mainWindow = new maphack_external_directx.MainWindow();
-				Application.Run(MainWindow);
-			}
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault(false);
+			_mainWindow = new maphack_external_directx.MainWindow();
+			Application.Run(MainWindow);
 		}
 
 		public static bool IsAdministrator
