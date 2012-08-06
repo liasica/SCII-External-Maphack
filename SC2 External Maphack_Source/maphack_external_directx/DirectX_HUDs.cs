@@ -683,6 +683,7 @@ namespace maphack_external_directx
 
 			lock (MainWindow.unit_counts)
 			{
+				if (MainWindow.unit_counts == null)
 				foreach (KeyValuePair<string, int> pair in MainWindow.unit_counts[p_no])
 				{
 					if (pair.Key == null)

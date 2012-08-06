@@ -766,8 +766,8 @@ namespace Data
 					{
 						if (files[i].Contains("patch-"))
 						{
-							int index = files[i].IndexOf("-");
-							int num3 = files[i].IndexOf(".");
+							int index = files[i].LastIndexOf("-");
+							int num3 = files[i].LastIndexOf(".");
 							try
 							{
 								_SC2Language = files[i].Substring(index + 1, (num3 - index) - 1);
@@ -800,7 +800,7 @@ namespace Data
 					Process[] processesByName = Process.GetProcessesByName("SC2");
 					if (processesByName.Length != 0)
 					{
-						_SC2Process = processesByName[0];
+						_SC2Process = processesByName[processesByName.Length - 1];
 					}
 				}
 				return _SC2Process;
@@ -854,7 +854,8 @@ namespace Data
 			{
 				get
 				{
-					return (GameData.StructStarts.Units + 0x14e);
+					return 0x02763864;
+					//return (GameData.StructStarts.Units + 0x14e);
 				}
 			}
 		}
@@ -900,7 +901,7 @@ namespace Data
 		public static class StructStarts
 		{
 			public static uint Abilities;
-			public static uint BnetIDs = 0x016CA8B8; //0x3165c08;
+			public static uint BnetIDs = 0x016E5E2C; //0x016CA8B8; //0x3165c08;
 			public static uint CameraInfo;
 
 			public static uint LocalSelection

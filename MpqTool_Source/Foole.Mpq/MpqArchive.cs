@@ -25,7 +25,7 @@ namespace Foole.Mpq
 
         public MpqArchive(string filename)
         {
-            //this.BaseStream = File.Open(filename, FileMode.Open, FileAccess.Read);
+            this.BaseStream = File.Open(filename, FileMode.Open, FileAccess.Read);
 			this.BaseStream = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
             this.Init();
         }
