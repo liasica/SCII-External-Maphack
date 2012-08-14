@@ -105,7 +105,7 @@ namespace Data
 				
 				manager.Close();
 			}
-			catch
+			catch(System.Exception ex)
 			{
 				bool oops = true;
 			}

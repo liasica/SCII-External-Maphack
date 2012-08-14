@@ -32,7 +32,7 @@ namespace maphack_external_directx
 		private System.Drawing.Font arial = new System.Drawing.Font("Arial", 12f, FontStyle.Bold);
 		private System.Drawing.Font arial2 = new System.Drawing.Font("Arial", 10f, FontStyle.Bold);
 		private IContainer components;
-		public static ObserverPanelTabs CurrentObserverPanelTab = ObserverPanelTabs.Units;
+		public static ObserverPanelTabs CurrentObserverPanelTab = ObserverPanelTabs.Buildings_and_Units_Same_Line;
 		public Device device;
 		private bool drawCameraAllies = true;
 		private bool drawCameraEnemies = true;
@@ -684,6 +684,7 @@ namespace maphack_external_directx
 			lock (MainWindow.unit_counts)
 			{
 				if (MainWindow.unit_counts == null)
+					return;
 				foreach (KeyValuePair<string, int> pair in MainWindow.unit_counts[p_no])
 				{
 					if (pair.Key == null)
@@ -714,44 +715,31 @@ namespace maphack_external_directx
 						{
 							case ObserverPanelTabs.Buildings_and_Units_Same_Line:
 								{
-									if (picture.Contains("building") || !picture.Contains("building"))
-									{
-										this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
-									}
+									this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
 									continue;
 								}
 							case ObserverPanelTabs.Buildings_and_Units_Different_Lines:
 								{
-									if (!picture.Contains("building"))
-									{
-										goto Label_0128;
-									}
-									this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
+									if (MainWindow.buildings.Contains(pair.Key))
+										this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
+									else
+										this.DrawPlayerWindowIndividualUnit(drawStyle, row + 1, num4++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
 									continue;
 								}
 							case ObserverPanelTabs.Buildings:
 								{
-									if (picture.Contains("building"))
-									{
+									if (MainWindow.buildings.Contains(pair.Key))
 										this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
-									}
 									continue;
 								}
 							case ObserverPanelTabs.Units:
 								{
-									if (!picture.Contains("building"))
-									{
+									if (!MainWindow.buildings.Contains(pair.Key))
 										this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
-									}
 									continue;
 								}
 						}
-
-					Label_0128:
-						if (!picture.Contains("building"))
-						{
-							this.DrawPlayerWindowIndividualUnit(drawStyle, row + 1, num4++, p_no, count, picture, tooltip, observerPlayerLogoWidth, observerPlayerLogoHeight);
-						}
+						
 					}
 					continue;
 

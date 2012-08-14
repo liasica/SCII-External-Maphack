@@ -170,10 +170,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Data\Database.cs" />
+    <Compile Include="Data\SC2fixed.cs" />
     <Compile Include="Data\MapData.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Data\MpqManager.cs" />
+    <Compile Include="Data\OffsetReader.cs" />
     <Compile Include="Data\UnitIdToNameClasses.cs" />
     <Compile Include="Data\ClassIdActor.cs">
       <SubType>Code</SubType>

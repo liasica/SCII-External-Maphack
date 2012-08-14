@@ -167,6 +167,7 @@ namespace Data
 			p.playerType = (PlayerType) _s.player_type;
 			p.team = _s.team;
 			p.name = _s.name;
+			p.nameLength = (int)_s.name_length;
 			p.playerColor = (PlayerColor) _s.slot_number;
 			p.drawingColor = player_colors[numplayer];
 			p.minerals = (int) _s.minerals_current;
@@ -178,8 +179,8 @@ namespace Data
 			p.mineralTotal = (int) _s.minerals_total;
 			p.gasTotal = (int) _s.vespene_total;
 			p.difficulty = (PlayerDifficulty) _s.difficulty;
-			p.actionsTotal = (int) _s.actions_total;
-			p.apmCurrent = (int) _s.apm_current;
+			//p.actionsTotal = (int) _s.actions_total;
+			//p.apmCurrent = (int) _s.apm_current;
 			p.armySize = (int) _s.army_size;
 			p.unitsLostMineralWorth = (int) _s.units_lost_mineral_worth;
 			p.unitsLostVespeneWorth = (int) _s.units_lost_vespene_worth;
@@ -190,15 +191,15 @@ namespace Data
 			p.cameraRotation = (int) _s.camera_rotation;
 			p.workersBuilt = (int) _s.harvesters_built;
 			p.workersCurrent = (int) _s.harvesters_current;
-			p.unitsKilled = (int) _s.units_killed;
-			p.unitsLost = (int) _s.units_lost;
+			//p.unitsKilled = (int) _s.units_killed;
+			//p.unitsLost = (int) _s.units_lost;
 			p.buildingQueueLength = (int) _s.building_queue_length;
 			p.slotNumber = (int) _s.slot_number;
 			p.supply = _s.supply_current / 4096f;
 			p.supplyCap = _s.supply_cap / 4096f;
 			p.supplyLimit = _s.supply_limit / 4096f;
 			uint num = (uint) mem.ReadMemory((uint) (_s.racePointer + 4), typeof(uint));
-			mem.ReadMemory((uint) (num + 8), 4, out buffer);
+			mem.ReadMemory((uint) num, 4, out buffer);
 			if (buffer[0] == 0)
 			{
 				p.race = Race.Neutral;
@@ -225,8 +226,8 @@ namespace Data
 					}
 				}
 			}
-			p.unit_selections = GetPlayerSelections(p);
-			p.units = new List<Unit>();
+			//p.unit_selections = GetPlayerSelections(p);
+			//p.units = new List<Unit>();
 			return p;
 		}
 
@@ -263,6 +264,8 @@ namespace Data
 
 		public static PlayerSelections GetPlayerSelections(uint pNumber)
 		{
+			//BROKEN! DO NOT USE!
+
 			PlayerSelections selections = new PlayerSelections {
 				currentSelection = new ControlGroup()
 			};
@@ -400,8 +403,9 @@ namespace Data
 						uint UINameLength = (uint)mem.ReadMemory(pUINameAddress + 0x8, typeof(uint));
 						uint UINameAddress = pUINameAddress + 0x10;
 
-						if ((uint)mem.ReadMemory(pUINameAddress + 0xc, typeof(uint)) != 0x43) //sometimes the string is right in this struct, other times it's a pointer.
-							UINameAddress = (uint)mem.ReadMemory(pUINameAddress + 0x10, typeof(uint));
+						byte fail = 0;
+						if (((fail = (byte)mem.ReadMemory(pUINameAddress + 12, typeof(byte))) & 4) != 0) //sometimes the string is right in this struct, other times it's a pointer.
+							UINameAddress = (uint)mem.ReadMemory(pUINameAddress + 16, typeof(uint));
 
 						if (UINameAddress != 0 && UINameLength > 0)
 						{
@@ -525,7 +529,7 @@ namespace Data
 		{
 			get
 			{
-				int MapBottom = ((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xe0), typeof(int)) + 2048) / 0x1000;
+				int MapBottom = ((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x120), typeof(int)) + 2048) / 0x1000;
 				return MapBottom;
 			}
 		}
@@ -534,7 +538,7 @@ namespace Data
 		{
 			get
 			{
-				int MapLeft = ((int) mem.ReadMemory((uint) (Pointers.MapInformation + 0xdc), typeof(int)) + 2048) / 0x1000;
+				int MapLeft = ((int) mem.ReadMemory((uint) (Pointers.MapInformation + 0x11c), typeof(int)) + 2048) / 0x1000;
 				return MapLeft;
 			}
 		}
@@ -544,7 +548,7 @@ namespace Data
 			get
 			{
 				int MapWidth = MapFullWidth;
-				int MapRight = ((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xe4), typeof(int)) + 2048) / 0x1000;
+				int MapRight = ((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x124), typeof(int)) + 2048) / 0x1000;
 				return MapRight;
 			}
 		}
@@ -554,7 +558,7 @@ namespace Data
 			get
 			{
 				int MapHeight = MapFullHeight;
-				int MapTop = ((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xe8), typeof(int)) + 2048) / 0x1000;
+				int MapTop = ((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x128), typeof(int)) + 2048) / 0x1000;
 				return MapTop;
 			}
 		}
@@ -563,7 +567,7 @@ namespace Data
 		{
 			get
 			{
-				int MapBottom = (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xf0), typeof(int));
+				int MapBottom = (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x130), typeof(int));
 				return MapBottom;
 			}
 		}
@@ -572,7 +576,7 @@ namespace Data
 		{
 			get
 			{
-				int MapLeft = (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xec), typeof(int));
+				int MapLeft = (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x12c), typeof(int));
 				return MapLeft;
 			}
 		}
@@ -582,7 +586,7 @@ namespace Data
 			get
 			{
 				int MapWidth = MapFullWidth;
-				int MapRight = (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xf4), typeof(int));
+				int MapRight = (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x134), typeof(int));
 				return MapRight;
 			}
 		}
@@ -592,7 +596,7 @@ namespace Data
 			get
 			{
 				int MapHeight = MapFullHeight;
-				int MapTop = (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xf8), typeof(int));
+				int MapTop = (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x138), typeof(int));
 				return MapTop;
 			}
 		}
@@ -601,7 +605,7 @@ namespace Data
 		{
 			get
 			{
-				return (((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xb0), typeof(int)) + 2048) / 0x1000);
+				return (((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xf0), typeof(int)) + 2048) / 0x1000);
 			}
 		}
 
@@ -609,7 +613,7 @@ namespace Data
 		{
 			get
 			{
-				return (((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xac), typeof(int)) + 2048) / 0x1000);
+				return (((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xec), typeof(int)) + 2048) / 0x1000);
 			}
 		}
 
@@ -854,7 +858,8 @@ namespace Data
 			{
 				get
 				{
-					return 0x02763864;
+					return 0x033EEF64;
+					
 					//return (GameData.StructStarts.Units + 0x14e);
 				}
 			}
@@ -889,10 +894,10 @@ namespace Data
 		public enum StructSizes : uint
 		{
 			Ability = 120,
-			BnetID = 0x4b0,
+			BnetID = 0x626, //0x4b0,
 			CameraInfo = 0x24,
 			ControlGroup = 0xcf8,
-			Player = 0x910,
+			Player = 0xA68,
 			SelectedUnits = 4,
 			Selection = 0xcf8,
 			Units = 0x1c0
@@ -901,7 +906,7 @@ namespace Data
 		public static class StructStarts
 		{
 			public static uint Abilities;
-			public static uint BnetIDs = 0x016E5E2C; //0x016CA8B8; //0x3165c08;
+			public static uint BnetIDs = 0x0176ACF0; //0x016E5E2C; //0x016CA8B8; //0x3165c08;
 			public static uint CameraInfo;
 
 			public static uint LocalSelection

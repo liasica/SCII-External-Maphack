@@ -21,10 +21,10 @@ namespace Data
 		public int nameLength;
 		public string rank_texture;
 		public int slotNumber;
-		public float apmCurrent;
-		public int actionsTotal;
-		public int unitsKilled;
-		public int unitsLost;
+		//public float apmCurrent;
+		//public int actionsTotal;
+		//public int unitsKilled;
+		//public int unitsLost;
 		public int workersCurrent;
 		public int workersBuilt;
 		public int buildingQueueLength;
@@ -80,7 +80,9 @@ namespace Data
 
 		public void UpdateRankTexture()
 		{
-			if (this.playerType == PlayerType.User && this.accountNumber.Contains("-S2-"))
+			//this is broken and isn't currently worth the time to fix.
+
+			/*if (this.playerType == PlayerType.User && this.accountNumber.Contains("-S2-"))
 			{
 				string str2 = this.accountNumber.Substring(this.accountNumber.LastIndexOf('-') + 1);
 				uint bnetID = 0;
@@ -120,7 +122,7 @@ namespace Data
 						}
 					}
 				}
-			}
+			}*/
 		}
 	}
 }

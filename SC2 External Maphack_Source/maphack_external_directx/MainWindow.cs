@@ -101,6 +101,7 @@ namespace maphack_external_directx
 
 		public static Dictionary<string, int>[] unit_counts = new Dictionary<string, int>[16];
 		public static Dictionary<string, string> unit_pictures = new Dictionary<string, string>();
+		public static HashSet<string> buildings = new HashSet<string>();
 		public static Dictionary<string, string> unit_names = new Dictionary<string, string>();
 
 		public static int[] unit_count_index = new int[] { 
@@ -389,6 +390,7 @@ namespace maphack_external_directx
 		public void GameStart()
 		{
 			GameData.mapDat = new MapData(GameData.getMapData().mapInfo.filePath);
+			buildings = new HashSet<string>();
 			unit_pictures = new Dictionary<string, string>();
 			unit_names = new Dictionary<string, string>();
 			active_players = 0;
@@ -480,6 +482,9 @@ namespace maphack_external_directx
 				total_units = list.Count;
 				foreach(Unit unit in list)
 				{
+					if ((unit.targetFilterFlags & TargetFilter.Structure) != 0 && !MainWindow.buildings.Contains(unit.textID))
+						MainWindow.buildings.Add(unit.textID);
+
 					if ((unit.targetFilterFlags & (TargetFilter.Missile | TargetFilter.Dead)) != 0 || unit.textID.StartsWith("Beacon"))
 						continue;
 					

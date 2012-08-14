@@ -5,13 +5,13 @@ namespace Data
 	using System.Runtime.InteropServices;
 
 	[StructLayout(LayoutKind.Explicit)]
-	public unsafe struct unit_model_s
+	public unsafe struct unit_model_s //this whole thing is outdated except for minimap_radius
 	{
 		[FieldOffset(0x18)]
 		public ushort unit_type;
 		[FieldOffset(0x6c)]
 		public uint pName_address;	
-		[FieldOffset(0x3b4)]
+		[FieldOffset(0x3d8)] //3b4 as of 1.4.3
 		public uint minimap_radius;
 		[FieldOffset(0x508)]
 		public ulong default_targetFilter_flags;
