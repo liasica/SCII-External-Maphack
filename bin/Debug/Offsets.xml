@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Offsets Version="1.5.2.22875">
+    <Array Name="Units" Type="Unit" Size="0x4000" Address="0x02767740"/>
+    <Struct Name="Unit" Size="0x1c0">
+        <Member Name="times_used" Type="Unsigned" Size="2" Offset="0"/>
+        <Member Name="token" Type="Unsigned" Size="2" Offset="times_used+2"/>
+        <Member Name="Prev_unit" Type="Unsigned" Size="2" Offset="token+2"/>
+        <Member Name="next_unit" Type="Unsigned" Size="2" Offset="Prev_unit+2"/>
+        <Member Name="unit_model" Type="Unsigned" Size="4" Offset="next_unit+2"/>
+        <Member Name="targetFilter_flags" Type="Unsigned" Size="8" Offset="unit_model+12"/>
+        <Member Name="sub_move_state" Type="Unsigned" Size="1" Offset="targetFilter_flags+13"/>
+        <Member Name="move_state" Type="Unsigned" Size="1" Offset="sub_move_state+1"/>
+        <Member Name="state" Type="Unsigned" Size="1" Offset="move_state+4"/>
+        <Member Name="player_owner" Type="Unsigned" Size="1" Offset="state+4"/>
+        <Member Name="isImmobile" Type="Unsigned" Size="1" Offset="player_owner+2"/>
+        <Member Name="kills" Type="Unsigned" Size="2" Offset="isImmobile+10"/>
+        <Member Name="player_owner2" Type="Unsigned" Size="1" Offset="kills+2"/>
+        <Member Name="player_owner3" Type="Unsigned" Size="1" Offset="player_owner2+1"/>
+        <Member Name="position_x" Type="Fixed" Size="4" Offset="player_owner3+11"/>
+        <Member Name="position_y" Type="Fixed" Size="4" Offset="position_x+4"/>
+        <Member Name="position_z" Type="Fixed" Size="4" Offset="position_y+4"/>
+        <Member Name="rotation_x" Type="Fixed" Size="4" Offset="position_z+12"/>
+        <Member Name="rotation_y" Type="Fixed" Size="4" Offset="rotation_x+4"/>
+        <Member Name="rotation" Type="Fixed" Size="4" Offset="rotation_y+4"/>
+        <Member Name="randomTimer" Type="Unsigned" Size="4" Offset="rotation+4"/>
+        <Member Name="death_type" Type="Unsigned" Size="4" Offset="randomTimer+9"/>
+        <Member Name="destination_x" Type="Fixed" Size="4" Offset="death_type+11"/>
+        <Member Name="destination_y" Type="Fixed" Size="4" Offset="destination_x+4"/>
+        <Member Name="destination_z" Type="Fixed" Size="4" Offset="destination_y+4"/>
+        <Member Name="last_order" Type="Unsigned" Size="4" Offset="destination_z+8"/>
+        <Member Name="destination2_x" Type="Fixed" Size="4" Offset="last_order+4"/>
+        <Member Name="destination2_y" Type="Fixed" Size="4" Offset="destination2_x+4"/>
+        <Member Name="start_position_x" Type="Fixed" Size="4" Offset="destination2_y+4"/>
+        <Member Name="start_position_y" Type="Fixed" Size="4" Offset="start_position_x+4"/>
+        <Member Name="destination3_x" Type="Fixed" Size="4" Offset="start_position_y+4"/>
+        <Member Name="destination3_y" Type="Fixed" Size="4" Offset="destination3_x+4"/>
+        <Member Name="start_position2_x" Type="Fixed" Size="4" Offset="destination3_y+4"/>
+        <Member Name="start_position2_y" Type="Fixed" Size="4" Offset="start_position2_x+4"/>
+        <Member Name="move_speed" Type="Unsigned" Size="4" Offset="start_position2_y+24"/>
+        <Member Name="commandQueue_pointer" Type="Unsigned" Size="4" Offset="move_speed+12"/>
+        <Member Name="abilities_pointer" Type="Unsigned" Size="4" Offset="commandQueue_pointer+8"/>
+        <Member Name="health_damage" Type="Fixed" Size="4" Offset="abilities_pointer+56"/>
+        <Member Name="shield_damage" Type="Fixed" Size="4" Offset="health_damage+4"/>
+        <Member Name="energy" Type="Fixed" Size="4" Offset="shield_damage+4"/>
+        <Member Name="bonus_max_health" Type="Fixed" Size="4" Offset="energy+4"/>
+        <Member Name="bonus_max_shields" Type="Fixed" Size="4" Offset="bonus_max_health+4"/>
+        <Member Name="bonus_max_energy" Type="Fixed" Size="4" Offset="bonus_max_shields+4"/>
+        <Member Name="health_multiplier" Type="Fixed" Size="4" Offset="bonus_max_energy+4"/>
+        <Member Name="shields_multiplier" Type="Fixed" Size="4" Offset="health_multiplier+4"/>
+        <Member Name="energy_multiplier" Type="Fixed" Size="4" Offset="shields_multiplier+4"/>
+        <Member Name="health_regen_bonus" Type="Fixed" Size="4" Offset="energy_multiplier+4"/>
+        <Member Name="shield_regen_bonus" Type="Fixed" Size="4" Offset="health_regen_bonus+4"/>
+        <Member Name="energy_regen_bonus" Type="Fixed" Size="4" Offset="shield_regen_bonus+4"/>
+        <Member Name="time_scale" Type="Fixed" Size="4" Offset="energy_regen_bonus+28"/>
+        <Member Name="lifespan" Type="Unsigned" Size="4" Offset="time_scale+5"/>
+        <Member Name="lastAttacked" Type="Unsigned" Size="4" Offset="lifespan+4"/>
+        <Member Name="bountyMinerals" Type="Unsigned" Size="4" Offset="lastAttacked+19"/>
+        <Member Name="bountyVespene" Type="Unsigned" Size="4" Offset="bountyMinerals+4"/>
+        <Member Name="bountyTerrazine" Type="Unsigned" Size="4" Offset="bountyVespene+4"/>
+        <Member Name="bountyCustom" Type="Unsigned" Size="4" Offset="bountyTerrazine+4"/>
+        <Member Name="bountyXP" Type="Unsigned" Size="4" Offset="bountyCustom+4"/>
+        <Member Name="cellX_approx" Type="Unsigned" Size="1" Offset="bountyXP+4"/>
+        <Member Name="cellY_approx" Type="Unsigned" Size="1" Offset="cellX_approx+1"/>
+	</Struct>
+</Offsets>
