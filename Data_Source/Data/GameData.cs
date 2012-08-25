@@ -15,6 +15,16 @@ namespace Data
 
 	public static class GameData
 	{
+		private static OffsetReader _offsets;
+		public static OffsetReader offsets
+		{
+			get
+			{
+				if (_offsets == null)
+					_offsets = new OffsetReader("Offsets.xml");
+				return _offsets;
+			}
+		}
 		public static MapData mapDat;
 		private static ReadWriteMemory _mem;
 		private static PatternScan _ps;
@@ -53,7 +63,8 @@ namespace Data
 			Point WindowLocation = new Point(0, 0);
 			if (ClientCoords != Rectangle.Empty && Utilities.MemoryHandling.Imports.ClientToScreen(_SC2Process.MainWindowHandle, ref WindowLocation))
 			{
-				ClientCoords.Offset(WindowLocation);
+				if(WindowLocation.X >-5000 || WindowLocation.Y > -5000)
+					ClientCoords.Offset(WindowLocation);
 				return ClientCoords;
 			}
 			return Rectangle.Empty;
@@ -186,8 +197,8 @@ namespace Data
 			p.unitsLostVespeneWorth = (int) _s.units_lost_vespene_worth;
 			p.buildingsConstructing = (int) _s.buildings_constructing;
 			p.cameraDistance = (int) _s.camera_distance;
-			p.cameraX = (int) Math.Round((double) (((double) _s.camera_x) / 4096.0));
-			p.cameraY = (int) Math.Round((double) (((double) _s.camera_y) / 4096.0));
+			p.cameraX = (int)(_s.camera_x + 0.5);
+			p.cameraY = (int)(_s.camera_y + 0.5);
 			p.cameraRotation = (int) _s.camera_rotation;
 			p.workersBuilt = (int) _s.harvesters_built;
 			p.workersCurrent = (int) _s.harvesters_current;
@@ -195,9 +206,9 @@ namespace Data
 			//p.unitsLost = (int) _s.units_lost;
 			p.buildingQueueLength = (int) _s.building_queue_length;
 			p.slotNumber = (int) _s.slot_number;
-			p.supply = _s.supply_current / 4096f;
-			p.supplyCap = _s.supply_cap / 4096f;
-			p.supplyLimit = _s.supply_limit / 4096f;
+			p.supply = _s.supply_current;
+			p.supplyCap = _s.supply_cap;
+			p.supplyLimit = _s.supply_limit;
 			uint num = (uint) mem.ReadMemory((uint) (_s.racePointer + 4), typeof(uint));
 			mem.ReadMemory((uint) num, 4, out buffer);
 			if (buffer[0] == 0)
@@ -425,8 +436,8 @@ namespace Data
 			Unit unit = new Unit { 
 				name = UINameAsText,
 				textID = NameAsText,
-				minimapRadius = (float)ums.minimap_radius / 4096f,
-				timeScale = us.time_scale / 4096f,
+				minimapRadius = ums.minimap_radius,
+				timeScale = us.time_scale,
 
 				ID = us.token,
 				playerNumber = us.player_owner,
@@ -446,41 +457,41 @@ namespace Data
 
 				energyRegenDelay = ums.energy_regen_delay / 65536f,
 				energyRegenRate = (ums.energy_regen_rate + us.energy_regen_bonus) / 256f,
-				energyDamage = (ums.max_energy * (us.energy_multiplier / 4096f) + us.bonus_max_energy - us.energy) / 4096f,
-				currentEnergy = us.energy / 4096f,
-				maxEnergy = (ums.max_energy * (us.energy_multiplier / 4096f) + us.bonus_max_energy) / 4096f,
+				energyDamage = ums.max_energy * us.energy_multiplier + us.bonus_max_energy - us.energy,
+				currentEnergy = us.energy,
+				maxEnergy = ums.max_energy * us.energy_multiplier + us.bonus_max_energy,
 
 				shieldRegenDelay = ums.shield_regen_delay / 65536f,
 				shieldRegenRate = (ums.shield_regen_rate + us.shield_regen_bonus)/ 256f,
-				shieldDamage = us.shield_damage / 4096f,
-				currentShield = (ums.max_shield * (us.shields_multiplier / 4096f) + us.bonus_max_shields - us.shield_damage) / 4096f,
-				maxShield = (ums.max_shield * (us.shields_multiplier / 4096f) + us.bonus_max_shields) / 4096f,
+				shieldDamage = us.shield_damage,
+				currentShield = ums.max_shield * us.shields_multiplier + us.bonus_max_shields - us.shield_damage,
+				maxShield = ums.max_shield * us.shields_multiplier + us.bonus_max_shields,
 
 				healthRegenDelay = ums.health_regen_delay / 65536f,
 				healthRegenRate = (ums.health_regen_rate + us.energy_regen_bonus) / 256f,
-				healthDamage = us.health_damage / 4096f,
-				currentHealth = (ums.max_health * (us.health_multiplier / 4096f) + us.bonus_max_health - us.health_damage) / 4096f,
-				maxHealth = (ums.max_health * (us.health_multiplier / 4096f) + us.bonus_max_health) / 4096f,
+				healthDamage = us.health_damage,
+				currentHealth = ums.max_health * us.health_multiplier + us.bonus_max_health - us.health_damage,
+				maxHealth = ums.max_health * us.health_multiplier + us.bonus_max_health,
 
-				locationX = ((float) us.position_x) / 4096f, 
-				locationY = ((float) us.position_y) / 4096f, 
-				locationZ = ((float) us.position_z) / 4096f, 
+				locationX = us.position_x, 
+				locationY = us.position_y, 
+				locationZ = us.position_z, 
 
-				destinationX = ((float) us.destination_x) / 4096f, 
-				destinationY = ((float) us.destination_y) / 4096f,
-				destinationZ = ((float) us.destination_z) / 4096f,
+				destinationX = us.destination_x, 
+				destinationY = us.destination_y,
+				destinationZ = us.destination_z,
 
-				destination2X = ((float) us.destination2_x) / 4096f,
-				destination2Y = ((float) us.destination2_y) / 4096f,
+				destination2X = us.destination2_x,
+				destination2Y = us.destination2_y,
 
 				kills = us.kills,
 
 				/*rotation = (int)(us.rotation * 0.010987669527379678),
 				rotationX = (int)us.rotation_x,
 				rotationY = (int)us.rotation_y,*/
-				rotation = 180 - us.rotation / 4096f * 45,
-				rotationX = 180 - us.rotation_x / 4096f * 45,
-				rotationY = 180 - us.rotation_y / 4096f * 45,
+				rotation = 180 - us.rotation * 45,
+				rotationX = 180 - us.rotation_x * 45,
+				rotationY = 180 - us.rotation_y * 45,
 
 				moveSpeed = (int)us.move_speed,
 				memoryLocation = StructStarts.Units + ((uint) StructSizes.Units * (us.token / 4u)),
@@ -529,8 +540,7 @@ namespace Data
 		{
 			get
 			{
-				int MapBottom = ((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x120), typeof(int)) + 2048) / 0x1000;
-				return MapBottom;
+				return (int)((fixed32)mem.ReadMemory((uint)(Pointers.MapInformation + 0x124), typeof(fixed32)) + 0.5);
 			}
 		}
 
@@ -538,8 +548,7 @@ namespace Data
 		{
 			get
 			{
-				int MapLeft = ((int) mem.ReadMemory((uint) (Pointers.MapInformation + 0x11c), typeof(int)) + 2048) / 0x1000;
-				return MapLeft;
+				return (int)((fixed32)mem.ReadMemory((uint)(Pointers.MapInformation + 0x120), typeof(fixed32)) + 0.5);
 			}
 		}
 
@@ -547,9 +556,7 @@ namespace Data
 		{
 			get
 			{
-				int MapWidth = MapFullWidth;
-				int MapRight = ((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x124), typeof(int)) + 2048) / 0x1000;
-				return MapRight;
+				return (int)((fixed32)mem.ReadMemory((uint)(Pointers.MapInformation + 0x128), typeof(fixed32)) + 0.5);
 			}
 		}
 
@@ -557,9 +564,7 @@ namespace Data
 		{
 			get
 			{
-				int MapHeight = MapFullHeight;
-				int MapTop = ((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x128), typeof(int)) + 2048) / 0x1000;
-				return MapTop;
+				return (int)((fixed32)mem.ReadMemory((uint)(Pointers.MapInformation + 0x12c), typeof(fixed32)) + 0.5);
 			}
 		}
 
@@ -567,8 +572,7 @@ namespace Data
 		{
 			get
 			{
-				int MapBottom = (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x130), typeof(int));
-				return MapBottom;
+				return (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x134), typeof(int));
 			}
 		}
 
@@ -576,8 +580,7 @@ namespace Data
 		{
 			get
 			{
-				int MapLeft = (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x12c), typeof(int));
-				return MapLeft;
+				return (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x130), typeof(int));
 			}
 		}
 
@@ -585,9 +588,7 @@ namespace Data
 		{
 			get
 			{
-				int MapWidth = MapFullWidth;
-				int MapRight = (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x134), typeof(int));
-				return MapRight;
+				return (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x138), typeof(int));
 			}
 		}
 
@@ -595,9 +596,7 @@ namespace Data
 		{
 			get
 			{
-				int MapHeight = MapFullHeight;
-				int MapTop = (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x138), typeof(int));
-				return MapTop;
+				return (int)mem.ReadMemory((uint)(Pointers.MapInformation + 0x13c), typeof(int));
 			}
 		}
 
@@ -605,7 +604,7 @@ namespace Data
 		{
 			get
 			{
-				return (((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xf0), typeof(int)) + 2048) / 0x1000);
+				return (int)((fixed32)mem.ReadMemory((uint)(Pointers.MapInformation + 0xf4), typeof(fixed32)) + 0.5);
 			}
 		}
 
@@ -613,7 +612,7 @@ namespace Data
 		{
 			get
 			{
-				return (((int)mem.ReadMemory((uint)(Pointers.MapInformation + 0xec), typeof(int)) + 2048) / 0x1000);
+				return (int)((fixed32)mem.ReadMemory((uint)(Pointers.MapInformation + 0xf0), typeof(fixed32)) + 0.5);
 			}
 		}
 
@@ -831,7 +830,7 @@ namespace Data
 		{
 			get
 			{
-				return (int) mem.ReadMemory(Offsets.OFFSET_GAME_TIMER, typeof(int));
+				return (int) mem.ReadMemory(ps.Timer(), typeof(int)) / 832;
 			}
 		}
 
@@ -894,7 +893,7 @@ namespace Data
 		public enum StructSizes : uint
 		{
 			Ability = 120,
-			BnetID = 0x626, //0x4b0,
+			BnetID = 0x4b0,
 			CameraInfo = 0x24,
 			ControlGroup = 0xcf8,
 			Player = 0xA68,
@@ -906,7 +905,7 @@ namespace Data
 		public static class StructStarts
 		{
 			public static uint Abilities;
-			public static uint BnetIDs = 0x0176ACF0; //0x016E5E2C; //0x016CA8B8; //0x3165c08;
+			public static uint BnetIDs = 0x0179EFF8; //0x0176ACF0; //0x016E5E2C; //0x016CA8B8; //0x03165c08;
 			public static uint CameraInfo;
 
 			public static uint LocalSelection

@@ -124,7 +124,7 @@ namespace Utilities.MemoryHandling
 			while (num2 <= num);
 		}
 
-		public static List<uint[]> getProcessDynamicMemoryRegions()
+		public static List<uint[]> getProcessDynamicMemoryRegions(IntPtr ProcessHandle)
 		{
 			long MaxAddress = 0x7fffffffL;
 			long CurrentAddress = 0L;
@@ -134,21 +134,11 @@ namespace Utilities.MemoryHandling
 			do
 			{
 				Imports.MEMORY_BASIC_INFORMATION lpBuffer = new Imports.MEMORY_BASIC_INFORMATION();
-				bool flag = Imports.VirtualQueryEx(Process.GetProcessesByName("SC2")[0].Handle, (IntPtr)CurrentAddress, out lpBuffer, (uint)Marshal.SizeOf(lpBuffer));
-
-				if ((uint)lpBuffer.BaseAddress < 0x31F304A8 && (uint)lpBuffer.BaseAddress + (uint)lpBuffer.RegionSize > 0x31F304A8)
-				{
-					int p = 0;
-				}
+				bool flag = Imports.VirtualQueryEx(ProcessHandle, (IntPtr)CurrentAddress, out lpBuffer, (uint)Marshal.SizeOf(lpBuffer));
 
 				if (flag && lpBuffer.State == 0x1000 && (uint)lpBuffer.RegionSize > 0 
 					&& lpBuffer.Protect == (uint) Imports.MemoryProtection.ReadWrite && lpBuffer.Type == 0x20000)
 				{
-					if (lpBuffer.Type == 0x20000)
-					{
-						int oops = 0;
-					}
-
 					uint[] temp = new uint[2];
 					temp[0] = (uint)lpBuffer.BaseAddress;
 					temp[1] = (uint)lpBuffer.RegionSize;

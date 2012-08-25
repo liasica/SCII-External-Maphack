@@ -9,15 +9,15 @@ namespace Data
 		[FieldOffset(0x0)]
 		public uint active;
 		[FieldOffset(0x8)]
-		public uint camera_x;
+		public fixed32 camera_x;
 		[FieldOffset(0xc)]
-		public uint camera_y;
+		public fixed32 camera_y;
 		[FieldOffset(0x10)]
-		public uint camera_distance;
+		public fixed32 camera_distance;
 		[FieldOffset(0x14)]
-		public uint camera_angle_of_attack;
+		public fixed32 camera_angle_of_attack;
 		[FieldOffset(0x18)]
-		public uint camera_rotation;
+		public fixed32 camera_rotation;
 		[FieldOffset(0x1c)]
 		public byte team;
 		[FieldOffset(0x1d)]
@@ -37,7 +37,7 @@ namespace Data
 		[FieldOffset(0xa4)]
 		public uint slot_number;
 		[FieldOffset(0xa8)]
-		public uint supply_limit;
+		public fixed32 supply_limit;
 		[FieldOffset(0xac)] //same offset?!
 		public uint credits;
 		[FieldOffset(0xac)] //same offset?!
@@ -45,9 +45,9 @@ namespace Data
 		[FieldOffset(0xb0)]
 		public uint research_points;
 		[FieldOffset(0xfc)]
-		public uint attack_multiplier;
+		public fixed32 attack_multiplier;
 		[FieldOffset(0x100)]
-		public uint damage_multiplier;
+		public fixed32 defense_multiplier;
 		//[FieldOffset(0x380)] //discarding this because I don't know which value is correct.
 		//public uint actions_total;
 		//[FieldOffset(0x3a8)] //discarding this because I don't know which value is correct.
@@ -75,9 +75,9 @@ namespace Data
 		[FieldOffset(0x580)]
 		public uint army_size;
 		[FieldOffset(0x5d8)]
-		public uint supply_cap;
+		public fixed32 supply_cap;
 		[FieldOffset(0x5f0)]
-		public uint supply_current;
+		public fixed32 supply_current;
 		[FieldOffset(0x628)]
 		public uint minerals_current;
 		[FieldOffset(0x630)]

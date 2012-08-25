@@ -9,6 +9,7 @@ namespace Data
 		private string _fileContents;
 		private string _fileContentsType;
 		private Foole.Mpq.MpqArchive _mpqArchive;
+		private Foole.Mpq.MpqArchive _topArchive;
 
 		public MpqManager(string mpqFile)
 		{
@@ -16,8 +17,36 @@ namespace Data
 			//string destFileName = Path.Combine(Path.GetTempPath(), info.Name);
 			//File.Copy(mpqFile, destFileName, true);
 			//this._mpqArchive = new Foole.Mpq.MpqArchive(destFileName);
-			this._mpqArchive = new Foole.Mpq.MpqArchive(mpqFile);
-			this._mpqArchive.AddListfileFilenames();
+			if(File.Exists(mpqFile))
+			{
+				this._mpqArchive = new Foole.Mpq.MpqArchive(mpqFile);
+				this._mpqArchive.AddListfileFilenames();
+				return;
+			}
+			
+			string[] SplitPath = mpqFile.Split('\\', '/');
+			string[] Remaining = null;
+			string Path = SplitPath.Length > 0 ? SplitPath[0] : string.Empty;
+
+			for (int i = 1; i < SplitPath.Length; i++)
+			{
+				Path += '\\' + SplitPath[i];
+				if (!Directory.Exists(Path))
+				{
+					Remaining = new string[SplitPath.Length - i];
+					Array.ConstrainedCopy(SplitPath, i, Remaining, 0, SplitPath.Length - i);
+					break;
+				}
+			}
+
+			if (Remaining != null && Remaining.Length > 0 && File.Exists(Path))
+			{
+				this._topArchive = new Foole.Mpq.MpqArchive(Path);
+				this._topArchive.AddListfileFilenames();
+			}
+
+
+			
 		}
 
 		public void Close()

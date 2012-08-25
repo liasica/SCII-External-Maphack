@@ -35,45 +35,45 @@ namespace Data
 		[FieldOffset(0x39)]
 		public byte player_owner3;
 		[FieldOffset(0x44)]
-		public uint position_x;
+		public fixed32 position_x;
 		[FieldOffset(0x48)]
-		public uint position_y;
+		public fixed32 position_y;
 		[FieldOffset(0x4c)]
-		public uint position_z;
+		public fixed32 position_z;
 		[FieldOffset(0x58)]
-		public int rotation_x;
+		public fixed32 rotation_x;
 		[FieldOffset(0x5c)]
-		public int rotation_y;
+		public fixed32 rotation_y;
 		[FieldOffset(0x60)]
-		public int rotation;
+		public fixed32 rotation;
 		[FieldOffset(0x64)]
 		public uint randomTimer;
 		[FieldOffset(0x6d)]
 		public uint death_type;
 		[FieldOffset(0x78)]
-		public uint destination_x;
+		public fixed32 destination_x;
 		[FieldOffset(0x7c)]
-		public uint destination_y;
+		public fixed32 destination_y;
 		[FieldOffset(0x80)]
-		public uint destination_z;
+		public fixed32 destination_z;
 		[FieldOffset(0x88)]
 		public uint last_order;
 		[FieldOffset(0x8c)]
-		public uint destination2_x;
+		public fixed32 destination2_x;
 		[FieldOffset(0x90)]
-		public uint destination2_y;
+		public fixed32 destination2_y;
 		[FieldOffset(0x94)]
-		public uint start_position_x;
+		public fixed32 start_position_x;
 		[FieldOffset(0x98)]
-		public uint start_position_y;
+		public fixed32 start_position_y;
 		[FieldOffset(0x9c)]
-		public uint destination3_x;
+		public fixed32 destination3_x;
 		[FieldOffset(0xa0)]
-		public uint destination3_y;
+		public fixed32 destination3_y;
 		[FieldOffset(0xa4)]
-		public uint start_position2_x;
+		public fixed32 start_position2_x;
 		[FieldOffset(0xa8)]
-		public uint start_position2_y;
+		public fixed32 start_position2_y;
 		[FieldOffset(0xc0)]
 		public uint move_speed;
 		[FieldOffset(0xcc)]
@@ -81,35 +81,35 @@ namespace Data
 		[FieldOffset(0xd4)]
 		public uint abilities_pointer;
 		[FieldOffset(0x10c)]
-		public uint health_damage;
+		public fixed32 health_damage;
 		[FieldOffset(0x110)]
-		public uint shield_damage;
+		public fixed32 shield_damage;
 		[FieldOffset(0x114)]
-		public uint energy;
+		public fixed32 energy;
 		[FieldOffset(0x118)]
-		public int bonus_max_health;
+		public fixed32 bonus_max_health;
 		[FieldOffset(0x11c)]
-		public int bonus_max_shields;
+		public fixed32 bonus_max_shields;
 		[FieldOffset(0x120)]
-		public int bonus_max_energy;
+		public fixed32 bonus_max_energy;
 		[FieldOffset(0x124)]
-		public uint health_multiplier;
+		public fixed32 health_multiplier;
 		[FieldOffset(0x128)]
-		public uint shields_multiplier;
+		public fixed32 shields_multiplier;
 		[FieldOffset(0x12c)]
-		public uint energy_multiplier;
+		public fixed32 energy_multiplier;
 		[FieldOffset(0x130)]
 		public int health_regen_bonus;
 		[FieldOffset(0x134)]
 		public int shield_regen_bonus;
 		[FieldOffset(0x138)]
 		public int energy_regen_bonus;
-		[FieldOffset(0x154)]
-		public uint time_scale;
 		[FieldOffset(0x159)]
 		public uint lifespan;
-		[FieldOffset(0x15d)]
+		[FieldOffset(0x15d)] //hmm 3 bytes between 4-byte values...
 		public uint lastAttacked;
+		[FieldOffset(0x160)] //hmm 3 bytes between 4-byte values...
+		public fixed32 time_scale;
 		[FieldOffset(0x170)]
 		public uint bountyMinerals;
 		[FieldOffset(0x174)]

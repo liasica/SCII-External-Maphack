@@ -51,10 +51,10 @@
         <Member Name="health_regen_bonus" Type="Fixed" Size="4" Offset="energy_multiplier+4"/>
         <Member Name="shield_regen_bonus" Type="Fixed" Size="4" Offset="health_regen_bonus+4"/>
         <Member Name="energy_regen_bonus" Type="Fixed" Size="4" Offset="shield_regen_bonus+4"/>
-        <Member Name="time_scale" Type="Fixed" Size="4" Offset="energy_regen_bonus+28"/>
-        <Member Name="lifespan" Type="Unsigned" Size="4" Offset="time_scale+5"/>
+        <Member Name="lifespan" Type="Unsigned" Size="4" Offset="energy_regen_bonus+33"/>
         <Member Name="lastAttacked" Type="Unsigned" Size="4" Offset="lifespan+4"/>
-        <Member Name="bountyMinerals" Type="Unsigned" Size="4" Offset="lastAttacked+19"/>
+		<Member Name="time_scale" Type="Fixed" Size="4" Offset="lastAttacked+3"/>
+        <Member Name="bountyMinerals" Type="Unsigned" Size="4" Offset="time_scale+16"/>
         <Member Name="bountyVespene" Type="Unsigned" Size="4" Offset="bountyMinerals+4"/>
         <Member Name="bountyTerrazine" Type="Unsigned" Size="4" Offset="bountyVespene+4"/>
         <Member Name="bountyCustom" Type="Unsigned" Size="4" Offset="bountyTerrazine+4"/>

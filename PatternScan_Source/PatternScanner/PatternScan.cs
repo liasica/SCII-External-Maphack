@@ -8,6 +8,7 @@ namespace PatternScanner
 	using Utilities.MemoryHandling;
 	public class PatternScan
 	{
+		private uint _Timer;
 		private uint _LocalPlayerNumber;
 		private uint _LocalSelection;
 		private uint _MapInfoPtr;
@@ -97,6 +98,26 @@ namespace PatternScanner
 			return list;
 		}
 
+		public uint Timer()
+		{
+			if (this.Process == null)
+			{
+				return 0;
+			}
+			if (this._Timer == 0)
+			{
+				byte[] bPattern = new byte[] { 
+					0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x2B, 0xC1,  0x8B, 0xD8, 0x03, 0xCB, 0x89, 0x0D,
+				 };
+				uint num = this.Process.FindPattern(bPattern, "xx????xxxxxxxx");
+				if (num != 0x800000)
+				{
+					this._Timer = this.Process.ReadUInt(num + 2);
+				}
+			}
+			return this._Timer;
+		}
+
 		public uint LocalPlayerNumber()
 		{
 			if (this.Process == null)
@@ -145,11 +166,11 @@ namespace PatternScanner
 			if (this._MapInfoPtr == 0)
 			{
 				byte[] bPattern1 = new byte[] {0x75, 0x01, 0x6A, 0x01, 0x8B, 0xF2, 0xE8, 0xD9, 0x58, 0xBE, 0xFF, 0x8B, 0x5D, 0x08, 0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x53, 0x56, 0x57, 0xE8, 0x08, 0x9B, 0xCD, 0xFF, 0x8B, 0x0D, 0xC8, 0xFD, 0x75, 0x01, 0x6A, 0x00, 0x8B, 0xF0, 0xE8, 0xB9, 0x58, 0xBE, 0xFF, 0x85, 0xDB, 0x75, 0x05, 0xE8};
-				uint num1 = this.Process.FindPattern(bPattern1, "xxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+				uint num1 = this.Process.FindPattern(bPattern1, "?xxxxxx??xxxxxxx????xxxx??xxxx???xxxxxx??xxxxxxx");
 				byte[] bPattern2 = new byte[] {0x0D, 0x8B, 0xC8, 0xE8, 0xD8, 0xAB, 0xCD, 0xFF, 0xA3, 0x50, 0x58, 0x65, 0x02, 0xC3, 0xC7, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC3, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0x8B, 0x0D, 0x68, 0x58, 0x65, 0x02, 0x85, 0xC9, 0x74, 0x0F, 0xE8, 0xC1, 0xC2, 0x21, 0x00, 0xC7};
-				uint num2 = this.Process.FindPattern(bPattern2, "xxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+				uint num2 = this.Process.FindPattern(bPattern2, "xxxx??xxx??xxxxx????xxxxxxxxxxxxxx????xxxxx??xxx");
 				byte[] bPattern3 = new byte[] {0xE8, 0x53, 0x96, 0xCD, 0xFF, 0x56, 0xE8, 0x1D, 0x53, 0xE7, 0xFF, 0x83, 0xC4, 0x04, 0xC7, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5E, 0xC3, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0x55, 0x8B, 0xEC, 0x51, 0x53, 0x56, 0xBA, 0x01};
-				uint num3 = this.Process.FindPattern(bPattern3, "xxxxxxxxxxxxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+				uint num3 = this.Process.FindPattern(bPattern3, "x??xxxx???xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 				if (num1 != 0x800000)
 					num1 = this.Process.ReadUInt(num1 + 16);
 				else
@@ -312,9 +333,9 @@ namespace PatternScanner
 				return Rectangle.Empty;
 			}
 			string sPattern = "00 6D 6C 64 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 14 00 00 00 E0 0F 4D 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 FF FF FF FF 00 00 00 00 28 03 00 00 1C 00 00 00 2A 04 00 00 22 01 00 00 28 03 00 00 1C 00 00 00 2A 04 00 00 22 01 00 00";
-			byte[] bPattern = {0xE0, 0x0F, 0x4D, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x28, 0x03, 0x00, 0x00, 0x1C, 0x00, 0x00, 0x00, 0x2A, 0x04, 0x00, 0x00, 0x22, 0x01, 0x00, 0x00, 0x28, 0x03, 0x00, 0x00, 0x1C, 0x00, 0x00, 0x00, 0x2A, 0x04, 0x00, 0x00, 0x22, 0x01, 0x00, 0x00};
+			byte[] bPattern = {0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x28, 0x03, 0x00, 0x00, 0x1C, 0x00, 0x00, 0x00, 0x2A, 0x04, 0x00, 0x00, 0x22, 0x01, 0x00, 0x00, 0x28, 0x03, 0x00, 0x00, 0x1C, 0x00, 0x00, 0x00, 0x2A, 0x04, 0x00, 0x00, 0x22, 0x01, 0x00, 0x00};
 			
-			List<uint[]> RegionList = Utilities.MemoryHandling.ReadWriteMemory.getProcessDynamicMemoryRegions();
+			List<uint[]> RegionList = Utilities.MemoryHandling.ReadWriteMemory.getProcessDynamicMemoryRegions(this.Process.ProcessHandle);
 			Comparison<uint[]> comp = delegate (uint[] val1, uint[] val2)
 			{
 				uint center = 0x30000000;
@@ -357,7 +378,7 @@ namespace PatternScanner
 			
 
 						//Address = this.Process.FindPattern(OldAddress, (int)(region[0] + region[1]) - (int) OldAddress - 1, sPattern, "xxxx????????????????xxxx????????????????????xxxxxxxx??xx??xx??xx??xx??xx??xx??xx??xx");
-						Address = SPattern.FindPattern(dataentry.bData, bPattern, "xxxx????????????????xxxxxxxx??xx??xx??xx??xx??xx??xx??xx??xx") + OldAddress;
+						Address = SPattern.FindPattern(dataentry.bData, bPattern, "xxxxxxxx??xx??xx??xx??xx??xx??xx??xx??xx") + OldAddress;
 					}
 					catch
 					{
@@ -366,26 +387,26 @@ namespace PatternScanner
 					}
 					if (Address != OldAddress)
 					{
-						byte[] temp = this.Process.ReadBytes(Address, 60);
-						if (temp[0x1c] == temp[0x2c] && temp[0x1d] == temp[0x2d]
-						 && temp[0x20] == temp[0x30] && temp[0x21] == temp[0x31]
-						 && temp[0x24] == temp[0x34] && temp[0x25] == temp[0x35]
-						 && temp[0x28] == temp[0x38] && temp[0x29] == temp[0x39])
+						byte[] temp = this.Process.ReadBytes(Address, 40);
+						if (temp[0x08] == temp[0x18] && temp[0x09] == temp[0x19]
+						 && temp[0x0c] == temp[0x1c] && temp[0x0d] == temp[0x1d]
+						 && temp[0x10] == temp[0x20] && temp[0x11] == temp[0x21]
+						 && temp[0x14] == temp[0x24] && temp[0x15] == temp[0x25])
 						{
-							int Y = (temp[0x1f] << 24) + (temp[0x1e] << 16) + (temp[0x1d] << 8) + temp[0x1c];
-							int X = (temp[0x23] << 24) + (temp[0x22] << 16) + (temp[0x21] << 8) + temp[0x20];
-							int Y2 = (temp[0x27] << 24) + (temp[0x26] << 16) + (temp[0x25] << 8) + temp[0x24];
-							int X2 = (temp[0x2b] << 24) + (temp[0x2a] << 16) + (temp[0x29] << 8) + temp[0x28];
+							int Y = (temp[0x0b] << 24) + (temp[0x0a] << 16) + (temp[0x09] << 8) + temp[0x08];
+							int X = (temp[0x0f] << 24) + (temp[0x0e] << 16) + (temp[0x0d] << 8) + temp[0x0c];
+							int Y2 = (temp[0x13] << 24) + (temp[0x12] << 16) + (temp[0x11] << 8) + temp[0x10];
+							int X2 = (temp[0x17] << 24) + (temp[0x16] << 16) + (temp[0x15] << 8) + temp[0x14];
 							if (Y > 1 && X > 1 && Y < Y2 && X < X2 && X < Y / 10 && X2 < Y2 / 2)
 							{
 								Rectangle ScreenRect = Screen.GetBounds(Point.Empty);
-								if (X > ScreenRect.Left && Y > ScreenRect.Top && X2 < ScreenRect.Right && Y2 < ScreenRect.Bottom)
+								if (X > ScreenRect.Left && Y > ScreenRect.Bottom / 3 && X2 < ScreenRect.Right && Y2 < ScreenRect.Bottom)
 									return new Rectangle(X, Y, X2 - X, Y2 - Y);
 							}
 						}
 					}
-					Address += 60;
-				} while (Address > OldAddress + 60 && Address < (region[0] + region[1]) - 60);
+					Address += 40;
+				} while (Address > OldAddress + 40 && Address < (region[0] + region[1]) - 40);
 			}
 
 			return Rectangle.Empty;

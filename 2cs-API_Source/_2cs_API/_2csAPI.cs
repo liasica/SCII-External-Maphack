@@ -348,12 +348,7 @@ namespace _2cs_API
 
 		public static bool InGame()
 		{
-			if (GameData.SecondsElapsed > 0)
-			{
-				return true;
-			}
-			uint num = (uint) GameData.mem.ReadMemory((uint) (GameData.StructStarts.Map + 0x4c), typeof(uint));
-			return (num > 0);
+			return GameData.SecondsElapsed > 0;
 		}
 
 		public static bool IsWorker(UnitType unitType)

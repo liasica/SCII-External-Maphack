@@ -471,7 +471,7 @@ namespace maphack_external_directx
 			this.device.RenderState.ZBufferEnable = true;
 			this.device.RenderState.ZBufferFunction = Compare.GreaterEqual;
 			this.device.RenderState.ZBufferWriteEnable = true;
-			this.device.Clear(ClearFlags.ZBuffer, Color.Black, 0.0f, 0);
+			this.device.Clear(ClearFlags.ZBuffer, Color.FromArgb(0, 1, 1, 1), 0.0f, 0);
 
 			this.DrawUnitPositionsOnMap(radiusFactor);
 
@@ -683,7 +683,7 @@ namespace maphack_external_directx
 
 			lock (MainWindow.unit_counts)
 			{
-				if (MainWindow.unit_counts == null)
+				if (MainWindow.unit_counts == null || MainWindow.unit_counts[p_no] == null)
 					return;
 				foreach (KeyValuePair<string, int> pair in MainWindow.unit_counts[p_no])
 				{
@@ -854,7 +854,7 @@ namespace maphack_external_directx
 			}
 			else
 			{
-				black = Color.DarkGray;
+				black = Color.Black;
 			}
 			int index = 1;
 			int num2 = 0;
@@ -1408,9 +1408,9 @@ namespace maphack_external_directx
 				Process.GetCurrentProcess().Kill();
 				return;
 			}
+			this.device.RenderState.AlphaBlendEnable = true;
 			this.device.RenderState.SourceBlend = Blend.SourceAlpha;
 			this.device.RenderState.DestinationBlend = Blend.InvSourceAlpha;
-			this.device.RenderState.AlphaBlendEnable = true;
 			this.textSprite = new Sprite(this.device);
 			this.textureSprite = new Sprite(this.device);
 		}
@@ -1438,7 +1438,7 @@ namespace maphack_external_directx
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;
-			this.BackColor = System.Drawing.Color.Black;
+			this.BackColor = System.Drawing.Color.FromArgb(255, 1, 1, 1);
 			this.ClientSize = new System.Drawing.Size(150, 150);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -1470,11 +1470,11 @@ namespace maphack_external_directx
 			SetWindowLong(base.Handle, -20, (IntPtr)(((GetWindowLong(base.Handle, -20) ^ 0x80000) ^ 0x20) | 8L));
 			if (AeroEnabled)
 			{
-				SetLayeredWindowAttributes(base.Handle, 0, 0xff, 2);
+				SetLayeredWindowAttributes(base.Handle, 0x00010101, 0xff, LWA_ALPHA);
 			}
 			else
 			{
-				SetLayeredWindowAttributes(base.Handle, 0, 0xff, 1);
+				SetLayeredWindowAttributes(base.Handle, 0x00010101, 0xff, LWA_COLORKEY);
 			}
 		}
 
@@ -1522,6 +1522,12 @@ namespace maphack_external_directx
 						this.DesiredClientRect.Width = int.Parse(ini[SectionName]["SizeX"]);
 					if (ini[SectionName].ContainsKey("SizeY"))
 						this.DesiredClientRect.Height = int.Parse(ini[SectionName]["SizeY"]);
+
+					if (this._HUDType == HUDType.Observer)
+					{
+						CurrentObserverPanelTab = (ObserverPanelTabs)Enum.Parse(typeof(ObserverPanelTabs), ini[SectionName]["Mode"]);
+						ObserverPanelDrawDirection = (ObserverPanelDirection)Enum.Parse(typeof(ObserverPanelDirection), ini[SectionName]["Direction"]);
+					}
 				}
 			}
 			catch (Exception)
@@ -1577,6 +1583,18 @@ namespace maphack_external_directx
 				section["SizeY"] = this.DesiredClientRect.Height.ToString();
 			else
 				section.Add("SizeY", this.DesiredClientRect.Height.ToString());
+
+			if(this._HUDType == HUDType.Observer)
+			{
+				if (section.ContainsKey("Mode"))
+					section["Mode"] = CurrentObserverPanelTab.ToString();
+				else
+					section.Add("Mode", CurrentObserverPanelTab.ToString());
+				if (section.ContainsKey("Direction"))
+					section["Direction"] = ObserverPanelDrawDirection.ToString();
+				else
+					section.Add("Direction", ObserverPanelDrawDirection.ToString());
+			}
 
 			file.Add(SectionName, section);
 			file.Save();
@@ -1830,7 +1848,7 @@ namespace maphack_external_directx
 			}
 			if (!this.pause)
 			{
-				this.device.Clear(ClearFlags.Target, Color.FromArgb(0, 0, 0, 0), 0f, 0);
+				this.device.Clear(ClearFlags.Target, Color.FromArgb(0, 1, 1, 1), 0f, 0);
 				this.device.BeginScene();
 				this.DrawStuff();
 				this.device.EndScene();

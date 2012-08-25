@@ -228,6 +228,45 @@ namespace Utilities.WebTools
 			return original.Replace("\\", "\\\\").Replace("/", "\\/").Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"").Replace("\f", "\\f");
 		}
 
+		public static bool GitHubIssueExists(string title, string message) //note: this will only check the first page.
+		{
+			try
+			{
+				Version Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
+				string VersionString = "v" + Version.Major + "." + Version.Minor + "." + Version.Build;
+				string FormattedTitle = Reformat(title); //not used, but it may help in the future.
+				string FormattedMessage = Reformat(message.Replace(@"C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\Git Repo\", ""));
+
+				HttpWebRequest wr = (HttpWebRequest)WebRequest.Create("https://api.github.com/repos/MrNukealizer/SCII-External-Maphack/issues?state=open");
+
+				wr.Method = "GET";
+				wr.Headers["Authorization"] = "Basic U0NJSUVNSDpCdWdzQnVnczEwMDBCdWdz";
+				wr.Date = DateTime.Now;
+
+				string Result = string.Empty;
+				WebResponse response = wr.GetResponse();
+				while (response.ContentLength != 0)
+				{
+					byte[] ResultAsBytes = new byte[response.ContentLength];
+					response.GetResponseStream().Read(ResultAsBytes, 0, (int)response.ContentLength);
+					if (ResultAsBytes[0] == 0) //if the response starts with 0, that means it is probably all 0's, and we're past the end of the data.
+						break;
+					Result += Encoding.UTF8.GetString(ResultAsBytes);
+					Result = Result.Replace("\0", ""); //we turned the entire buffer into a string, but it might not have been full,
+					                                   //so there may be 0's after the actual string, which get included anyway and mess stuff up.
+					response = wr.GetResponse();
+				}
+				response.Close();
+
+				if (Result.Replace("\\r", "").Replace("\\n", "").Contains(FormattedMessage.Replace("\\r", "").Replace("\\n", "")))
+					return true;
+			}
+			catch (WebException ex)
+			{
+			}
+			return false;
+		}
+
 		public static void CreateGitHubIssue(string title, string message)
 		{
 			try
@@ -236,8 +275,8 @@ namespace Utilities.WebTools
 				string VersionString = "v" + Version.Major + "." + Version.Minor + "." + Version.Build;
 				string FormattedTitle = Reformat(title);
 				string FormattedMessage = Reformat(message.Replace(@"C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\Git Repo\", ""));
-				string JsonBody = "{\n  \"title\": \"Auto-Reported crash " + VersionString + ": " + FormattedTitle + "\",\n  \"body\": \"" + FormattedMessage + "\",\n  \"state\": \"open\",\n  \"labels\": [\n    \"Bug-Crash\"\n  ]\n}";
-				byte[] JsonBodyAsBytes = Encoding.ASCII.GetBytes(JsonBody);
+				string JsonBody = "{\n  \"title\": \"Auto-Reported crash " + VersionString + ": " + FormattedTitle + "\",\n  \"body\": \"" + FormattedMessage + "\",\n  \"state\": \"open\",\n  \"labels\": [\n    \"Auto-reported\"\n  ]\n}";
+				byte[] JsonBodyAsBytes = Encoding.UTF8.GetBytes(JsonBody);
 
 				HttpWebRequest wr = (HttpWebRequest) WebRequest.Create("https://api.github.com/repos/MrNukealizer/SCII-External-Maphack/issues");
 
@@ -274,6 +313,11 @@ namespace Utilities.WebTools
 				return;
 			}
 
+			if(GitHubIssueExists(ex.Message, ex.ToString()))
+			{
+				MessageBox.Show("Uh oh... It appears we have a crash. This problem has already been reported by somebody else, so please be patient while it is fixed.", "Unexpected Crash", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+				return;
+			}
 
 		CheeZecake:
 			DialogResult result = MessageBox.Show("Uh oh... It appears we have a crash. Would you like to submit a report? This does not require you to do anyhting more after clicking Yes, and does not contain any information other than what the error was and where in the program it occurred.", "Unexpected Crash", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
