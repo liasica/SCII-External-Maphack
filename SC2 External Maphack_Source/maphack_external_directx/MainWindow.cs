@@ -295,7 +295,6 @@ namespace maphack_external_directx
 
 		public MainWindow()
 		{
-			//OffsetReader fail = GameData.offsets;
 			this.InitializeComponent();
 			this.Text += " " + version_string;
 

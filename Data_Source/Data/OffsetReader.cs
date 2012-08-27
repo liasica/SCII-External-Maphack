@@ -38,8 +38,8 @@ namespace Data
 		}
 
 		XElement _File;
-		List<ORArray> _Arrays;
-		List<ORStruct> _Structs;
+		Dictionary<string, ORArray> _Arrays;
+		Dictionary<string, ORStruct> _Structs;
 		string _Version;
 		string Version
 		{
@@ -51,11 +51,91 @@ namespace Data
 					return "Offsets file not parsed.";
 			}
 		}
+
+
+		public Type GetStructMemberType(string StructDotMember)
+		{
+			string[] Split = StructDotMember.Split('.');
+			return GetStructMemberType(Split[0], Split[1]);
+		}
+		public Type GetStructMemberType(string Struct, string Member)
+		{
+			return _Structs[Struct].members[Member].type;
+		}
+
+		public int GetStructMemberOffset(string StructMember)
+		{
+			string[] Split = StructMember.Split('.');
+			return GetStructMemberOffset(Split[0], Split[1]);
+		}
+		public int GetStructMemberOffset(string Struct, string Member)
+		{
+			return _Structs[Struct].members[Member].offset;
+		}
+
+		public string GetArrayType(string Array)
+		{
+			return _Arrays[Array].type;
+		}
+
+		public int GetArrayElementAddress(string ArrayElement)
+		{
+			string[] Split = ArrayElement.Split('[', ']');
+			return GetArrayElementAddress(Split[0], ImprovedParse.Parse(Split[1]));
+		}
+		public int GetArrayElementAddress(string Array, int Index)
+		{
+			return _Arrays[Array].address + Index * _Structs[GetArrayType(Array)].size;
+		}
+
+		public int GetArrayElementMemberAddress(string ArrayElementMember)
+		{
+			char[] splitters = new char[] { '[', ']', '.' };
+			string[] Split = ArrayElementMember.Split(splitters, StringSplitOptions.RemoveEmptyEntries);
+			return GetArrayElementMemberAddress(Split[0], ImprovedParse.Parse(Split[1]), Split[2]);
+		}
+		public int GetArrayElementMemberAddress(string Array, int Index, string Member)
+		{
+			return GetArrayElementAddress(Array, Index) + GetStructMemberOffset(GetArrayType(Array), Member);
+		}
+
+		public Type GetArrayElementMemberType(string ArrayElementMember)
+		{
+			string[] Split = ArrayElementMember.Split('.');
+			return GetArrayElementMemberType(Split[0], Split[1]);
+		}
+		public Type GetArrayElementMemberType(string Array, string Member)
+		{
+			return GetStructMemberType(GetArrayType(Array), Member);
+		}
+
+		public Object ReadArrayElementMember(string ArrayElementMember)
+		{
+			char[] splitters = new char[] { '[', ']', '.' };
+			string[] Split = ArrayElementMember.Split(splitters, StringSplitOptions.RemoveEmptyEntries);
+			return ReadArrayElementMember(Split[0], ImprovedParse.Parse(Split[1]), Split[2]);
+		}
+		public Object ReadArrayElementMember(string Array, int Index, string Member)
+		{
+			return mem.ReadMemory((uint)GetArrayElementMemberAddress(Array, Index, Member), GetArrayElementMemberType(Array, Member));
+		}
+
+		public bool WriteArrayElementMember(string ArrayElementMember, Object NewValue)
+		{
+			char[] splitters = new char[] { '[', ']', '.' };
+			string[] Split = ArrayElementMember.Split(splitters, StringSplitOptions.RemoveEmptyEntries);
+			return WriteArrayElementMember(Split[0], ImprovedParse.Parse(Split[1]), Split[2], NewValue);
+		}
+		public bool WriteArrayElementMember(string Array, int Index, string Member, Object NewValue)
+		{
+			byte[] buffer = ReadWriteMemory.RawSerialize(NewValue);
+			return mem.WriteMemory((uint)GetArrayElementMemberAddress(Array, Index, Member), buffer.Length, ref buffer);
+		}
 		
 		public OffsetReader(string Filename)
 		{
-			_Arrays = new List<ORArray>();
-			_Structs = new List<ORStruct>();
+			_Arrays = new Dictionary<string, ORArray>();
+			_Structs = new Dictionary<string, ORStruct>();
 
 			FileStream fs = new FileStream(Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 			StreamReader sr = new StreamReader(fs, Encoding.UTF8);
@@ -69,12 +149,12 @@ namespace Data
 			if (_File.HasElements && _File.Element("Array") != null)
 			{
 				foreach (XElement element in _File.Elements("Array"))
-					_Arrays.Add(new ORArray(element));
+					_Arrays.Add(element.Attribute("Name").Value, new ORArray(element));
 			}
 			if (_File.HasElements && _File.Element("Struct") != null)
 			{
 				foreach (XElement element in _File.Elements("Struct"))
-					_Structs.Add(new ORStruct(element));
+					_Structs.Add(element.Attribute("Name").Value, new ORStruct(element));
 			}
 		}
 	}
@@ -90,7 +170,7 @@ namespace Data
 		public int offset
 		{ get; set; }
 		
-		public ORStructMember(XElement data, List<ORStructMember> others)
+		public ORStructMember(XElement data, Dictionary<string, ORStructMember> others)
 		{
 			name = data.Attribute("Name").Value;
 			offset = 0;
@@ -104,14 +184,8 @@ namespace Data
 				if (Split.Length == 2)
 				{
 					int BaseOffset = 0;
-					foreach (ORStructMember member in others)
-					{
-						if (member.name == Split[0])
-						{
-							BaseOffset = member.offset;
-							break;
-						}
-					}
+					if(others.ContainsKey(Split[0]))
+						BaseOffset = others[Split[0]].offset;
 
 					offset = BaseOffset + ImprovedParse.Parse(Split[1]);
 				}
@@ -203,17 +277,17 @@ namespace Data
 		{ get; set; }
 		public int size
 		{ get; set; }
-		public List<ORStructMember> members
+		public Dictionary<string, ORStructMember> members
 		{ get; set; }
 
 		public ORStruct(XElement data)
 		{
 			name = data.Attribute("Name").Value;
 			size = ImprovedParse.Parse(data.Attribute("Size").Value);
-			members = new List<ORStructMember>();
+			members = new Dictionary<string, ORStructMember>();
 			foreach (XElement member in data.Elements("Member"))
 			{
-				members.Add(new ORStructMember(member, members));
+				members.Add(member.Attribute("Name").Value, new ORStructMember(member, members));
 			}
 		}
 	}
