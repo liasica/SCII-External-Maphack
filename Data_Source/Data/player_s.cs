@@ -84,12 +84,12 @@ namespace Data
 		public uint vespene_current;
 		[FieldOffset(0x638)]
 		public uint terrazine_current;
+		[FieldOffset(0x640)]
+		public uint custom_resource_current;
 		[FieldOffset(0x648)]
 		public uint minerals_total;
 		[FieldOffset(0x650)]
 		public uint vespene_total;
-		[FieldOffset(0x640)]
-		public uint custom_resource_current;
 		[FieldOffset(0x658)]
 		public uint terrazine_total;
 		[FieldOffset(0x660)]

@@ -147,14 +147,14 @@ namespace Data
 			}
 		}
 
-		public Unit Unit
+		/*public Unit Unit
 		{
 			get
 			{
 				unit_s us = (unit_s) this._mem.ReadMemory(this.UnitAddress, typeof(unit_s));
 				return GameData.ParseUnit(us);
 			}
-		}
+		}*/
 
 		public uint UnitAddress
 		{

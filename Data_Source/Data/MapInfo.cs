@@ -20,7 +20,7 @@ namespace Data
 		public int playableX;
 		public int playableY;
 		public event PropertyChangedEventHandler PropertyChanged;
-		public int secondsElapsed;
+		public float secondsElapsed;
 		public int width;
 
 		public event PropertyChangedEventHandler ePropertyChanged

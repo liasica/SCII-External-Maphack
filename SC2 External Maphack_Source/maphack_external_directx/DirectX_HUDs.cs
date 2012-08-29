@@ -862,7 +862,7 @@ namespace maphack_external_directx
 			{
 				if (MainWindow.show_window[index])
 				{
-					Data.Player player = GameData.GetPlayer((uint)index);
+					Data.Player player = GameData.GetPlayer(index);
 					int row = num2++;
 					if (CurrentObserverPanelTab == ObserverPanelTabs.Buildings_and_Units_Different_Lines)
 					{
@@ -1342,7 +1342,7 @@ namespace maphack_external_directx
 		private static extern void DwmExtendFrameIntoClientArea(IntPtr hWnd, ref Margins pMargins);
 		[DllImport("dwmapi.dll")]
 		private static extern int DwmIsCompositionEnabled(ref int enabled);
-		private void GetAbilities()
+		/*private void GetAbilities()
 		{
 			this.unit_queue_counter = new int[0x10, 130];
 			this.abilities = GameData.getAbilitiesData();
@@ -1358,7 +1358,7 @@ namespace maphack_external_directx
 					}
 				}
 			}
-		}
+		}*/
 
 		private object getTallest(object[,] heights, int column, int row)
 		{

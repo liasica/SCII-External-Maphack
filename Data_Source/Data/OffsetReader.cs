@@ -22,7 +22,43 @@ namespace Data
 		}
 	}
 
-	public class OffsetReader //obviously not complete. This will be used for reading offsets from a file instead of doing a pattern scan every time.
+	static class UpdateFile
+	{
+		public static void Update(string Filename)
+		{
+			XDocument File = XDocument.Load(Filename);
+			File.Root.Attribute("Version").Value = GameData.SC2Version;
+			IEnumerable<XElement> Current =
+				from el in File.Root.Elements("Array")
+				where el.Attribute("Name").Value == "Players"
+				select el;
+			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.PlayerStruct().ToString("X");
+			Current =
+				from el in File.Root.Elements("Array")
+				where el.Attribute("Name").Value == "Units"
+				select el;
+			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.UnitStruct().ToString("X");
+			Current =
+				from el in File.Root.Elements("Struct")
+				where el.Attribute("Name").Value == "Timer"
+				select el;
+			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.Timer().ToString("X");
+			Current =
+				from el in File.Root.Elements("Struct")
+				where el.Attribute("Name").Value == "MapInfo"
+				select el;
+			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.MapInfoPtr().ToString("X");
+			Current =
+				from el in File.Root.Elements("Struct")
+				where el.Attribute("Name").Value == "Player"
+				select el;
+			Current.ElementAt(0).Attribute("Size").Value = "0x" + GameData.ps.PlayerStructSize().ToString("X");
+
+			File.Save(Filename);
+		}
+	}
+
+	public class OffsetReader
 	{
 		private ReadWriteMemory _mem;
 		private ReadWriteMemory mem
@@ -37,9 +73,11 @@ namespace Data
 			}
 		}
 
-		XElement _File;
+		XDocument _File;
+		XElement _BaseElement;
 		Dictionary<string, ORArray> _Arrays;
 		Dictionary<string, ORStruct> _Structs;
+		string _Filename;
 		string _Version;
 		string Version
 		{
@@ -52,6 +90,24 @@ namespace Data
 			}
 		}
 
+		public bool CheckVersion()
+		{
+			return GameData.SC2Version == Version;
+		}
+
+		public void UpdateAddresses()
+		{
+			UpdateFile.Update(_Filename);
+		}
+
+		public int GetStructSize(string Struct)
+		{
+			return _Structs[Struct].size;
+		}
+		public int GetStructAddress(string Struct)
+		{
+			return _Structs[Struct].address;
+		}
 
 		public Type GetStructMemberType(string StructDotMember)
 		{
@@ -73,9 +129,31 @@ namespace Data
 			return _Structs[Struct].members[Member].offset;
 		}
 
+		public int GetStructMemberSize(string StructMember)
+		{
+			string[] Split = StructMember.Split('.');
+			return GetStructMemberSize(Split[0], Split[1]);
+		}
+		public int GetStructMemberSize(string Struct, string Member)
+		{
+			return _Structs[Struct].members[Member].size;
+		}
+
 		public string GetArrayType(string Array)
 		{
 			return _Arrays[Array].type;
+		}
+		public int GetArrayCount(string Array)
+		{
+			return  _Arrays[Array].size;
+		}
+		public int GetArrayTotalSize(string Array)
+		{
+			return GetArrayCount(Array) * GetArrayElementSize(Array);
+		}
+		public int GetArrayAddress(string Array)
+		{
+			return _Arrays[Array].address;
 		}
 
 		public int GetArrayElementAddress(string ArrayElement)
@@ -86,6 +164,11 @@ namespace Data
 		public int GetArrayElementAddress(string Array, int Index)
 		{
 			return _Arrays[Array].address + Index * _Structs[GetArrayType(Array)].size;
+		}
+
+		public int GetArrayElementSize(string Array)
+		{
+			return _Structs[GetArrayType(Array)].size;
 		}
 
 		public int GetArrayElementMemberAddress(string ArrayElementMember)
@@ -109,6 +192,16 @@ namespace Data
 			return GetStructMemberType(GetArrayType(Array), Member);
 		}
 
+		public int GetArrayElementMemberSize(string ArrayElementMember)
+		{
+			string[] Split = ArrayElementMember.Split('.');
+			return GetArrayElementMemberSize(Split[0], Split[1]);
+		}
+		public int GetArrayElementMemberSize(string Array, string Member)
+		{
+			return GetStructMemberSize(GetArrayType(Array), Member);
+		}
+
 		public Object ReadArrayElementMember(string ArrayElementMember)
 		{
 			char[] splitters = new char[] { '[', ']', '.' };
@@ -117,7 +210,15 @@ namespace Data
 		}
 		public Object ReadArrayElementMember(string Array, int Index, string Member)
 		{
-			return mem.ReadMemory((uint)GetArrayElementMemberAddress(Array, Index, Member), GetArrayElementMemberType(Array, Member));
+			if (GetArrayElementMemberType(Array, Member) == typeof(string))
+			{
+				int Length = GetArrayElementMemberSize(Array, Member);
+				byte[] buffer = new byte[Length];
+				mem.ReadMemory((IntPtr)GetArrayElementMemberAddress(Array, Index, Member), Length, out buffer);
+				return System.Text.Encoding.UTF8.GetString(buffer).TrimEnd('\0');
+			}
+			else
+				return mem.ReadMemory((uint)GetArrayElementMemberAddress(Array, Index, Member), GetArrayElementMemberType(Array, Member));
 		}
 
 		public bool WriteArrayElementMember(string ArrayElementMember, Object NewValue)
@@ -126,34 +227,90 @@ namespace Data
 			string[] Split = ArrayElementMember.Split(splitters, StringSplitOptions.RemoveEmptyEntries);
 			return WriteArrayElementMember(Split[0], ImprovedParse.Parse(Split[1]), Split[2], NewValue);
 		}
-		public bool WriteArrayElementMember(string Array, int Index, string Member, Object NewValue)
+		public bool WriteArrayElementMember(string array, int Index, string Member, Object NewValue)
 		{
-			byte[] buffer = ReadWriteMemory.RawSerialize(NewValue);
-			return mem.WriteMemory((uint)GetArrayElementMemberAddress(Array, Index, Member), buffer.Length, ref buffer);
+			if (GetArrayElementMemberType(array, Member) == typeof(string))
+			{
+				int Length = GetArrayElementMemberSize(array, Member);
+				byte[] StringAsBytes = Encoding.UTF8.GetBytes((string)NewValue);
+				byte[] buffer = new byte[Length];
+				Array.Copy(StringAsBytes, buffer, StringAsBytes.Length < buffer.Length - 1 ? StringAsBytes.Length : buffer.Length - 1);
+				buffer[buffer.Length - 1] = 0;
+
+				return mem.WriteMemory((uint)GetArrayElementMemberAddress(array, Index, Member), buffer.Length, ref buffer);
+			}
+			else
+			{
+				byte[] buffer = ReadWriteMemory.RawSerialize(NewValue);
+				return mem.WriteMemory((uint)GetArrayElementMemberAddress(array, Index, Member), buffer.Length, ref buffer);
+			}
+		}
+
+		public Object ReadStructMember(string Struct, string Member, int Address = 0)
+		{
+			if (Address == 0)
+				Address = GetStructAddress(Struct);
+
+			if (GetStructMemberType(Struct, Member) == typeof(string))
+			{
+				int Length = GetStructMemberSize(Struct, Member);
+				byte[] buffer = new byte[Length];
+				mem.ReadMemory((IntPtr)(GetStructMemberOffset(Struct, Member) + Address), Length, out buffer);
+				return System.Text.Encoding.UTF8.GetString(buffer).TrimEnd('\0');
+			}
+			else
+				return mem.ReadMemory((uint)(GetStructMemberOffset(Struct, Member) + Address), GetStructMemberType(Struct, Member));
+		}
+
+		public bool WriteStructMember(string Struct, string Member, Object NewValue, int Address = 0)
+		{
+			if (Address == 0 )
+				Address = GetStructAddress(Struct);
+
+			if (GetStructMemberType(Struct, Member) == typeof(string))
+			{
+				int Length = GetStructMemberSize(Struct, Member);
+				byte[] StringAsBytes = Encoding.UTF8.GetBytes((string)NewValue);
+				byte[] buffer = new byte[Length];
+				Array.Copy(StringAsBytes, buffer, StringAsBytes.Length < buffer.Length - 1 ? StringAsBytes.Length : buffer.Length - 1);
+				buffer[buffer.Length - 1] = 0;
+
+				return mem.WriteMemory((uint)(GetStructMemberOffset(Struct, Member) + Address), buffer.Length, ref buffer);
+			}
+			else
+			{
+				byte[] buffer = ReadWriteMemory.RawSerialize(NewValue);
+				return mem.WriteMemory((uint)(GetStructMemberOffset(Struct, Member) + Address), buffer.Length, ref buffer);
+			}
 		}
 		
 		public OffsetReader(string Filename)
 		{
+			Parse(Filename);
+		}
+
+		private void Parse(string Filename)
+		{
 			_Arrays = new Dictionary<string, ORArray>();
 			_Structs = new Dictionary<string, ORStruct>();
 
-			FileStream fs = new FileStream(Filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-			StreamReader sr = new StreamReader(fs, Encoding.UTF8);
-			_File = XElement.Parse(sr.ReadToEnd());
-			sr.Close();
-			if (_File.HasAttributes && _File.Attribute("Version") != null)
-				_Version = _File.Attribute("Version").Value;
+			_Filename = Filename;
+
+			_File = XDocument.Load(Filename);
+			_BaseElement = _File.Root;
+			if (_BaseElement.HasAttributes && _BaseElement.Attribute("Version") != null)
+				_Version = _BaseElement.Attribute("Version").Value;
 			else
 				_Version = "-1.-1.-1.-1";
 
-			if (_File.HasElements && _File.Element("Array") != null)
+			if (_BaseElement.HasElements && _BaseElement.Element("Array") != null)
 			{
-				foreach (XElement element in _File.Elements("Array"))
+				foreach (XElement element in _BaseElement.Elements("Array"))
 					_Arrays.Add(element.Attribute("Name").Value, new ORArray(element));
 			}
-			if (_File.HasElements && _File.Element("Struct") != null)
+			if (_BaseElement.HasElements && _BaseElement.Element("Struct") != null)
 			{
-				foreach (XElement element in _File.Elements("Struct"))
+				foreach (XElement element in _BaseElement.Elements("Struct"))
 					_Structs.Add(element.Attribute("Name").Value, new ORStruct(element));
 			}
 		}
@@ -165,7 +322,7 @@ namespace Data
 		{ get; set; }
 		public Type type
 		{ get; set; }
-		public uint size
+		public int size
 		{ get; set; }
 		public int offset
 		{ get; set; }
@@ -191,7 +348,7 @@ namespace Data
 				}
 			}
 
-			uint Size = (uint)ImprovedParse.Parse(data.Attribute("Size").Value);
+			int Size = ImprovedParse.Parse(data.Attribute("Size").Value);
 			string Type = data.Attribute("Type").Value;
 			switch (Type)
 			{
@@ -277,6 +434,8 @@ namespace Data
 		{ get; set; }
 		public int size
 		{ get; set; }
+		public int address
+		{ get; set; }
 		public Dictionary<string, ORStructMember> members
 		{ get; set; }
 
@@ -284,6 +443,10 @@ namespace Data
 		{
 			name = data.Attribute("Name").Value;
 			size = ImprovedParse.Parse(data.Attribute("Size").Value);
+			if (data.Attribute("Address") != null)
+				address = ImprovedParse.Parse(data.Attribute("Address").Value);
+			else
+				address = 0;
 			members = new Dictionary<string, ORStructMember>();
 			foreach (XElement member in data.Elements("Member"))
 			{

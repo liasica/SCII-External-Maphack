@@ -1904,7 +1904,7 @@ namespace _2cs_API
 				{
 					try
 					{
-						return GameData.GetPlayer(LocalPlayerNumber);
+						return GameData.GetPlayer((int)LocalPlayerNumber);
 					}
 					catch
 					{

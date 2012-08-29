@@ -7,6 +7,7 @@ namespace Data
 	[StructLayout(LayoutKind.Sequential)]
 	public struct Unit
 	{
+		public uint modelPtr;
 		public float timeScale;
 		public bool isAlive;
 		public bool isImmobile;
