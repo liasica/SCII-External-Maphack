@@ -304,7 +304,7 @@ namespace Utilities.WebTools
 		{
 			if (ex is FileNotFoundException && ex.Message.Contains("fasmdll_managed.dll") && File.Exists("fasmdll_managed.dll"))
 			{
-				DialogResult ShowDownloadPage = MessageBox.Show("The module \"fasmdll_managed.dll\" could not be loaded. This is probably because you don't have the Microsoft Visual C++ 2010 Redistributable Package. Do you want to open the download page in a web browser?", "Missing File", MessageBoxButtons.YesNo, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
+				DialogResult ShowDownloadPage = MessageBox.Show("The module \"fasmdll_managed.dll\" could not be loaded. This is probably because you don't have the Microsoft Visual C++ 2010 Redistributable Package.\nDo you want to open the download page in a web browser?", "Missing File", MessageBoxButtons.YesNo, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
 				if (ShowDownloadPage == DialogResult.Yes)
 				{
 					Process.Start("http://www.microsoft.com/download/en/details.aspx?id=5555");
@@ -312,6 +312,21 @@ namespace Utilities.WebTools
 				Application.Exit();
 				return;
 			}
+
+			if (ex is FileNotFoundException && ex.Message.Contains("Microsoft.DirectX.Direct3DX.dll") && File.Exists("Microsoft.DirectX.Direct3DX.dll"))
+			{
+				DialogResult ShowDownloadPage = MessageBox.Show("The module \"Microsoft.DirectX.Direct3DX.dll\" could not be loaded. This is probably because you're missing something required by Direct3D.\nInstalling the Microsoft DirectX End-User Runtime should fix the problem.\nDo you want to open the download page in a web browser?", "Missing File", MessageBoxButtons.YesNo, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
+				if (ShowDownloadPage == DialogResult.Yes)
+				{
+					Process.Start("http://www.microsoft.com/en-us/download/details.aspx?id=35");
+				}
+				Application.Exit();
+				return;
+
+
+
+			}
+		
 
 			if(GitHubIssueExists(ex.Message, ex.ToString()))
 			{

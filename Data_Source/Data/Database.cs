@@ -17,6 +17,7 @@ namespace Data
 
 		public static string GetItemFilename(string DatabaseItem, bool GetNew)
 		{
+			MpqManager manager;
 			string Filename = "Database\\" + DatabaseItem.Replace('/', '\\');
 
 			if(!Directory.Exists(Filename.Remove(Filename.LastIndexOf('\\'))))
@@ -31,19 +32,22 @@ namespace Data
 			if (GameData.mapDat == null)
 				GameData.mapDat = new MapData(GameData.getMapData().mapInfo.filePath);
 
-			MpqManager manager = new MpqManager(GameData.mapDat.FileName);
-			if (manager.MpqArchive.FileExists(DatabaseItem))
+			if (File.Exists(GameData.mapDat.FileName))
 			{
-				byte[] file = manager.read(DatabaseItem);
-				using (FileStream fs = File.Create(Filename))
+				manager = new MpqManager(GameData.mapDat.FileName);
+				if (manager.MpqArchive.FileExists(DatabaseItem))
 				{
-					fs.Write(file, 0, file.Length);
-					fs.Close();
+					byte[] file = manager.read(DatabaseItem);
+					using (FileStream fs = File.Create(Filename))
+					{
+						fs.Write(file, 0, file.Length);
+						fs.Close();
+					}
+					manager.Close();
+					return Filename;
 				}
 				manager.Close();
-				return Filename;
 			}
-			manager.Close();
 			
 			for (int i = GameData.mapDat.Dependencies.Count - 1; i >= 0; i--)
 			{

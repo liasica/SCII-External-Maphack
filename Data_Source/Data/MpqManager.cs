@@ -23,30 +23,6 @@ namespace Data
 				this._mpqArchive.AddListfileFilenames();
 				return;
 			}
-			
-			string[] SplitPath = mpqFile.Split('\\', '/');
-			string[] Remaining = null;
-			string Path = SplitPath.Length > 0 ? SplitPath[0] : string.Empty;
-
-			for (int i = 1; i < SplitPath.Length; i++)
-			{
-				Path += '\\' + SplitPath[i];
-				if (!Directory.Exists(Path))
-				{
-					Remaining = new string[SplitPath.Length - i];
-					Array.ConstrainedCopy(SplitPath, i, Remaining, 0, SplitPath.Length - i);
-					break;
-				}
-			}
-
-			if (Remaining != null && Remaining.Length > 0 && File.Exists(Path))
-			{
-				this._topArchive = new Foole.Mpq.MpqArchive(Path);
-				this._topArchive.AddListfileFilenames();
-			}
-
-
-			
 		}
 
 		public void Close()
