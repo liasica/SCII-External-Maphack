@@ -53,6 +53,11 @@ namespace Data
 				where el.Attribute("Name").Value == "Player"
 				select el;
 			Current.ElementAt(0).Attribute("Size").Value = "0x" + GameData.ps.PlayerStructSize().ToString("X");
+			Current =
+				from el in File.Root.Elements("Struct")
+				where el.Attribute("Name").Value == "LocalPlayer"
+				select el;
+			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.LocalPlayerNumber().ToString("X");
 
 			File.Save(Filename);
 		}

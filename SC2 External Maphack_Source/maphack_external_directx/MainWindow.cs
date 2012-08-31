@@ -291,6 +291,7 @@ namespace maphack_external_directx
 		private DataGridViewTextBoxColumn Race;
 		private DataGridViewCheckBoxColumn Toggle;
 		private ToolTip toolTip1;
+		private ToolStripButton btnTrainer;
 		public static float[] y_coordsDest = new float[0x4000];
 
 		public MainWindow()
@@ -585,6 +586,7 @@ namespace maphack_external_directx
 			this.toolStripButtonObserver = new System.Windows.Forms.ToolStripButton();
 			this.toolStripButtonMap = new System.Windows.Forms.ToolStripButton();
 			this.btnOptions = new System.Windows.Forms.ToolStripButton();
+			this.btnTrainer = new System.Windows.Forms.ToolStripButton();
 			this.toolStripLabelStatus = new System.Windows.Forms.ToolStripLabel();
 			this.tmrMain = new System.Windows.Forms.Timer(this.components);
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
@@ -735,6 +737,7 @@ namespace maphack_external_directx
             this.toolStripButtonObserver,
             this.toolStripButtonMap,
             this.btnOptions,
+            this.btnTrainer,
             this.toolStripLabelStatus});
 			this.toolStrip.Location = new System.Drawing.Point(0, 23);
 			this.toolStrip.Name = "toolStrip";
@@ -749,19 +752,19 @@ namespace maphack_external_directx
             this.resetToolStripMenuItem,
             this.stopToolStripMenuItem});
 			this.contextMenuStrip.Name = "contextMenuStrip1";
-			this.contextMenuStrip.Size = new System.Drawing.Size(153, 70);
+			this.contextMenuStrip.Size = new System.Drawing.Size(148, 48);
 			// 
 			// resetToolStripMenuItem
 			// 
 			this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
-			this.resetToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.resetToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
 			this.resetToolStripMenuItem.Text = "Reset Settings";
 			this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
 			// 
 			// stopToolStripMenuItem
 			// 
 			this.stopToolStripMenuItem.Name = "stopToolStripMenuItem";
-			this.stopToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.stopToolStripMenuItem.Size = new System.Drawing.Size(147, 22);
 			this.stopToolStripMenuItem.Text = "Stop";
 			this.stopToolStripMenuItem.Click += new System.EventHandler(this.stopToolStripMenuItem_Click);
 			// 
@@ -804,6 +807,16 @@ namespace maphack_external_directx
 			this.btnOptions.Size = new System.Drawing.Size(53, 22);
 			this.btnOptions.Text = "Options";
 			this.btnOptions.Click += new System.EventHandler(this.btnOptions_Click);
+			// 
+			// btnTrainer
+			// 
+			this.btnTrainer.BackColor = System.Drawing.Color.Gray;
+			this.btnTrainer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.btnTrainer.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.btnTrainer.Name = "btnTrainer";
+			this.btnTrainer.Size = new System.Drawing.Size(73, 22);
+			this.btnTrainer.Text = "Add Trainer";
+			this.btnTrainer.Click += new System.EventHandler(this.btnTrainer_Click);
 			// 
 			// toolStripLabelStatus
 			// 
@@ -1318,6 +1331,11 @@ namespace maphack_external_directx
 			{
 				return new Size((int) map_width, (int) map_height);
 			}
+		}
+
+		private void btnTrainer_Click(object sender, EventArgs e)
+		{
+			new Trainer().Show();
 		}
 	}
 }

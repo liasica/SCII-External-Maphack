@@ -1946,7 +1946,7 @@ namespace _2cs_API
 			{
 				get
 				{
-					return (byte) GameData.mem.ReadMemory(GameData.Offsets.LocalPlayerNumber, typeof(byte));
+					return (byte)GameData.offsets.ReadStructMember("LocalPlayer", "LocalPlayer");
 				}
 			}
 			public static bool LocalPlayerGameOver

@@ -53,9 +53,9 @@ namespace Data
 		{ _rawData = it._rawData; }
 
 		public fixed32(float it)
-		{ _rawData = (Int32)(it * 4096 + 0.5); } //add half of the minimum precision to minimize rounding errors. We all know that 1.999999 is really 2.0.
+		{ _rawData = (Int32)(it * 4096 + (it >= 0 ? 0.5 : -0.5)); } //add half of the minimum precision to minimize rounding errors. We all know that 1.999999 is really 2.0.
 		public fixed32(double it)
-		{ _rawData = (Int32)(it * 4096 + 0.5); } //add half of the minimum precision to minimize rounding errors. We all know that 1.999999 is really 2.0.
+		{ _rawData = (Int32)(it * 4096 + (it >= 0 ? 0.5 : -0.5)); } //add half of the minimum precision to minimize rounding errors. We all know that 1.999999 is really 2.0.
 		public fixed32(Int32 it)
 		{ _rawData = (Int32)(it * 4096); }
 		public fixed32(UInt32 it)
