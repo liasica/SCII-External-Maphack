@@ -801,7 +801,7 @@ namespace Data
 		{
 			get
 			{
-				if (_SC2Process == null || _SC2Process.HasExited || _SC2Process.MainModule == null)
+				if (_SC2Process == null || _SC2Process.HasExited)
 				{
 					_SC2Process = null;
 

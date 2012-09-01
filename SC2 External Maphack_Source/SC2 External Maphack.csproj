@@ -130,13 +130,13 @@
       <Name>Microsoft.CSharp</Name>
       <HintPath>Microsoft.CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.DirectX">
-      <Name>Microsoft.DirectX</Name>
-      <HintPath>Microsoft.DirectX.dll</HintPath>
+    <Reference Include="Microsoft.DirectX, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\Microsoft.DirectX.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.DirectX.Direct3D">
-      <Name>Microsoft.DirectX.Direct3D</Name>
-      <HintPath>Microsoft.DirectX.Direct3D.dll</HintPath>
+    <Reference Include="Microsoft.DirectX.Direct3D, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\Microsoft.DirectX.Direct3D.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.DirectX.Direct3DX, Version=1.0.2910.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>

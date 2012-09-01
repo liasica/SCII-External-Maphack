@@ -152,6 +152,9 @@ namespace Data
 		}
 		public void Parse(string fileName)
 		{
+			if (fileName == null)
+				fileName = string.Empty;
+
 			MpqManager manager = null;
 
 			if (!File.Exists(fileName))
