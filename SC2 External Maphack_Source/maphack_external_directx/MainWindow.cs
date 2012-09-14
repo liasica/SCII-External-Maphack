@@ -17,6 +17,10 @@ namespace maphack_external_directx
 
 	public class MainWindow : Form
 	{
+		private static bool atGameStart = true;
+
+		public static Dictionary<string, Queue<long>> Refreshes = new Dictionary<string, Queue<long>>();
+
 		public static Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 		public static string version_string = "v" + version.Major + "." + version.Minor + "." + version.Build;
 
@@ -83,11 +87,10 @@ namespace maphack_external_directx
 		public static string[] player_supply = new string[0x10];
 		public static uint[] player_teams = new uint[0x10];
 		public static PlayerType[] player_types = new PlayerType[0x10];
-		public static string[] rank_textures = new string[0x10];
-		public static string[] rank_tooltips = new string[0x10];
 		private Thread readMemory;
 		private ToolStripMenuItem resetToolStripMenuItem;
 		public static DirectX_HUDs ResourcesHUD;
+		public static DirectX_HUDs InfoHUD;
 		public static bool[] show = new bool[0x10];
 		public static bool[] show_window = new bool[0x10];
 		private ToolStripMenuItem stopToolStripMenuItem;
@@ -281,17 +284,18 @@ namespace maphack_external_directx
 		public static float[] x_coords = new float[0x4000];
 		public static float[] x_coordsDest = new float[0x4000];
 		public static float[] y_coords = new float[0x4000];
+		private ToolTip toolTip1;
+		private ToolStripButton btnTrainer;
+		private System.Windows.Forms.Timer tmrUpdateStatus;
 		private DataGridViewTextBoxColumn PlayerNumber;
 		private DataGridViewImageColumn p_color;
-		private DataGridViewImageColumn rank;
 		private DataGridViewTextBoxColumn TeamNumber;
 		private DataGridViewTextBoxColumn PlayerName;
 		private DataGridViewTextBoxColumn PlayerAccountNumber;
 		private DataGridViewTextBoxColumn Status;
 		private DataGridViewTextBoxColumn Race;
 		private DataGridViewCheckBoxColumn Toggle;
-		private ToolTip toolTip1;
-		private ToolStripButton btnTrainer;
+		public ToolStripButton toolStripButtonInfo;
 		public static float[] y_coordsDest = new float[0x4000];
 
 		public MainWindow()
@@ -397,7 +401,9 @@ namespace maphack_external_directx
 			active_players = 0;
 			actual_players = 0;
 			this.UpdateMapSize();
-			this.GetPlayers(true);
+			atGameStart = true;
+			this.GetPlayers();
+			atGameStart = false;
 			Database.Reset();
 		}
 
@@ -423,14 +429,14 @@ namespace maphack_external_directx
 			}
 		}
 
-		private void GetPlayers(bool atGameStart = false)
+		private void GetPlayers()
 		{
 			List<Data.Player> list = GameData.getPlayersData();
 			int num = 0;
 			for (byte i = 0; i < list.Count; i = (byte) (i + 1))
 			{
 				Data.Player player = list[i];
-				if ((player.playerType != PlayerType.Neutral) && (player.playerType != PlayerType.Hostile))
+				if ((player.playerType != PlayerType.None) && (player.playerType != PlayerType.Neutral) && (player.playerType != PlayerType.Hostile))
 				{
 					if (atGameStart)
 					{
@@ -439,7 +445,7 @@ namespace maphack_external_directx
 						player_teams[i] = (uint) player.team;
 						player_types[i] = player.playerType;
 						player_name[i] = player.name;
-						player_slots[i] = (uint) player.slotNumber;
+						player_slots[i] = (uint) player.colorIndex;
 						player_race[i] = player.race;
 						if (player.race == Data.Race.Neutral)
 						{
@@ -463,10 +469,13 @@ namespace maphack_external_directx
 			{
 				players = list;
 			}
+
+			UpdateRefreshes("Players");
 		}
 
 		private void GetUnits()
 		{
+			Unit.UpdateUnits();
 			List<Unit> list = GameData.getUnitData();
 
 			int[,] numArray = new int[0x10, 130];
@@ -483,42 +492,47 @@ namespace maphack_external_directx
 				total_units = list.Count;
 				foreach(Unit unit in list)
 				{
-					if ((unit.targetFilterFlags & TargetFilter.Structure) != 0 && !MainWindow.buildings.Contains(unit.textID))
-						MainWindow.buildings.Add(unit.textID);
+					TargetFilter unitFlags = unit.targetFilterFlags;
+					string unitID = unit.textID;
+					uint unitOwner = unit.playerNumber;
+					int unitType = (int)unit.unitType;
 
-					if ((unit.targetFilterFlags & (TargetFilter.Missile | TargetFilter.Dead)) != 0 || unit.textID.StartsWith("Beacon"))
+					if ((unitFlags & TargetFilter.Structure) != 0 && !MainWindow.buildings.Contains(unitID))
+						MainWindow.buildings.Add(unitID);
+
+					if ((unitFlags & (TargetFilter.Missile | TargetFilter.Dead)) != 0 || unitID.StartsWith("Beacon"))
 						continue;
 					
 					lock (unit_pictures)
 					{
-						if (!unit_pictures.ContainsKey(unit.textID))
+						if (!unit_pictures.ContainsKey(unitID))
 						{
-							unit_pictures.Add(unit.textID, GameData.mapDat.GetUnitPictureFilename(unit.textID));
+							unit_pictures.Add(unitID, GameData.mapDat.GetUnitPictureFilename(unitID));
 						}
 					}
 
 					lock (unit_names)
 					{
-						if (!unit_names.ContainsKey(unit.textID))
+						if (!unit_names.ContainsKey(unitID))
 						{
-							unit_names.Add(unit.textID, unit.name);
+							unit_names.Add(unitID, unit.name);
 						}
 					}
 
-					if (newUnitCounts[unit.playerNumber].ContainsKey(unit.textID))
+					if (newUnitCounts[unitOwner].ContainsKey(unitID))
 					{
-						newUnitCounts[unit.playerNumber][unit.textID]++;
+						newUnitCounts[unitOwner][unitID]++;
 					}
 					else
 					{
-						newUnitCounts[unit.playerNumber].Add(unit.textID, 1);
+						newUnitCounts[unitOwner].Add(unitID, 1);
 					}
 
-					if ((int)unit.unitType < unit_count_index.Length && unit_count_index[(int)unit.unitType] != -1)
+					if (unitType < unit_count_index.Length && unit_count_index[unitType] != -1)
                     {
 						try
 						{
-							numArray[(int) unit.playerNumber,  unit_count_index[(int) unit.unitType]]++;
+							numArray[(int)unitOwner,  unit_count_index[unitType]]++;
 						}
 						catch
 						{
@@ -538,6 +552,8 @@ namespace maphack_external_directx
 					units = list;
 				}
 			}
+
+			UpdateRefreshes("Units");
 		}
 
 		private void HUDOff(uint p_no)
@@ -571,7 +587,6 @@ namespace maphack_external_directx
 			this.dataGridViewPlayerData = new System.Windows.Forms.DataGridView();
 			this.PlayerNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.p_color = new System.Windows.Forms.DataGridViewImageColumn();
-			this.rank = new System.Windows.Forms.DataGridViewImageColumn();
 			this.TeamNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.PlayerName = new System.Windows.Forms.DataGridViewTextBoxColumn();
 			this.PlayerAccountNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -590,6 +605,8 @@ namespace maphack_external_directx
 			this.toolStripLabelStatus = new System.Windows.Forms.ToolStripLabel();
 			this.tmrMain = new System.Windows.Forms.Timer(this.components);
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+			this.tmrUpdateStatus = new System.Windows.Forms.Timer(this.components);
+			this.toolStripButtonInfo = new System.Windows.Forms.ToolStripButton();
 			((System.ComponentModel.ISupportInitialize)(this.dataGridViewPlayerData)).BeginInit();
 			this.toolStrip.SuspendLayout();
 			this.contextMenuStrip.SuspendLayout();
@@ -602,6 +619,8 @@ namespace maphack_external_directx
 			this.dataGridViewPlayerData.AllowUserToOrderColumns = true;
 			this.dataGridViewPlayerData.AllowUserToResizeColumns = false;
 			this.dataGridViewPlayerData.AllowUserToResizeRows = false;
+			this.dataGridViewPlayerData.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.dataGridViewPlayerData.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
 			this.dataGridViewPlayerData.BackgroundColor = System.Drawing.Color.Black;
 			this.dataGridViewPlayerData.ClipboardCopyMode = System.Windows.Forms.DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
@@ -617,7 +636,6 @@ namespace maphack_external_directx
 			this.dataGridViewPlayerData.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.PlayerNumber,
             this.p_color,
-            this.rank,
             this.TeamNumber,
             this.PlayerName,
             this.PlayerAccountNumber,
@@ -647,7 +665,7 @@ namespace maphack_external_directx
 			this.dataGridViewPlayerData.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
 			this.dataGridViewPlayerData.RowHeadersWidth = 24;
 			this.dataGridViewPlayerData.ScrollBars = System.Windows.Forms.ScrollBars.None;
-			this.dataGridViewPlayerData.Size = new System.Drawing.Size(535, 24);
+			this.dataGridViewPlayerData.Size = new System.Drawing.Size(773, 24);
 			this.dataGridViewPlayerData.TabIndex = 2;
 			this.dataGridViewPlayerData.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewPlayerData_CellContentClick);
 			// 
@@ -667,14 +685,6 @@ namespace maphack_external_directx
 			this.p_color.HeaderText = "C";
 			this.p_color.Name = "p_color";
 			this.p_color.ReadOnly = true;
-			// 
-			// rank
-			// 
-			this.rank.FillWeight = 53.61267F;
-			this.rank.HeaderText = "R";
-			this.rank.MinimumWidth = 25;
-			this.rank.Name = "rank";
-			this.rank.ReadOnly = true;
 			// 
 			// TeamNumber
 			// 
@@ -733,6 +743,7 @@ namespace maphack_external_directx
 			this.toolStrip.Dock = System.Windows.Forms.DockStyle.Bottom;
 			this.toolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
 			this.toolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripButtonInfo,
             this.toolStripButtonResources,
             this.toolStripButtonObserver,
             this.toolStripButtonMap,
@@ -742,7 +753,7 @@ namespace maphack_external_directx
 			this.toolStrip.Location = new System.Drawing.Point(0, 23);
 			this.toolStrip.Name = "toolStrip";
 			this.toolStrip.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-			this.toolStrip.Size = new System.Drawing.Size(535, 25);
+			this.toolStrip.Size = new System.Drawing.Size(773, 25);
 			this.toolStrip.TabIndex = 3;
 			this.toolStrip.Text = "toolStrip";
 			// 
@@ -831,12 +842,28 @@ namespace maphack_external_directx
 			this.tmrMain.Interval = 1000;
 			this.tmrMain.Tick += new System.EventHandler(this.tmrMain_Tick);
 			// 
+			// tmrUpdateStatus
+			// 
+			this.tmrUpdateStatus.Enabled = true;
+			this.tmrUpdateStatus.Interval = 25;
+			this.tmrUpdateStatus.Tick += new System.EventHandler(this.tmrUpdateStatus_Tick);
+			// 
+			// toolStripButtonInfo
+			// 
+			this.toolStripButtonInfo.BackColor = System.Drawing.Color.Gray;
+			this.toolStripButtonInfo.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+			this.toolStripButtonInfo.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButtonInfo.Name = "toolStripButtonInfo";
+			this.toolStripButtonInfo.Size = new System.Drawing.Size(52, 22);
+			this.toolStripButtonInfo.Text = "Info Off";
+			this.toolStripButtonInfo.Click += new System.EventHandler(this.toolStripButtonInfo_Click);
+			// 
 			// MainWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.BackColor = System.Drawing.Color.Black;
-			this.ClientSize = new System.Drawing.Size(535, 48);
+			this.ClientSize = new System.Drawing.Size(773, 48);
 			this.Controls.Add(this.toolStrip);
 			this.Controls.Add(this.dataGridViewPlayerData);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
@@ -872,23 +899,14 @@ namespace maphack_external_directx
 				orderby x.team
 				select x).ToList<Data.Player>().GetEnumerator())
 			{
-				ThreadStart start = null;
 				Data.Player player;
 				while (enumerator.MoveNext())
 				{
 					player = enumerator.Current;
-					if (start == null)
-					{
-						start = delegate {
-							this.updateRankTexture(player);
-						};
-					}
-					new Thread(start).Start();
-					uint number = player.number;
+					int number = player.number;
 					DataGridViewRow dataGridViewRow = new DataGridViewRow();
 					DataGridViewTextBoxCell dataGridViewCell = new DataGridViewTextBoxCell();
 					DataGridViewImageCell cell2 = new DataGridViewImageCell();
-					DataGridViewImageCell cell3 = new DataGridViewImageCell();
 					DataGridViewTextBoxCell cell4 = new DataGridViewTextBoxCell();
 					DataGridViewTextBoxCell cell5 = new DataGridViewTextBoxCell();
 					DataGridViewTextBoxCell cell6 = new DataGridViewTextBoxCell();
@@ -907,8 +925,6 @@ namespace maphack_external_directx
 					dataGridViewRow.Cells.Add(cell2);
 					graphics.Dispose();
 					brush.Dispose();
-					cell3.Value = Image.FromFile(@"Leagues\none.png");
-					dataGridViewRow.Cells.Add(cell3);
 					cell4.Value = "Team " + (player.team + 1);
 					dataGridViewRow.Cells.Add(cell4);
 					cell5.Value = player.name;
@@ -924,7 +940,7 @@ namespace maphack_external_directx
 					if (player.team != _2csAPI.Player.LocalPlayerTeam)
 					{
 						cell8.Value = true;
-						this.HUDOn(number);
+						this.HUDOn((uint)number);
 					}
 					else
 					{
@@ -939,13 +955,10 @@ namespace maphack_external_directx
 		private void ReadMemory()
 		{
 		Label_0000:
-			while (Debugger.IsAttached)
-			{
-				this.UpdateStuff();
-				Thread.Sleep(UpdateInfoDelay);
-			}
 			try
 			{
+				if (GameData.SC2Process == null || GameData.SC2Process.HasExited)
+					GameData.ResetProcess();
 				this.UpdateStuff();
 				Thread.Sleep(UpdateInfoDelay);
 				goto Label_0000;
@@ -987,8 +1000,6 @@ namespace maphack_external_directx
 					ds2.Visible = true;
 				}
 			}
-			rank_textures = new string[0x10];
-			rank_tooltips = new string[0x10];
 			if (File.Exists(settings_path))
 			{
 				File.Delete(settings_path);
@@ -1016,15 +1027,6 @@ namespace maphack_external_directx
 
 		private void tmrMain_Tick(object sender, EventArgs e)
 		{
-			if (!GameData.SC2Opened)
-			{
-				this.message = "SC2 is not opened";
-			}
-			else
-			{
-				this.message = _2csAPI.InGame() ? "In Game" : ("SC2 Version " + GameData.SC2Version);
-			}
-			this.toolStripLabelStatus.Text = this.message;
 			if (_2csAPI.InGame() && draw)
 			{
 				if (this.dataGridViewPlayerData.RowCount == 0)
@@ -1051,23 +1053,7 @@ namespace maphack_external_directx
 					for (int i = 0; i < actualPlayers.Count; i++)
 					{
 						Data.Player player = actualPlayers[i];
-						uint number = player.number;
-						Image NewRankTexture = null;
-						if (rank_textures[number] != null)
-						{
-							NewRankTexture = Image.FromFile(rank_textures[number]);
-							NewRankTexture.Tag = rank_textures[number];
-						}
-						else
-						{
-							NewRankTexture = Image.FromFile(@"Leagues\none.png");
-							NewRankTexture.Tag = @"Leagues\none.png";
-						}
-
-						if (((Bitmap)this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["rank"].Index].Value).Tag != NewRankTexture.Tag)
-							this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["rank"].Index].Value = NewRankTexture;
-
-						this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["rank"].Index].ToolTipText = rank_tooltips[number];
+						int number = player.number;
 
 						this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["PlayerAccountNumber"].Index].Value = player.accountNumber;
 						this.dataGridViewPlayerData.Rows[i].Cells[this.dataGridViewPlayerData.Columns["Status"].Index].Value = player.victoryStatus;
@@ -1095,23 +1081,31 @@ namespace maphack_external_directx
 				this.dataGridViewPlayerData.Height = dgvHeight;
 				base.ClientSize = new Size(this.dataGridViewPlayerData.Width, this.dataGridViewPlayerData.Height + this.toolStrip.Height);
 			}
+			UpdateRefreshes("GUI");
 		}
 
 		private static void toggleHUD(ref DirectX_HUDs hud, DirectX_HUDs.HUDType hudType, ToolStripButton button)
 		{
-			if (hud == null)
+			try
 			{
-				button.Text = hudType.ToString() + " Off";
-				button.BackColor = Color.FromArgb(0x80, 0xff, 0x80);
-				hud = new DirectX_HUDs(hudType);
-				hud.Show();
+				if (hud == null)
+				{
+					button.Text = hudType.ToString() + " Off";
+					button.BackColor = Color.FromArgb(0x80, 0xff, 0x80);
+					hud = new DirectX_HUDs(hudType);
+					hud.Show();
+				}
+				else
+				{
+					button.Text = hudType.ToString() + " On";
+					button.BackColor = Color.Gray;
+					hud.Close();
+					hud = null;
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				button.Text = hudType.ToString() + " On";
-				button.BackColor = Color.Gray;
-				hud.Close();
-				hud = null;
+				WT.ReportCrash(ex, null);
 			}
 		}
 
@@ -1145,6 +1139,9 @@ namespace maphack_external_directx
 
 				case DirectX_HUDs.HUDType.Resources:
 					return this.toolStripButtonResources;
+				
+				case DirectX_HUDs.HUDType.Info:
+					return this.toolStripButtonInfo;
 			}
 			return null;
 		}
@@ -1162,6 +1159,11 @@ namespace maphack_external_directx
 		public void toolStripButtonResources_Click(object sender, EventArgs e)
 		{
 			toggleHUD(ref ResourcesHUD, DirectX_HUDs.HUDType.Resources, this.toolStripButtonResources);
+		}
+
+		private void toolStripButtonInfo_Click(object sender, EventArgs e)
+		{
+			toggleHUD(ref InfoHUD, DirectX_HUDs.HUDType.Info, this.toolStripButtonInfo);
 		}
 
 		private void UpdateMapSize()
@@ -1215,31 +1217,8 @@ namespace maphack_external_directx
 			playable_map_right += 3;
 			playable_map_top += 3;
 			playable_map_bottom -= 2;*/
-		}
 
-		private void updateRankTexture(Data.Player p)
-		{
-			if (/*Debugger.IsAttached*/false)
-			{
-				p.UpdateRankTexture();
-				rank_textures[p.number] = p.rank_texture;
-			}
-			else
-			{
-				try
-				{
-					p.UpdateRankTexture();
-					rank_textures[p.number] = p.rank_texture;
-					rank_tooltips[p.number] = p.rankIconTooltip;
-				}
-				catch (ThreadAbortException)
-				{
-				}
-				catch (Exception exception)
-				{
-					WT.ReportCrash(exception, Program.ApplicationTitle + " " + Program.ApplicationVersion, null, null, false);
-				}
-			}
+			UpdateRefreshes("MapSize");
 		}
 
 		private void UpdateStuff()
@@ -1267,11 +1246,51 @@ namespace maphack_external_directx
 					}
 					else
 					{
-						this.UpdateMapSize();
-						this.GetPlayers(false);
-						this.GetUnits();
+						ThreadStart ts = new ThreadStart(UpdateMapSize);
+						Thread t = new Thread(ts);
+						t.Start();
+						//this.UpdateMapSize();
+
+						ts = new ThreadStart(GetPlayers);
+						t = new Thread(ts);
+						t.Start();
+						//this.GetPlayers();
+
+						ts = new ThreadStart(GetUnits);
+						t = new Thread(ts);
+						t.Start();
+						//this.GetUnits();
 					}
 				}
+			}
+
+			UpdateRefreshes("Data");
+		}
+
+		public static void UpdateRefreshes(string type)
+		{	
+			long timer;
+			Imports.QueryPerformanceCounter(out timer);
+			long freq;
+			Imports.QueryPerformanceFrequency(out freq);
+
+			lock (Refreshes)
+			{
+				if (!Refreshes.ContainsKey(type))
+					Refreshes.Add(type, new Queue<long>());
+				Refreshes[type].Enqueue(timer);
+				
+				List<string> keys = Refreshes.Keys.ToList();
+
+				foreach (string key in keys)
+				{
+					while (Refreshes[key].Count > 0 && Refreshes[key].Peek() < timer - freq * 10)
+						Refreshes[key].Dequeue();
+
+					if (Refreshes[key].Count == 0)
+						Refreshes.Remove(key);
+				}
+				
 			}
 		}
 
@@ -1337,6 +1356,26 @@ namespace maphack_external_directx
 		{
 			new Trainer().Show();
 		}
+
+		private void tmrUpdateStatus_Tick(object sender, EventArgs e)
+		{
+			if (!GameData.SC2Opened)
+			{
+				this.message = "SC2 is not opened";
+			}
+			else
+			{
+				decimal seconds = (decimal)GameData.SecondsElapsed;
+				int hours = (int)seconds / 3600;
+				int minutes = (int)seconds / 60;
+				seconds %= 60;
+				string time = (hours > 0 ? hours.ToString() + ":" : "") + minutes.ToString(hours > 0 ? "D2" : "D") + ":" + seconds.ToString("00.00");
+				this.message = _2csAPI.InGame() ? "In Game: " + time : ("SC2 Version " + GameData.SC2Version);
+			}
+			this.toolStripLabelStatus.Text = this.message;
+			UpdateRefreshes("Status");
+		}
+
 	}
 }
 

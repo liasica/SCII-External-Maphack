@@ -122,9 +122,9 @@ namespace _2cs_API
 				{
 					return false;
 				}
-				if ((((u.unitType != UnitType.Hatchery) && (u.unitType != UnitType.Hive)) && ((u.unitType != UnitType.Lair) && (u.unitType != UnitType.CommandCenter))) && (((u.unitType != UnitType.CommandCenterFlying) && (u.unitType != UnitType.OrbitalCommand)) && ((u.unitType != UnitType.OrbitalCommandFlying) && (u.unitType != UnitType.PlanetaryFortress))))
+				if ((((u.unitType != (ushort)UnitType.Hatchery) && (u.unitType != (ushort)(ushort)UnitType.Hive)) && ((u.unitType != (ushort)UnitType.Lair) && (u.unitType != (ushort)UnitType.CommandCenter))) && (((u.unitType != (ushort)UnitType.CommandCenterFlying) && (u.unitType != (ushort)UnitType.OrbitalCommand)) && ((u.unitType != (ushort)UnitType.OrbitalCommandFlying) && (u.unitType != (ushort)UnitType.PlanetaryFortress))))
 				{
-					return u.unitType == UnitType.Nexus;
+					return u.unitType == (ushort)UnitType.Nexus;
 				}
 				return true;
 			});
@@ -135,7 +135,7 @@ namespace _2cs_API
 			List<Unit> list = FindBuildings(playerNumber);
 			if (list.Count == 0)
 			{
-				return new Unit();
+				return new Unit(0);
 			}
 			Random random = new Random();
 			return list[random.Next(0, list.Count - 1)];
@@ -153,7 +153,7 @@ namespace _2cs_API
 
 		public static Unit FindUnit(UnitType unitType, uint playerNumber)
 		{
-			return GameData.getUnitData().Find(u => (u.unitType == unitType) && (u.playerNumber == playerNumber));
+			return GameData.getUnitData().Find(u => (u.unitType == (ushort)unitType) && (u.playerNumber == playerNumber));
 		}
 
 		public static List<Unit> FindUnits(UnitType unitType)
@@ -168,7 +168,7 @@ namespace _2cs_API
 
 		public static List<Unit> FindUnits(UnitType unitType, uint playerNumber)
 		{
-			return GameData.getUnitData().FindAll(u => (u.unitType == unitType) && (u.playerNumber == playerNumber));
+			return GameData.getUnitData().FindAll(u => (u.unitType == (ushort)unitType) && (u.playerNumber == playerNumber));
 		}
 
 		public static List<Unit> FindUnits(UnitType[] unitTypes, uint playerNumber)
@@ -180,7 +180,7 @@ namespace _2cs_API
 			{
 				if (match == null)
 				{
-					match = u => (u.unitType == unitTypes[i]) && (u.playerNumber == playerNumber);
+					match = u => (u.unitType == (ushort)unitTypes[i]) && (u.playerNumber == playerNumber);
 				}
 				List<Unit> collection = list.FindAll(match);
 				list2.AddRange(collection);
@@ -190,7 +190,7 @@ namespace _2cs_API
 
 		public static Unit FindUnitUnderconstruction(UnitType unitType, uint playerNumber)
 		{
-			return GameData.getUnitData().Find(u => ((u.unitType == unitType) && (u.healthDamage != 0)) && (u.playerNumber == playerNumber));
+			return GameData.getUnitData().Find(u => ((u.unitType == (ushort)unitType) && (u.healthDamage != 0)) && (u.playerNumber == playerNumber));
 		}
 
 		public static List<Unit> FindWorkers()
@@ -202,7 +202,7 @@ namespace _2cs_API
 		{
 			List<Unit> list = GameData.getUnitData();
 			List<Unit> list2 = new List<Unit>();
-			List<Unit> collection = list.FindAll(u => IsWorker(u.unitType) && (u.playerNumber == playerNumber));
+			List<Unit> collection = list.FindAll(u => IsWorker((UnitType)u.unitType) && (u.playerNumber == playerNumber));
 			list2.AddRange(collection);
 			return list2;
 		}
@@ -279,7 +279,7 @@ namespace _2cs_API
 			{
 				if (match == null)
 				{
-					match = p => (p.unitType == UnitType.MineralField) && (DistanceBetweenUnits(p, mainBuildings[i]) <= 10.0);
+					match = p => (p.unitType == (ushort)UnitType.MineralField) && (DistanceBetweenUnits(p, mainBuildings[i]) <= 10.0);
 				}
 				list.AddRange(GameData.getUnitData().FindAll(match));
 			}
@@ -303,7 +303,7 @@ namespace _2cs_API
 			List<Unit> mineralFields = GetMineralFields();
 			if (mineralFields.Count == 0)
 			{
-				return new Unit();
+				return new Unit(0);
 			}
 			Random random = new Random();
 			return mineralFields[random.Next(0, mineralFields.Count - 1)];
@@ -326,7 +326,7 @@ namespace _2cs_API
 				if (match == null)
 				{
 					match = delegate (Unit p) {
-						if (((p.unitType != UnitType.VespeneGeyser) && (p.unitType != UnitType.SpacePlatformGeyser)) && ((p.unitType != UnitType.TempleGeyser) && (p.unitType != UnitType.RichVespeneGeyser)))
+						if (((p.unitType != (ushort)UnitType.VespeneGeyser) && (p.unitType != (ushort)UnitType.SpacePlatformGeyser)) && ((p.unitType != (ushort)UnitType.TempleGeyser) && (p.unitType != (ushort)UnitType.RichVespeneGeyser)))
 						{
 							return false;
 						}
@@ -342,8 +342,8 @@ namespace _2cs_API
 		{
 			UnitType workerType = WorkerType;
 			uint localPlayerNumber = Player.LocalPlayerNumber;
-			GameData.GetPlayerSelections(localPlayerNumber);
-			return GameData.getUnitData().FindAll(p => ((p.playerNumber == localPlayerNumber) && (p.unitType == workerType)) && (p.state != UnitStateOld.WorkerBuilding));
+			GameData.GetPlayerSelections((int)localPlayerNumber);
+			return GameData.getUnitData().FindAll(p => ((p.playerNumber == localPlayerNumber) && (p.unitType == (ushort)workerType)) && (p.state != UnitStateOld.WorkerBuilding));
 		}
 
 		public static bool InGame()
@@ -377,9 +377,9 @@ namespace _2cs_API
 				{
 					return false;
 				}
-				if (u.unitType != UnitType.CommandCenterFlying)
+				if (u.unitType != (ushort)UnitType.CommandCenterFlying)
 				{
-					return u.unitType == UnitType.BarracksFlying;
+					return u.unitType == (ushort)UnitType.BarracksFlying;
 				}
 				return true;
 			}).ID != 0);
@@ -387,7 +387,7 @@ namespace _2cs_API
 
 		public static int UnitCount(UnitType unitType)
 		{
-			return GameData.getUnitData().FindAll(u => u.unitType == unitType).Count;
+			return GameData.getUnitData().FindAll(u => u.unitType == (ushort)unitType).Count;
 		}
 
 		public static int UnitCount(uint playerNumber)
@@ -402,7 +402,7 @@ namespace _2cs_API
 
 		public static int UnitCount(UnitType unitType, uint playerNumber)
 		{
-			return GameData.getUnitData().FindAll(u => (u.unitType == unitType) && (u.playerNumber == playerNumber)).Count;
+			return GameData.getUnitData().FindAll(u => (u.unitType == (ushort)unitType) && (u.playerNumber == playerNumber)).Count;
 		}
 
 		public static bool UnitExists(UnitType unitType)
@@ -422,7 +422,7 @@ namespace _2cs_API
 
 		public static bool UnitExists(UnitType unitType, int quantity, uint playerNumber)
 		{
-			return (GameData.getUnitData().FindAll(u => (u.unitType == unitType) && (u.playerNumber == playerNumber)).Count >= quantity);
+			return (GameData.getUnitData().FindAll(u => (u.unitType == (ushort)unitType) && (u.playerNumber == playerNumber)).Count >= quantity);
 		}
 
 		public static string UnitHotkey(UnitType unit)
@@ -470,13 +470,13 @@ namespace _2cs_API
 					ControlGroup currentSelection = GameData.GetPlayerSelections(Player.LocalPlayer).currentSelection;
 					if (currentSelection.selected_unit_ids.Count == 0)
 					{
-						return new Unit();
+						return new Unit(0);
 					}
 					return FindUnit(currentSelection.selected_unit_ids[0]);
 				}
 				catch
 				{
-					return new Unit();
+					return new Unit(0);
 				}
 			}
 		}
@@ -485,7 +485,7 @@ namespace _2cs_API
 		{
 			get
 			{
-				return SelectedUnit.unitType;
+				return (UnitType)SelectedUnit.unitType;
 			}
 		}
 
@@ -1908,7 +1908,7 @@ namespace _2cs_API
 					}
 					catch
 					{
-						return new Data.Player();
+						return new Data.Player(0);
 					}
 				}
 			}

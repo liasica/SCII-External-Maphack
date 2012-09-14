@@ -151,7 +151,7 @@ namespace Utilities.MemoryHandling
 			return ReturnVal;
 		}
 
-		public static object RawDeserialize(byte[] rawData, int position, Type anyType)
+		/*public static object RawDeserialize(byte[] rawData, int position, Type anyType)
 		{
 			int cb = Marshal.SizeOf(anyType);
 			if (cb > rawData.Length)
@@ -163,9 +163,25 @@ namespace Utilities.MemoryHandling
 			object obj2 = Marshal.PtrToStructure(destination, anyType);
 			Marshal.FreeHGlobal(destination);
 			return obj2;
+		}*/
+
+		public static unsafe object RawDeserialize(byte[] rawData, int position, Type anyType)
+		{
+			int cb = Marshal.SizeOf(anyType);
+			if (cb > rawData.Length)
+			{
+				return null;
+			}
+			object obj2;
+			fixed(void* ptr = &rawData[0])
+			{
+				IntPtr destination = new IntPtr(ptr);
+				obj2 = Marshal.PtrToStructure(destination, anyType);
+			}
+			return obj2;
 		}
 
-		public static byte[] RawSerialize(object anything)
+		/*public static byte[] RawSerialize(object anything)
 		{
 			int cb = Marshal.SizeOf(anything);
 			IntPtr ptr = Marshal.AllocHGlobal(cb);
@@ -173,6 +189,18 @@ namespace Utilities.MemoryHandling
 			byte[] destination = new byte[cb];
 			Marshal.Copy(ptr, destination, 0, cb);
 			Marshal.FreeHGlobal(ptr);
+			return destination;
+		}*/
+
+		public static unsafe byte[] RawSerialize(object anything)
+		{
+			int cb = Marshal.SizeOf(anything);
+			byte[] destination = new byte[cb];
+			fixed (void* ptr = &destination[0])
+			{
+				IntPtr iptr = new IntPtr(ptr);
+				Marshal.StructureToPtr(anything, iptr, false);
+			}
 			return destination;
 		}
 
@@ -192,16 +220,17 @@ namespace Utilities.MemoryHandling
 
 		public bool ReadMemory(IntPtr memoryLocation, int bufferLength, out byte[] lpBuffer)
 		{
+			int lpBytesRead;
 			lpBuffer = new byte[bufferLength];
 			if (this.m_lpHandle.ToInt32() == 0)
 			{
 				return false;
 			}
-			if (!Imports.ReadProcessMemory(this.m_lpHandle, memoryLocation, lpBuffer, bufferLength, out this.m_lpBytesRead))
+			if (!Imports.ReadProcessMemory(this.m_lpHandle, memoryLocation, lpBuffer, bufferLength, out lpBytesRead))
 			{
 				return false;
 			}
-			if (this.m_lpBytesRead != bufferLength)
+			if (lpBytesRead != bufferLength)
 			{
 				return false;
 			}
@@ -210,6 +239,7 @@ namespace Utilities.MemoryHandling
 
 		public bool ReadMemory(uint memoryLocation, int bufferLength, out byte[] lpBuffer)
 		{
+			int lpBytesRead;
 			lpBuffer = new byte[bufferLength];
 			if (this.m_lpHandle.ToInt32() == 0)
 			{
@@ -220,7 +250,7 @@ namespace Utilities.MemoryHandling
 				UIntPtr lpAddress = (UIntPtr) memoryLocation;
 				Imports.MEMORY_BASIC_INFORMATION memory_basic_information = new Imports.MEMORY_BASIC_INFORMATION();
 				Imports.VirtualQueryEx(this.m_lpHandle, lpAddress, out memory_basic_information, (uint) bufferLength);
-				if (!Imports.ReadProcessMemory(this.m_lpHandle, lpAddress, lpBuffer, bufferLength, out this.m_lpBytesRead))
+				if (!Imports.ReadProcessMemory(this.m_lpHandle, lpAddress, lpBuffer, bufferLength, out lpBytesRead))
 				{
 					return false;
 				}
@@ -234,13 +264,14 @@ namespace Utilities.MemoryHandling
 
 		public bool ReadMemory(uint memoryLocation, int bufferLength, out int uintOut)
 		{
+			int lpBytesRead;
 			uintOut = 0;
 			if (this.m_lpHandle.ToInt32() == 0)
 			{
 				return false;
 			}
 			byte[] lpBuffer = new byte[4];
-			if (!Imports.ReadProcessMemory(this.m_lpHandle, (IntPtr) memoryLocation, lpBuffer, bufferLength, out this.m_lpBytesRead))
+			if (!Imports.ReadProcessMemory(this.m_lpHandle, (IntPtr) memoryLocation, lpBuffer, bufferLength, out lpBytesRead))
 			{
 				return false;
 			}
@@ -250,13 +281,14 @@ namespace Utilities.MemoryHandling
 
 		public bool ReadMemory(uint memoryLocation, int bufferLength, out uint uintOut)
 		{
+			int lpBytesRead;
 			uintOut = 0;
 			if (this.m_lpHandle.ToInt32() == 0)
 			{
 				return false;
 			}
 			byte[] lpBuffer = new byte[4];
-			if (!Imports.ReadProcessMemory(this.m_lpHandle, (IntPtr) memoryLocation, lpBuffer, bufferLength, out this.m_lpBytesRead))
+			if (!Imports.ReadProcessMemory(this.m_lpHandle, (IntPtr) memoryLocation, lpBuffer, bufferLength, out lpBytesRead))
 			{
 				return false;
 			}
@@ -266,11 +298,12 @@ namespace Utilities.MemoryHandling
 
 		public bool WriteMemory(IntPtr memoryLocation, int bufferLength, ref byte[] lpBuffer)
 		{
+			int lpBytesWrote;
 			if (this.m_lpHandle.ToInt32() == 0)
 			{
 				return false;
 			}
-			if (!Imports.WriteProcessMemory(this.m_lpHandle, memoryLocation, lpBuffer, bufferLength, out this.m_lpBytesWrote))
+			if (!Imports.WriteProcessMemory(this.m_lpHandle, memoryLocation, lpBuffer, bufferLength, out lpBytesWrote))
 			{
 				return false;
 			}

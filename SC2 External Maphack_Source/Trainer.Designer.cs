@@ -52,20 +52,28 @@
 			this.boxGas = new System.Windows.Forms.NumericUpDown();
 			this.boxMins = new System.Windows.Forms.NumericUpDown();
 			this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-			this.buttonApply = new System.Windows.Forms.Button();
-			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.groupBox3 = new System.Windows.Forms.GroupBox();
 			this.rDDNormal = new System.Windows.Forms.RadioButton();
 			this.rDDCustom = new System.Windows.Forms.RadioButton();
 			this.boxDDCustom = new System.Windows.Forms.NumericUpDown();
 			this.rDDNoChange = new System.Windows.Forms.RadioButton();
 			this.rDDNone = new System.Windows.Forms.RadioButton();
-			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.rDTNone = new System.Windows.Forms.RadioButton();
 			this.rDTNoChange = new System.Windows.Forms.RadioButton();
 			this.boxDTCustom = new System.Windows.Forms.NumericUpDown();
 			this.rDTCustom = new System.Windows.Forms.RadioButton();
 			this.rDTNormal = new System.Windows.Forms.RadioButton();
+			this.rTSNone = new System.Windows.Forms.RadioButton();
+			this.rTSNoChange = new System.Windows.Forms.RadioButton();
+			this.boxTSCustom = new System.Windows.Forms.NumericUpDown();
+			this.rTSCustom = new System.Windows.Forms.RadioButton();
+			this.rTSNormal = new System.Windows.Forms.RadioButton();
+			this.buttonApply = new System.Windows.Forms.Button();
+			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.groupBox4 = new System.Windows.Forms.GroupBox();
+			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.groupBox5 = new System.Windows.Forms.GroupBox();
+			this.cbFreezeUnits = new System.Windows.Forms.CheckBox();
+			this.groupBox6 = new System.Windows.Forms.GroupBox();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.boxMaxSupply)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.boxSupply)).BeginInit();
@@ -73,11 +81,14 @@
 			((System.ComponentModel.ISupportInitialize)(this.boxTerra)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.boxGas)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.boxMins)).BeginInit();
-			this.groupBox2.SuspendLayout();
-			this.groupBox3.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.boxDDCustom)).BeginInit();
-			this.groupBox4.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.boxDTCustom)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.boxTSCustom)).BeginInit();
+			this.groupBox2.SuspendLayout();
+			this.groupBox4.SuspendLayout();
+			this.groupBox3.SuspendLayout();
+			this.groupBox5.SuspendLayout();
+			this.groupBox6.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// timer1
@@ -448,42 +459,6 @@
 			this.toolTip1.InitialDelay = 250;
 			this.toolTip1.ReshowDelay = 50;
 			// 
-			// buttonApply
-			// 
-			this.buttonApply.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-			this.buttonApply.Location = new System.Drawing.Point(12, 276);
-			this.buttonApply.Name = "buttonApply";
-			this.buttonApply.Size = new System.Drawing.Size(140, 23);
-			this.buttonApply.TabIndex = 3;
-			this.buttonApply.Text = "Apply Changes Now";
-			this.buttonApply.UseVisualStyleBackColor = false;
-			this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
-			// 
-			// groupBox2
-			// 
-			this.groupBox2.Controls.Add(this.groupBox4);
-			this.groupBox2.Controls.Add(this.groupBox3);
-			this.groupBox2.Location = new System.Drawing.Point(372, 9);
-			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(232, 181);
-			this.groupBox2.TabIndex = 4;
-			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "Combat";
-			// 
-			// groupBox3
-			// 
-			this.groupBox3.Controls.Add(this.rDDNone);
-			this.groupBox3.Controls.Add(this.rDDNoChange);
-			this.groupBox3.Controls.Add(this.boxDDCustom);
-			this.groupBox3.Controls.Add(this.rDDCustom);
-			this.groupBox3.Controls.Add(this.rDDNormal);
-			this.groupBox3.Location = new System.Drawing.Point(6, 19);
-			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(106, 155);
-			this.groupBox3.TabIndex = 0;
-			this.groupBox3.TabStop = false;
-			this.groupBox3.Text = "Damage Dealt";
-			// 
 			// rDDNormal
 			// 
 			this.rDDNormal.AutoSize = true;
@@ -560,20 +535,6 @@
 			this.rDDNone.Text = "None";
 			this.toolTip1.SetToolTip(this.rDDNone, "Units will do no damage.");
 			this.rDDNone.UseVisualStyleBackColor = true;
-			// 
-			// groupBox4
-			// 
-			this.groupBox4.Controls.Add(this.rDTNone);
-			this.groupBox4.Controls.Add(this.rDTNoChange);
-			this.groupBox4.Controls.Add(this.boxDTCustom);
-			this.groupBox4.Controls.Add(this.rDTCustom);
-			this.groupBox4.Controls.Add(this.rDTNormal);
-			this.groupBox4.Location = new System.Drawing.Point(119, 19);
-			this.groupBox4.Name = "groupBox4";
-			this.groupBox4.Size = new System.Drawing.Size(106, 155);
-			this.groupBox4.TabIndex = 0;
-			this.groupBox4.TabStop = false;
-			this.groupBox4.Text = "Damage Taken";
 			// 
 			// rDTNone
 			// 
@@ -652,11 +613,175 @@
 			this.toolTip1.SetToolTip(this.rDTNormal, "Units will take 100% damage.");
 			this.rDTNormal.UseVisualStyleBackColor = true;
 			// 
+			// rTSNone
+			// 
+			this.rTSNone.AutoSize = true;
+			this.rTSNone.Location = new System.Drawing.Point(6, 42);
+			this.rTSNone.Name = "rTSNone";
+			this.rTSNone.Size = new System.Drawing.Size(51, 17);
+			this.rTSNone.TabIndex = 2;
+			this.rTSNone.Text = "None";
+			this.toolTip1.SetToolTip(this.rTSNone, "This will either stop units or do something glitchy.");
+			this.rTSNone.UseVisualStyleBackColor = true;
+			// 
+			// rTSNoChange
+			// 
+			this.rTSNoChange.AutoSize = true;
+			this.rTSNoChange.Checked = true;
+			this.rTSNoChange.Location = new System.Drawing.Point(6, 19);
+			this.rTSNoChange.Name = "rTSNoChange";
+			this.rTSNoChange.Size = new System.Drawing.Size(79, 17);
+			this.rTSNoChange.TabIndex = 2;
+			this.rTSNoChange.TabStop = true;
+			this.rTSNoChange.Text = "No Change";
+			this.toolTip1.SetToolTip(this.rTSNoChange, "Will not change anything when changes are applied.");
+			this.rTSNoChange.UseVisualStyleBackColor = true;
+			// 
+			// boxTSCustom
+			// 
+			this.boxTSCustom.DecimalPlaces = 4;
+			this.boxTSCustom.Enabled = false;
+			this.boxTSCustom.Increment = new decimal(new int[] {
+            5,
+            0,
+            0,
+            65536});
+			this.boxTSCustom.Location = new System.Drawing.Point(6, 111);
+			this.boxTSCustom.Maximum = new decimal(new int[] {
+            524287,
+            0,
+            0,
+            0});
+			this.boxTSCustom.Minimum = new decimal(new int[] {
+            524287,
+            0,
+            0,
+            -2147483648});
+			this.boxTSCustom.Name = "boxTSCustom";
+			this.boxTSCustom.Size = new System.Drawing.Size(79, 20);
+			this.boxTSCustom.TabIndex = 1;
+			this.toolTip1.SetToolTip(this.boxTSCustom, "Custom time scale. Over 100.0 is not recommended.");
+			this.boxTSCustom.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			// 
+			// rTSCustom
+			// 
+			this.rTSCustom.AutoSize = true;
+			this.rTSCustom.Location = new System.Drawing.Point(6, 88);
+			this.rTSCustom.Name = "rTSCustom";
+			this.rTSCustom.Size = new System.Drawing.Size(63, 17);
+			this.rTSCustom.TabIndex = 0;
+			this.rTSCustom.Text = "Custom:";
+			this.toolTip1.SetToolTip(this.rTSCustom, "Set a custom time scale");
+			this.rTSCustom.UseVisualStyleBackColor = true;
+			this.rTSCustom.CheckedChanged += new System.EventHandler(this.rTSCustom_CheckedChanged);
+			// 
+			// rTSNormal
+			// 
+			this.rTSNormal.AutoSize = true;
+			this.rTSNormal.Location = new System.Drawing.Point(6, 65);
+			this.rTSNormal.Name = "rTSNormal";
+			this.rTSNormal.Size = new System.Drawing.Size(58, 17);
+			this.rTSNormal.TabIndex = 0;
+			this.rTSNormal.Text = "Normal";
+			this.toolTip1.SetToolTip(this.rTSNormal, "Units will do everything at 100% speed.");
+			this.rTSNormal.UseVisualStyleBackColor = true;
+			// 
+			// buttonApply
+			// 
+			this.buttonApply.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+			this.buttonApply.Location = new System.Drawing.Point(12, 276);
+			this.buttonApply.Name = "buttonApply";
+			this.buttonApply.Size = new System.Drawing.Size(140, 23);
+			this.buttonApply.TabIndex = 3;
+			this.buttonApply.Text = "Apply Changes Now";
+			this.toolTip1.SetToolTip(this.buttonApply, "Apply all selected changes now.");
+			this.buttonApply.UseVisualStyleBackColor = false;
+			this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
+			// 
+			// groupBox2
+			// 
+			this.groupBox2.Controls.Add(this.groupBox4);
+			this.groupBox2.Controls.Add(this.groupBox3);
+			this.groupBox2.Location = new System.Drawing.Point(372, 9);
+			this.groupBox2.Name = "groupBox2";
+			this.groupBox2.Size = new System.Drawing.Size(232, 181);
+			this.groupBox2.TabIndex = 4;
+			this.groupBox2.TabStop = false;
+			this.groupBox2.Text = "Combat";
+			// 
+			// groupBox4
+			// 
+			this.groupBox4.Controls.Add(this.rDTNone);
+			this.groupBox4.Controls.Add(this.rDTNoChange);
+			this.groupBox4.Controls.Add(this.boxDTCustom);
+			this.groupBox4.Controls.Add(this.rDTCustom);
+			this.groupBox4.Controls.Add(this.rDTNormal);
+			this.groupBox4.Location = new System.Drawing.Point(119, 19);
+			this.groupBox4.Name = "groupBox4";
+			this.groupBox4.Size = new System.Drawing.Size(106, 155);
+			this.groupBox4.TabIndex = 0;
+			this.groupBox4.TabStop = false;
+			this.groupBox4.Text = "Damage Taken";
+			// 
+			// groupBox3
+			// 
+			this.groupBox3.Controls.Add(this.boxDDCustom);
+			this.groupBox3.Controls.Add(this.rDDNone);
+			this.groupBox3.Controls.Add(this.rDDNoChange);
+			this.groupBox3.Controls.Add(this.rDDCustom);
+			this.groupBox3.Controls.Add(this.rDDNormal);
+			this.groupBox3.Location = new System.Drawing.Point(6, 19);
+			this.groupBox3.Name = "groupBox3";
+			this.groupBox3.Size = new System.Drawing.Size(106, 155);
+			this.groupBox3.TabIndex = 0;
+			this.groupBox3.TabStop = false;
+			this.groupBox3.Text = "Damage Dealt";
+			// 
+			// groupBox5
+			// 
+			this.groupBox5.Controls.Add(this.cbFreezeUnits);
+			this.groupBox5.Controls.Add(this.groupBox6);
+			this.groupBox5.Location = new System.Drawing.Point(159, 197);
+			this.groupBox5.Name = "groupBox5";
+			this.groupBox5.Size = new System.Drawing.Size(445, 181);
+			this.groupBox5.TabIndex = 5;
+			this.groupBox5.TabStop = false;
+			this.groupBox5.Text = "Players\' Units";
+			// 
+			// cbFreezeUnits
+			// 
+			this.cbFreezeUnits.AutoSize = true;
+			this.cbFreezeUnits.Location = new System.Drawing.Point(6, 19);
+			this.cbFreezeUnits.Name = "cbFreezeUnits";
+			this.cbFreezeUnits.Size = new System.Drawing.Size(58, 17);
+			this.cbFreezeUnits.TabIndex = 1;
+			this.cbFreezeUnits.Text = "Freeze";
+			this.cbFreezeUnits.UseVisualStyleBackColor = true;
+			// 
+			// groupBox6
+			// 
+			this.groupBox6.Controls.Add(this.rTSNone);
+			this.groupBox6.Controls.Add(this.rTSNoChange);
+			this.groupBox6.Controls.Add(this.boxTSCustom);
+			this.groupBox6.Controls.Add(this.rTSCustom);
+			this.groupBox6.Controls.Add(this.rTSNormal);
+			this.groupBox6.Location = new System.Drawing.Point(332, 19);
+			this.groupBox6.Name = "groupBox6";
+			this.groupBox6.Size = new System.Drawing.Size(106, 155);
+			this.groupBox6.TabIndex = 0;
+			this.groupBox6.TabStop = false;
+			this.groupBox6.Text = "Time Scale";
+			// 
 			// Trainer
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(610, 306);
+			this.ClientSize = new System.Drawing.Size(610, 384);
+			this.Controls.Add(this.groupBox5);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.buttonApply);
 			this.Controls.Add(this.groupBox1);
@@ -674,13 +799,18 @@
 			((System.ComponentModel.ISupportInitialize)(this.boxTerra)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.boxGas)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.boxMins)).EndInit();
-			this.groupBox2.ResumeLayout(false);
-			this.groupBox3.ResumeLayout(false);
-			this.groupBox3.PerformLayout();
 			((System.ComponentModel.ISupportInitialize)(this.boxDDCustom)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.boxDTCustom)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.boxTSCustom)).EndInit();
+			this.groupBox2.ResumeLayout(false);
 			this.groupBox4.ResumeLayout(false);
 			this.groupBox4.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.boxDTCustom)).EndInit();
+			this.groupBox3.ResumeLayout(false);
+			this.groupBox3.PerformLayout();
+			this.groupBox5.ResumeLayout(false);
+			this.groupBox5.PerformLayout();
+			this.groupBox6.ResumeLayout(false);
+			this.groupBox6.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -725,6 +855,14 @@
 		private System.Windows.Forms.NumericUpDown boxDDCustom;
 		private System.Windows.Forms.RadioButton rDDCustom;
 		private System.Windows.Forms.RadioButton rDDNormal;
+		private System.Windows.Forms.GroupBox groupBox5;
+		private System.Windows.Forms.GroupBox groupBox6;
+		private System.Windows.Forms.RadioButton rTSNone;
+		private System.Windows.Forms.RadioButton rTSNoChange;
+		private System.Windows.Forms.NumericUpDown boxTSCustom;
+		private System.Windows.Forms.RadioButton rTSCustom;
+		private System.Windows.Forms.RadioButton rTSNormal;
+		private System.Windows.Forms.CheckBox cbFreezeUnits;
 
 	}
 }

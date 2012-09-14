@@ -20,6 +20,7 @@ namespace maphack_external_directx
 	using System.Text;
 	using System.Windows.Forms;
 	using Utilities.KeyboardHook;
+	using Utilities.WebTools;
 
 	public class DirectX_HUDs : Form
 	{
@@ -31,6 +32,8 @@ namespace maphack_external_directx
 		private List<Abil> abilities = new List<Abil>();
 		private System.Drawing.Font arial = new System.Drawing.Font("Arial", 12f, FontStyle.Bold);
 		private System.Drawing.Font arial2 = new System.Drawing.Font("Arial", 10f, FontStyle.Bold);
+		private System.Drawing.Font arial3 = new System.Drawing.Font("Arial", 10f, FontStyle.Regular);
+		private System.Drawing.Font arial4 = new System.Drawing.Font("Arial", 9f, FontStyle.Regular);
 		private IContainer components;
 		public static ObserverPanelTabs CurrentObserverPanelTab = ObserverPanelTabs.Buildings_and_Units_Same_Line;
 		public Device device;
@@ -38,7 +41,6 @@ namespace maphack_external_directx
 		private bool drawCameraEnemies = true;
 		private bool drawCameraSelf;
 		private bool drawCameraSpectator;
-		private bool drawRanks = true;
 		private bool drawUnitDestinationAllies = true;
 		private bool drawUnitDestinationEnemies = true;
 		private bool drawUnitDestinationSelf;
@@ -50,17 +52,6 @@ namespace maphack_external_directx
 		private SortedDictionary<int, Microsoft.DirectX.Direct3D.Font> fonts = new SortedDictionary<int, Microsoft.DirectX.Direct3D.Font>();
 		public HUDFrame frame;
 		public const int GWL_EXSTYLE = -20;
-		public int[] indexofindex = new int[] { 
-			0x1d, 0x22, 0x23, 0x24, 0x26, 0x27, 40, 0x29, 0x2a, 0x2b, 0x2c, 60, 0x3d, 0x3e, 0x3f, 0x4c, 
-			0x4d, 0x4e, 0x4f, 80, 0x51, 0x52, 0x53, 0x54, 0x55, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a, 0x6b, 
-			0x6c, 0x6d, 110, 0x6f, 0x85, 0x87, 0x88, 0x89, 0x8a, 0x8b, 140, 0x8d, 0x8e, 0x8f, 0x91, 0x92, 
-			0x93, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9f, 0xa4, 0xa8, 160, 0xa2, 30, 0x1f, 0x2d, 0x2f, 0x30, 
-			0x31, 50, 0x33, 0x34, 0x35, 0x36, 0x37, 0x39, 0x3a, 0x3b, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 
-			70, 0x47, 0x48, 0x4a, 0x57, 0x59, 90, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f, 0x60, 0x61, 0x62, 0x63, 
-			100, 0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 120, 0x79, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f, 0x80, 
-			0x81, 130, 0x9e, 0xa1, 0xa5, 0xa6, 0xa7, 0xa9, 0x2e, 0x4b, 0x58, 0x86, 0xb9, 0x49, 0x70, 0x84, 
-			0x90, 0xb1
-		 };
 		public const int LWA_ALPHA = 2;
 		public const int LWA_COLORKEY = 1;
 		private Margins marg;
@@ -70,7 +61,6 @@ namespace maphack_external_directx
 		public static int observerPlayerLogoWidth = 40;
 		public bool pause;
 		private Utilities.KeyboardHook.KeyboardHook previousObserverPanelHotkey;
-		public string[] races = new string[] { "Neutral", "Zerg", "Protoss", "Terran" };
 		public static int resouceColumnWidth = 100;
 		public static Size resourceIconSize = new Size(24, 24);
 		public static int resourceIconFrameSize = 2;
@@ -83,93 +73,7 @@ namespace maphack_external_directx
 		private SortedDictionary<string, Texture> textures = new SortedDictionary<string, Texture>();
 		private Sprite textureSprite;
 		public Timer tmrRefreshRate;
-		public int[,] unit_queue_counter = new int[0x10, 130];
-		public double[] unit_radius = new double[] { 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 
-			0.0, 0.0, 0.375, 0.375, 1.375, 0.0, 0.375, 0.375, 0.375, 0.375, 0.375, 0.375, 0.375, 2.5, 1.25, 1.5, 
-			1.75, 1.25, 0.75, 1.25, 0.75, 1.5, 1.625, 1.625, 0.0, 1.25, 1.5, 0.75, 1.0, 1.0, 0.75, 0.75, 
-			2.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.625, 1.625, 0.375, 1.75, 1.25, 0.375, 0.375, 0.375, 0.5625, 
-			1.0, 0.625, 0.75, 0.75, 0.625, 1.25, 0.0, 2.5, 1.0, 1.5, 1.75, 1.5, 1.5, 1.5, 0.75, 1.75, 
-			1.5, 1.25, 1.5, 1.5, 1.5, 0.375, 0.625, 0.375, 0.375, 0.375, 0.75, 1.25, 1.0, 0.875, 0.475, 0.625, 
-			0.375, 0.25, 2.5, 0.75, 1.5, 1.5, 1.5, 1.5, 1.0, 1.5, 1.5, 1.5, 1.5, 1.5, 0.875, 0.875, 
-			2.5, 2.5, 1.0, 0.0, 0.375, 0.375, 1.0, 0.625, 0.475, 1.0, 0.625, 0.75, 0.625, 0.625, 1.0, 0.375, 
-			0.375, 0.625, 0.625, 0.375, 0.0, 0.0, 0.0, 0.0, 0.0, 0.875, 0.875, 0.75, 0.625, 1.0, 2.5, 1.0, 
-			2.5, 1.75, 2.5, 0.0, 0.875, 0.75, 0.875, 0.875, 0.75, 1.0, 0.0, 0.75, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.25, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.375, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.75, 1.5, 0.0, 1.5, 0.0, 0.0, 0.0, 0.75, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 
-			0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
-		 };
+		
 		public KeyValuePair<string, int>[] unit_textures = new KeyValuePair<string, int>[] { 
 			new KeyValuePair<string, int>(@"Assets\btn-unit-protoss-colossus.dds", 0x1d), new KeyValuePair<string, int>(@"Assets\btn-building-terran-techlab.dds", 30), new KeyValuePair<string, int>(@"Assets\btn-building-terran-reactor.dds", 0x1f), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-baneling.dds", 0x22), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-baneling.dds", 0x23), new KeyValuePair<string, int>(@"Assets\btn-unit-protoss-mothership.dds", 0x24), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-changeling.dds", 0x26), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-changeling.dds", 0x27), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-changeling.dds", 40), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-changeling.dds", 0x29), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-changeling.dds", 0x2a), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-changeling.dds", 0x2b), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-infestedmarine.dds", 0x2c), new KeyValuePair<string, int>(@"Assets\btn-building-terran-commandcenter.dds", 0x2d), new KeyValuePair<string, int>(@"Assets\btn-building-terran-supplydepot.dds", 0x2e), new KeyValuePair<string, int>(@"Assets\btn-building-terran-refinery.dds", 0x2f), 
 			new KeyValuePair<string, int>(@"Assets\btn-building-terran-barracks.dds", 0x30), new KeyValuePair<string, int>(@"Assets\btn-building-terran-engineeringbay.dds", 0x31), new KeyValuePair<string, int>(@"Assets\btn-building-terran-missileturret.dds", 50), new KeyValuePair<string, int>(@"Assets\btn-building-terran-bunker.dds", 0x33), new KeyValuePair<string, int>(@"Assets\btn-building-terran-sensordome.dds", 0x34), new KeyValuePair<string, int>(@"Assets\btn-building-terran-ghostacademy.dds", 0x35), new KeyValuePair<string, int>(@"Assets\btn-building-terran-factory.dds", 0x36), new KeyValuePair<string, int>(@"Assets\btn-building-terran-starport.dds", 0x37), new KeyValuePair<string, int>(@"Assets\btn-building-terran-armory.dds", 0x39), new KeyValuePair<string, int>(@"Assets\btn-building-terran-fusioncore.dds", 0x3a), new KeyValuePair<string, int>(@"Assets\btn-building-terran-autoturret.dds", 0x3b), new KeyValuePair<string, int>(@"Assets\btn-unit-terran-siegetank.dds", 60), new KeyValuePair<string, int>(@"Assets\btn-unit-terran-siegetank.dds", 0x3d), new KeyValuePair<string, int>(@"Assets\btn-unit-terran-vikingassault.dds", 0x3e), new KeyValuePair<string, int>(@"Assets\btn-unit-terran-vikingfighter.dds", 0x3f), new KeyValuePair<string, int>(@"Assets\btn-building-terran-commandcenter.dds", 0x40), 
@@ -193,72 +97,81 @@ namespace maphack_external_directx
 
 		public DirectX_HUDs(HUDType hudType)
 		{
-			switch(hudType)
+			try
 			{
-				case HUDType.Map:
-					this.DefaultClientRect = new Rectangle(50, 50, 150, 150); // Totally arbitrary.
-					break;
-				case HUDType.Observer:
-					this.DefaultClientRect = new Rectangle(200, 200, 800, 800); // I think this is the default size...
-					break;
-				case HUDType.Resources:
-					this.DefaultClientRect = new Rectangle(200, 200,
-						(DirectX_HUDs.resouceColumnWidth + DirectX_HUDs.resourceIconFrameSize * 2) * 5,   // I Haven't looked at this much, but that's about what HUDFrame.updateSize() does,
-						(DirectX_HUDs.resourceIconSize.Height + DirectX_HUDs.resourceIconFrameSize * 2)); // except that it's for 1 player instead of the current number.
-					break;
-				default:
-					this.DefaultClientRect = new Rectangle(50, 50, 150, 150); // Same as map.
-					break;
-			}
-
-			this.InitializeComponent();
-			this._HUDType = hudType;
-			this.initWindow();
-			this.initDirectX();
-			this.initVariables();
-			this.initFrame();
-			this.LoadSettings();
-
-			/*if (_HUDType == HUDType.Map)
-			{
-				Rectangle ScreenRect = Screen.GetBounds(new Point(MainWindow.minimap_location_x, MainWindow.minimap_location_y));
-				if (MainWindow.minimap_location_x >= ScreenRect.Right
-				|| MainWindow.minimap_location_y >= ScreenRect.Bottom
-				|| MainWindow.minimap_size_x >= ScreenRect.Width
-				|| MainWindow.minimap_size_y >= ScreenRect.Height)
+				switch (hudType)
 				{
+					case HUDType.Map:
+						this.DefaultClientRect = new Rectangle(50, 50, 150, 150); // Totally arbitrary.
+						break;
+					case HUDType.Observer:
+						this.DefaultClientRect = new Rectangle(200, 200, 800, 800); // I think this is the default size...
+						break;
+					case HUDType.Resources:
+						this.DefaultClientRect = new Rectangle(200, 200,
+							(DirectX_HUDs.resouceColumnWidth + DirectX_HUDs.resourceIconFrameSize * 2) * 5,   // I Haven't looked at this much, but that's about what HUDFrame.updateSize() does,
+							(DirectX_HUDs.resourceIconSize.Height + DirectX_HUDs.resourceIconFrameSize * 2)); // except that it's for 1 player instead of the current number.
+						break;
+					case HUDType.Info:
+						this.DefaultClientRect = new Rectangle(200, 200, 800, 800); // I think this is the default size...
+						break;
+					default:
+						this.DefaultClientRect = new Rectangle(50, 50, 150, 150); // Same as map.
+						break;
+				}
 
-					Rectangle MinimapRect = GameData.GetMinimapCoords();
-					MainWindow.minimap_location_x = MinimapRect.X;
-					MainWindow.minimap_location_y = MinimapRect.Y;
-					MainWindow.minimap_size_x = MinimapRect.Width;
-					MainWindow.minimap_size_y = MinimapRect.Height;
+				this.InitializeComponent();
+				this._HUDType = hudType;
+				this.initWindow();
+				this.initDirectX();
+				this.initVariables();
+				this.initFrame();
+				this.LoadSettings();
 
+				/*if (_HUDType == HUDType.Map)
+				{
+					Rectangle ScreenRect = Screen.GetBounds(new Point(MainWindow.minimap_location_x, MainWindow.minimap_location_y));
 					if (MainWindow.minimap_location_x >= ScreenRect.Right
 					|| MainWindow.minimap_location_y >= ScreenRect.Bottom
 					|| MainWindow.minimap_size_x >= ScreenRect.Width
 					|| MainWindow.minimap_size_y >= ScreenRect.Height)
 					{
-						MainWindow.minimap_location_x = ScreenRect.Width / 2;
-						MainWindow.minimap_location_y = ScreenRect.Height / 2;
-						MainWindow.minimap_size_x = 262;
-						MainWindow.minimap_size_y = 258;
+
+						Rectangle MinimapRect = GameData.GetMinimapCoords();
+						MainWindow.minimap_location_x = MinimapRect.X;
+						MainWindow.minimap_location_y = MinimapRect.Y;
+						MainWindow.minimap_size_x = MinimapRect.Width;
+						MainWindow.minimap_size_y = MinimapRect.Height;
+
+						if (MainWindow.minimap_location_x >= ScreenRect.Right
+						|| MainWindow.minimap_location_y >= ScreenRect.Bottom
+						|| MainWindow.minimap_size_x >= ScreenRect.Width
+						|| MainWindow.minimap_size_y >= ScreenRect.Height)
+						{
+							MainWindow.minimap_location_x = ScreenRect.Width / 2;
+							MainWindow.minimap_location_y = ScreenRect.Height / 2;
+							MainWindow.minimap_size_x = 262;
+							MainWindow.minimap_size_y = 258;
+						}
+
+						SaveMapSettings(MainWindow.minimap_location_x, MainWindow.minimap_location_y, MainWindow.minimap_size_x, MainWindow.minimap_size_y);
 					}
 
-					SaveMapSettings(MainWindow.minimap_location_x, MainWindow.minimap_location_y, MainWindow.minimap_size_x, MainWindow.minimap_size_y);
-				}
+					Rectangle WindowRect = this.frame.DesktopBounds;
+					Rectangle ClientRect = this.frame.RectangleToScreen(this.frame.ClientRectangle);
 
-				Rectangle WindowRect = this.frame.DesktopBounds;
-				Rectangle ClientRect = this.frame.RectangleToScreen(this.frame.ClientRectangle);
+					this.frame.Location = new Point(MainWindow.minimap_location_x - (ClientRect.Left - WindowRect.Left), MainWindow.minimap_location_y - (ClientRect.Top - WindowRect.Top));
+					this.frame.ClientSize = new Size(MainWindow.minimap_size_x, MainWindow.minimap_size_y);
+				}*/
 
-				this.frame.Location = new Point(MainWindow.minimap_location_x - (ClientRect.Left - WindowRect.Left), MainWindow.minimap_location_y - (ClientRect.Top - WindowRect.Top));
-				this.frame.ClientSize = new Size(MainWindow.minimap_size_x, MainWindow.minimap_size_y);
-			}*/
+				this.tmrRefreshRate.Interval = MainWindow.HUDRefreshRate;
+				this.tmrRefreshRate.Enabled = true;
 
-			this.tmrRefreshRate.Interval = MainWindow.HUDRefreshRate;
-			this.tmrRefreshRate.Enabled = true;
-
-
+			}
+			catch (Exception ex)
+			{
+				WT.ReportCrash(ex, null);
+			}
 		}
 
 		private void DirectX_HUDs_FormClosed(object sender, FormClosedEventArgs e)
@@ -425,6 +338,7 @@ namespace maphack_external_directx
 
 		public void DrawLine(float x1, float y1, float x2, float y2, Color col, bool PositionRatio = true)
 		{
+			float z = 0;
 			if ((x1 != x2) || (y1 != y2))
 			{
 				if (PositionRatio)
@@ -434,10 +348,10 @@ namespace maphack_external_directx
 					x2 = (x2 - MainWindow.playable_map_left) * MainWindow.minimap_scale + MainWindow.minimap_offset_x;
 					y2 = (y2 - (MainWindow.map_height - MainWindow.playable_map_top)) * MainWindow.minimap_scale + MainWindow.minimap_offset_y;
 				}
-				Line line = new Line(this.device);
-				Microsoft.DirectX.Vector2[] vertexList = new Microsoft.DirectX.Vector2[] { new Microsoft.DirectX.Vector2(x1, y1), new Microsoft.DirectX.Vector2(x2, y2) };
-				line.Draw(vertexList, col);
-				line.Dispose();
+
+				this.device.VertexFormat = VertexFormats.Diffuse | VertexFormats.Transformed;
+				CustomVertex.TransformedColored[] vertexStreamZeroData = new CustomVertex.TransformedColored[] { new CustomVertex.TransformedColored(x1, y1, z, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x2, y2, z, 0f, col.ToArgb()) };
+				this.device.DrawUserPrimitives(PrimitiveType.LineList, 1, vertexStreamZeroData);
 			}
 		}
 
@@ -465,20 +379,20 @@ namespace maphack_external_directx
 			this.DrawRectangleOutline(MainWindow.minimap_offset_x, MainWindow.minimap_offset_y, this.ClientSize.Width - MainWindow.minimap_offset_x * 2 - 1
 				, this.ClientSize.Height - MainWindow.minimap_offset_y * 2 - 1, OutlineColor2, false);
 
-			float radiusFactor = 2.3f;
-			this.DrawUnitDestinations(radiusFactor);
+			this.DrawUnitDestinations();
 
 			this.device.RenderState.ZBufferEnable = true;
 			this.device.RenderState.ZBufferFunction = Compare.GreaterEqual;
 			this.device.RenderState.ZBufferWriteEnable = true;
 			this.device.Clear(ClearFlags.ZBuffer, Color.FromArgb(0, 1, 1, 1), 0.0f, 0);
 
-			this.DrawUnitPositionsOnMap(radiusFactor);
+			this.DrawUnitPositionsOnMap();
 
 			this.device.RenderState.ZBufferWriteEnable = false;
 			this.device.RenderState.ZBufferEnable = false;
 
 			this.DrawPlayerCameras();
+			MainWindow.UpdateRefreshes("Map");
 		}
 
 		private void drawPerimeterWithRamps()
@@ -523,38 +437,73 @@ namespace maphack_external_directx
 
 		private void DrawPlayerCameras()
 		{
-			for (uint i = 1; i < MainWindow.active_players + 1; i++)
+			lock (MainWindow.players)
 			{
-				if (MainWindow.player_teams[i] != MainWindow.localteam)
+				foreach (Player player in MainWindow.players)
 				{
-					if (this.drawCameraEnemies)
+					if (player.team != MainWindow.localteam)
 					{
-						goto Label_0042;
+						if (this.drawCameraEnemies)
+						{
+							goto Label_0042;
+						}
+						continue;
 					}
-					continue;
-				}
-				if (i == MainWindow.localplayer)
-				{
-					if (this.drawCameraSelf)
+					if (player.number == MainWindow.localplayer)
 					{
-						goto Label_0042;
+						if (this.drawCameraSelf)
+						{
+							goto Label_0042;
+						}
+						continue;
 					}
-					continue;
-				}
-				if (!this.drawCameraAllies)
-				{
-					continue;
-				}
-			Label_0042:
-				if (this.drawCameraSpectator || ((MainWindow.player_playing[i] && (MainWindow.player_types[i] != PlayerType.Spectator)) && (MainWindow.player_types[i] != PlayerType.Referee)))
-				{
-					if (MainWindow.player_status[i] != VictoryStatus.Playing)
+					if (!this.drawCameraAllies)
 					{
-						return;
+						continue;
 					}
-					float x = MainWindow.player_cameraX[i] - 10;
-					float y = MainWindow.player_cameraY[i] + 15;
-					this.DrawCamera(x, MainWindow.map_height - y, 20f, 20f, GameData.player_colors[i], true);
+				Label_0042:
+					if (this.drawCameraSpectator || ((MainWindow.player_playing[player.number] && (player.playerType != PlayerType.Spectator)) && (player.playerType != PlayerType.Referee)))
+					{
+						if (player.victoryStatus != VictoryStatus.Playing)
+						{
+							return;
+						}
+						float x = player.cameraX - 10;
+						float y = player.cameraY+ 15;
+						this.DrawCamera(x, MainWindow.map_height - y, 20f, 20f, player.drawingColor, true);
+					}
+				}
+			}
+		}
+
+		private void drawInfo()
+		{
+			long freq;
+			Imports.QueryPerformanceFrequency(out freq);
+			
+			MainWindow.UpdateRefreshes("Info");
+			lock (MainWindow.Refreshes)
+			{
+				int y = 0;
+				foreach (KeyValuePair<string, Queue<long>> pair in MainWindow.Refreshes)
+				{
+					double FPS = 0;
+					if(pair.Value.Count >= 2)
+						FPS = (double)pair.Value.Count / ((double)(pair.Value.Last() - pair.Value.First()) / (double)freq);
+					string text = pair.Key + ": " + FPS.ToString("F1");
+
+					if (!this.fonts.ContainsKey(this.arial4.GetHashCode()))
+						this.fonts.Add(this.arial4.GetHashCode(), new Microsoft.DirectX.Direct3D.Font(this.device, this.arial4));
+
+					Rectangle rectangle = this.fonts[this.arial4.GetHashCode()].MeasureString(this.textSprite, text, DrawTextFormat.None, Color.White);
+
+					int X = 5;
+					int Y = 5 + y * rectangle.Height;
+
+					this.DrawRectangle(X - 2, Y, rectangle.Width + 4, rectangle.Height, Color.Black, false);
+					this.DrawText(X, Y, text, this.arial4, Color.White, false);
+
+					y++;
 				}
 			}
 		}
@@ -567,110 +516,97 @@ namespace maphack_external_directx
 			bool showCustom = false;
 			bool showSupply = false;
 
-			for (int i = 0; i < MainWindow.actual_players && i < MainWindow.actual_player.Length; i++)
-			{
-				if (MainWindow.actual_player[i] < 0 || MainWindow.actual_player[i] >= 16)
-					continue;
-
-				if (MainWindow.player_minerals[MainWindow.actual_player[i]] != 0)
-					showMins = true;
-				if (MainWindow.player_vespene[MainWindow.actual_player[i]] != 0)
-					showGas = true;
-				if (MainWindow.player_terrazine[MainWindow.actual_player[i]] != 0)
-					showTerrazine = true;
-				if (MainWindow.player_custom_resource[MainWindow.actual_player[i]] != 0)
-					showCustom = true;
-				if (string.IsNullOrWhiteSpace(MainWindow.player_supply[MainWindow.actual_player[i]]))
-					MainWindow.player_supply[MainWindow.actual_player[i]] = "?/?";
-
-				string[] splitSupply = MainWindow.player_supply[MainWindow.actual_player[i]].Split('/');
-				float currentSupply = 0;
-				float maxSupply = 0;
-				if (splitSupply.Length >= 2 && float.TryParse(splitSupply[0], out currentSupply) && float.TryParse(splitSupply[1], out maxSupply))
-				{
-					if(maxSupply != 0 && currentSupply != 0)
-						showSupply = true;
-				}
-				else
-					showSupply = true;
-			}
-
 			int index = 0;
-			for (int i = 0; i < 0x10; i++)
+			lock (MainWindow.players)
 			{
+				foreach (Player player in MainWindow.players)
+				{
+					if (MainWindow.show_window[player.number])
+					{
+						if (player.minerals != 0)
+							showMins = true;
+						if (player.gas != 0)
+							showGas = true;
+						if (player.terrazine != 0)
+							showTerrazine = true;
+						if (player.custom != 0)
+							showCustom = true;
+						if (player.supply != 0 && player.supplyCap != 0)
+							showSupply = true;
+					}
+				}
+
 				int f = resourceIconFrameSize;
 				int f2 = resourceIconFrameSize * 2;
-
-				lock (MainWindow.players)
+				foreach (Player player in MainWindow.players)
 				{
-					if (MainWindow.show_window[i] && i < MainWindow.players.Count)
+					int pNumber = player.number;
+					string pMins = player.minerals.ToString();
+					string pGas = player.gas.ToString();
+					string pTerra = player.terrazine.ToString();
+					string pCustom = player.custom.ToString();
+					string pSupply = player.supply.ToString() + "/" + player.supplyCap.ToString();
+
+					string pName = player.name;
+					string pRace = player.race.ToString().ToLower();
+					Color pColor = player.drawingColor;
+
+					if (MainWindow.show_window[pNumber])
 					{
 						int x = f;
 						int y = (index * (resourceIconSize.Height + f2)) + f;
 						int textY = (int)(y + (resourceIconSize.Height - this.arial2.GetHeight()) / 2);
 
-						bool MoreMins = true;
-						for (int j = 0; j < 16; j++)
-						{
-							if (j != i && MainWindow.show_window[j] && MainWindow.player_minerals[j] * 1.5 > MainWindow.player_minerals[i])
-							{
-								MoreMins = false;
-								break;
-							}
-						}
+						bool MoreMins = false;
 
 						if (showMins)
 						{
-							this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), GameData.player_colors[i], false);
+							this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), pColor, false);
 							if (MoreMins)
-								this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-highyieldmineral-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
+								this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-highyieldmineral-" + pRace + ".dds", false), false);
 							else
-								this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-mineral-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
+								this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-mineral-" + pRace + ".dds", false), false);
 
-							//this.DrawRectangleOutline((float) x, (float) y, (float) resourceIconSize.Width, (float) resourceIconSize.Height, GameData.player_colors[i], false);
-							this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_minerals[i].ToString(), this.arial2, Color.White, false);
-							this.Tooltips.Add(new KeyValuePair<Rectangle, string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), MainWindow.players[i].name + "'s minerals: " + MainWindow.player_minerals[i].ToString()));
+							this.DrawText((x + resourceIconSize.Width + f) + 5, textY, pMins, this.arial2, Color.White, false);
+							this.Tooltips.Add(new KeyValuePair<Rectangle, string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), pName + "'s minerals: " + pMins));
 							x += resouceColumnWidth + f2;
 						}
 						if (showGas)
 						{
-							this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), GameData.player_colors[i], false);
-							this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-gas-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
-							//this.DrawRectangleOutline((float) x, (float) y, (float) resourceIconSize.Width, (float) resourceIconSize.Height, GameData.player_colors[i], false);
-							this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_vespene[i].ToString(), this.arial2, Color.White, false);
-							this.Tooltips.Add(new KeyValuePair<Rectangle, string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), MainWindow.players[i].name + "'s vespene: " + MainWindow.player_vespene[i].ToString()));
+							this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), pColor, false);
+							this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-gas-" + pRace + ".dds", false), false);
+							this.DrawText((x + resourceIconSize.Width + f) + 5, textY, pGas, this.arial2, Color.White, false);
+							this.Tooltips.Add(new KeyValuePair<Rectangle, string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), pName + "'s vespene: " + pGas));
 							x += resouceColumnWidth + f2;
 						}
 						if (showTerrazine)
 						{
-							this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), GameData.player_colors[i], false);
-							this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-energy-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
-							//this.DrawRectangleOutline((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, GameData.player_colors[i], false);
-							this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_terrazine[i].ToString(), this.arial2, Color.White, false);
-							this.Tooltips.Add(new KeyValuePair<Rectangle, string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), MainWindow.players[i].name + "'s terrazine: " + MainWindow.player_terrazine[i].ToString()));
+							this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), pColor, false);
+							this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-energy-" + pRace + ".dds", false), false);
+							this.DrawText((x + resourceIconSize.Width + f) + 5, textY, pTerra, this.arial2, Color.White, false);
+							this.Tooltips.Add(new KeyValuePair<Rectangle, string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), pName + "'s terrazine: " + pTerra));
 							x += resouceColumnWidth + f2;
 						}
 						if (showCustom)
 						{
-							this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), GameData.player_colors[i], false);
-							this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-health-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
-							//this.DrawRectangleOutline((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, GameData.player_colors[i], false);
-							this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_custom_resource[i].ToString(), this.arial2, Color.White, false);
-							this.Tooltips.Add(new KeyValuePair<Rectangle, string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), MainWindow.players[i].name + "'s custom: " + MainWindow.player_custom_resource[i].ToString()));
+							this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), pColor, false);
+							this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-health-" + pRace + ".dds", false), false);
+							this.DrawText((x + resourceIconSize.Width + f) + 5, textY, pCustom, this.arial2, Color.White, false);
+							this.Tooltips.Add(new KeyValuePair<Rectangle, string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), pName + "'s custom: " + pCustom));
 							x += resouceColumnWidth + f2;
 						}
 						if (showSupply)
 						{
-							this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), GameData.player_colors[i], false);
-							this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-supply-" + MainWindow.player_race[i].ToString().ToLower() + ".dds", false), false);
-							//this.DrawRectangleOutline((float) x, (float) y, (float) resourceIconSize.Width, (float) resourceIconSize.Height, GameData.player_colors[i], false);
-							this.DrawText((x + resourceIconSize.Width + f) + 5, textY, MainWindow.player_supply[i], this.arial2, Color.White, false);
-							this.Tooltips.Add(new KeyValuePair<Rectangle, string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), MainWindow.players[i].name + "'s supply: " + MainWindow.player_supply[i]));
+							this.DrawRectangle((float)(x - f), (float)(y - f), (float)(resourceIconSize.Width + f2), (float)(resourceIconSize.Height + f2), pColor, false);
+							this.DrawTexture((float)x, (float)y, (float)resourceIconSize.Width, (float)resourceIconSize.Height, Database.GetItemFilename(@"Assets\Textures\icon-supply-" + pRace + ".dds", false), false);
+							this.DrawText((x + resourceIconSize.Width + f) + 5, textY, pSupply, this.arial2, Color.White, false);
+							this.Tooltips.Add(new KeyValuePair<Rectangle, string>(new Rectangle(x - f, y - f, resouceColumnWidth + f2, resourceIconSize.Height + f2), pName + "'s supply: " + pSupply));
 						}
 						index++;
 					}
 				}
 			}
+			MainWindow.UpdateRefreshes("Resources");
 		}
 
 		private void DrawPlayerUnitData(UnitDrawStyle drawStyle, int row, int p_no)
@@ -747,72 +683,6 @@ namespace maphack_external_directx
 			}
 		}
 
-		/*private void DrawPlayerUnitData(UnitDrawStyle drawStyle, int row, int p_no)
-		{
-			int length = this.indexofindex.Length;
-			int num3 = 0;
-			int num4 = 0;
-			List<KeyValuePair<string, int>> list = new List<KeyValuePair<string, int>>();
-			list.AddRange(this.unit_textures);
-			Predicate<KeyValuePair<string, int>> match = null;
-			for (int j = 0; j < length; j++)
-			{
-				KeyValuePair<string, int> pair;
-				int num2 = MainWindow.unit_count_index[this.indexofindex[j]];
-				if (MainWindow.unit_counter[p_no, num2] > 0)
-				{
-					if (match == null)
-					{
-						match = p => p.Value == this.indexofindex[j];
-					}
-					pair = list.Find(match);
-					string key = pair.Key;
-					switch (CurrentObserverPanelTab)
-					{
-						case ObserverPanelTabs.Buildings_and_Units_Same_Line:
-						{
-							if (pair.Key.Contains("building") || pair.Key.Contains("unit"))
-							{
-								this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, num2, observerPlayerLogoWidth, observerPlayerLogoHeight);
-							}
-							continue;
-						}
-						case ObserverPanelTabs.Buildings_and_Units_Different_Lines:
-						{
-							if (!pair.Key.Contains("building"))
-							{
-								goto Label_0128;
-							}
-							this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, num2, observerPlayerLogoWidth, observerPlayerLogoHeight);
-							continue;
-						}
-						case ObserverPanelTabs.Buildings:
-						{
-							if (pair.Key.Contains("building"))
-							{
-								this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, num2, observerPlayerLogoWidth, observerPlayerLogoHeight);
-							}
-							continue;
-						}
-						case ObserverPanelTabs.Units:
-						{
-							if (pair.Key.Contains("unit"))
-							{
-								this.DrawPlayerWindowIndividualUnit(drawStyle, row, num3++, p_no, num2, observerPlayerLogoWidth, observerPlayerLogoHeight);
-							}
-							continue;
-						}
-					}
-				}
-				continue;
-			Label_0128:
-				if (pair.Key.Contains("unit"))
-				{
-					this.DrawPlayerWindowIndividualUnit(drawStyle, row + 1, num4++, p_no, num2, observerPlayerLogoWidth, observerPlayerLogoHeight);
-				}
-			}
-		}*/
-
 		private void DrawPlayerWindowIndividualUnit(UnitDrawStyle drawStyle, int row, int column, int p_no, int unit_count, string picture_filename, string tooltip, int width, int height)
 		{
 			if (drawStyle == UnitDrawStyle.ObserverPanel)
@@ -884,17 +754,13 @@ namespace maphack_external_directx
 					}
 					this.DrawRectangle((float)num4, (float)num5, (float)observerPlayerLogoWidth, (float)observerPlayerLogoHeight, player.drawingColor, false);
 					this.DrawRectangle((float)(num4 + 2), (float)(num5 + 2), (float)(observerPlayerLogoWidth - 4), (float)(observerPlayerLogoHeight - 4), black, false);
-					if (this.drawRanks && (MainWindow.rank_textures[index] != null))
-					{
-						this.DrawTexture((float)num4, (float)num5, (float)observerPlayerLogoWidth, (float)observerPlayerLogoHeight, MainWindow.rank_textures[index], false);
-					}
 					this.Tooltips.Add(new KeyValuePair<Rectangle,string>(new Rectangle(num4, num5, observerPlayerLogoWidth, observerPlayerLogoHeight), player.name + " (" + player.number + ")"));
 
 					this.DrawPlayerUnitData(UnitDrawStyle.ObserverPanel, row, index);
 				}
 				index++;
 			}
-			
+			MainWindow.UpdateRefreshes("Observer");
 		}
 
 		private void DrawTooltip(string Text, int X, int Y)
@@ -983,66 +849,6 @@ namespace maphack_external_directx
 			this.device.DrawUserPrimitives(PrimitiveType.LineList, 4, vertexStreamZeroData);
 		}
 
-		/*public void DrawRectangle(float x, float y, float width, float height, Color col, bool PositionRatio = true, bool? SizeRatio = null)
-		{
-			if (SizeRatio == null)
-				SizeRatio = PositionRatio;
-			
-			float MainWindow.minimap_scale = ((float)base.ClientRectangle.Width) / MainWindow.playable_map_width;
-			float MainWindow.minimap_scale = ((float)base.ClientRectangle.Height) / MainWindow.playable_map_height;
-			if (PositionRatio)
-			{
-				//float MainWindow.minimap_scale = ((float) base.ClientRectangle.Width) / MainWindow.map_width;
-				//float MainWindow.minimap_scale = ((float) base.ClientRectangle.Height) / MainWindow.map_height;
-
-				x = (x - MainWindow.playable_map_left) * MainWindow.minimap_scale * MainWindow.minimap_scale_x;
-				y = (y - (MainWindow.map_height - MainWindow.playable_map_top)) * MainWindow.minimap_scale * MainWindow.minimap_scale_y;
-				x += ((float)base.ClientRectangle.Width) / 2 - (MainWindow.playable_map_width / 2 * MainWindow.minimap_scale * MainWindow.minimap_scale_x);
-				y += ((float)base.ClientRectangle.Height) / 2 - (MainWindow.playable_map_height / 2 * MainWindow.minimap_scale * MainWindow.minimap_scale_y);
-			}
-			if((bool) SizeRatio)
-			{
-				width *= MainWindow.minimap_scale * MainWindow.minimap_scale_x;
-				height *= MainWindow.minimap_scale * MainWindow.minimap_scale_y;
-			}
-			x -= width / 2;
-			y -= height / 2;
-
-			this.device.VertexFormat = VertexFormats.Diffuse | VertexFormats.Transformed;
-			CustomVertex.TransformedColored[] vertexStreamZeroData = new CustomVertex.TransformedColored[] { new CustomVertex.TransformedColored(x, y, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x + width, y, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x + width, y + height, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x, y + height, 0f, 0f, col.ToArgb()) };
-			this.device.DrawUserPrimitives(PrimitiveType.TriangleFan, 2, vertexStreamZeroData);
-		}
-
-		public void DrawRectangleOutline(float x, float y, float width, float height, Color col, bool PositionRatio = true, bool? SizeRatio = null)
-		{
-			if (SizeRatio == null)
-				SizeRatio = PositionRatio;
-
-			float MainWindow.minimap_scale = ((float)base.ClientRectangle.Width) / MainWindow.playable_map_width;
-			float MainWindow.minimap_scale = ((float)base.ClientRectangle.Height) / MainWindow.playable_map_height;
-			if (PositionRatio)
-			{
-				//float MainWindow.minimap_scale = ((float) base.ClientRectangle.Width) / MainWindow.map_width;
-				//float MainWindow.minimap_scale = ((float) base.ClientRectangle.Height) / MainWindow.map_height;
-
-				x = (x - MainWindow.playable_map_left) * MainWindow.minimap_scale * MainWindow.minimap_scale_x;
-				y = (y - (MainWindow.map_height - MainWindow.playable_map_top)) * MainWindow.minimap_scale * MainWindow.minimap_scale_y;
-				x += ((float)base.ClientRectangle.Width) / 2 - (MainWindow.playable_map_width / 2 * MainWindow.minimap_scale * MainWindow.minimap_scale_x);
-				y += ((float)base.ClientRectangle.Height) / 2 - (MainWindow.playable_map_height / 2 * MainWindow.minimap_scale * MainWindow.minimap_scale_y);
-			}
-			if ((bool) SizeRatio)
-			{
-				width *= MainWindow.minimap_scale * MainWindow.minimap_scale_x;
-				height *= MainWindow.minimap_scale * MainWindow.minimap_scale_y;
-			}
-			x -= width / 2;
-			y -= height / 2;
-
-			this.device.VertexFormat = VertexFormats.Diffuse | VertexFormats.Transformed;
-			CustomVertex.TransformedColored[] vertexStreamZeroData = new CustomVertex.TransformedColored[] { new CustomVertex.TransformedColored(x, y, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x + width, y, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x + width, y, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x + width, y + height, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x + width, y + height, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x, y + height, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x, y + height, 0f, 0f, col.ToArgb()), new CustomVertex.TransformedColored(x, y, 0f, 0f, col.ToArgb()) };
-			this.device.DrawUserPrimitives(PrimitiveType.LineList, 4, vertexStreamZeroData);
-		}*/
-
 		private void DrawStuff()
 		{
 			this.Tooltips = new List<KeyValuePair<Rectangle, string>>();
@@ -1060,6 +866,10 @@ namespace maphack_external_directx
 
 					case HUDType.Resources:
 						this.drawPlayerResources();
+						break;
+
+					case HUDType.Info:
+						this.drawInfo();
 						break;
 
 					case HUDType.CellFlags:
@@ -1103,6 +913,7 @@ namespace maphack_external_directx
 				x = (int)(x * num);
 				y = (int)(y * num2);
 			}
+
 			this.textSprite.Begin(SpriteFlags.AlphaBlend);
 			if (!this.fonts.ContainsKey(font.GetHashCode()))
 			{
@@ -1150,20 +961,12 @@ namespace maphack_external_directx
 			this.device.DrawUserPrimitives(PrimitiveType.TriangleList, 1, vertexStreamZeroData);
 		}
 
-		private void DrawUnitDestinations(float radiusFactor)
+		private void DrawUnitDestinations()
 		{
 			foreach (Unit unit in MainWindow.units)
 			{
-				if (!unit.isAlive)
-				{
-					continue;
-				}
-
-				if (unit.playerNumber == MainWindow.neutralplayer)
-				{
-					//continue;
-				}
-				if (MainWindow.player_teams[unit.playerNumber] != MainWindow.localteam)
+				uint uOwner = unit.playerNumber;
+				if (MainWindow.player_teams[uOwner] != MainWindow.localteam)
 				{
 					if (this.drawUnitDestinationEnemies)
 					{
@@ -1171,7 +974,7 @@ namespace maphack_external_directx
 					}
 					continue;
 				}
-				if (unit.playerNumber == MainWindow.localplayer)
+				if (uOwner == MainWindow.localplayer)
 				{
 					if (this.drawUnitDestinationSelf)
 					{
@@ -1183,24 +986,13 @@ namespace maphack_external_directx
 				{
 					continue;
 				}
+
 			Label_005A:
-				/*UnitRadius = (float) this.unit_radius[MainWindow.u_type[i]];
-				if (UnitRadius < 0.5)
+				float uDX = unit.destinationX;
+				float uDY = unit.destinationY;
+				if (/*unit.commandQueuePointer != 0 && */(uDX != 0.0) && (uDY != 0.0))
 				{
-					UnitRadius *= 2.5f;
-				}
-				else if (UnitRadius < 1f)
-				{
-					UnitRadius *= 1.5f;
-				}
-				else
-				{
-					UnitRadius *= 1.5f;
-				}*/
-				//if ((unit.destinationX != 0.0) && (unit.destinationY != 0.0))
-				if (unit.commandQueuePointer != 0 && (unit.destinationX != 0.0) && (unit.destinationY != 0.0))
-				{
-					this.DrawLine(unit.locationX, (MainWindow.map_height - unit.locationY), unit.destinationX, (MainWindow.map_height - unit.destinationY), Color.Yellow, true);
+					this.DrawLine(unit.locationX, (MainWindow.map_height - unit.locationY), uDX, (MainWindow.map_height - uDY), Color.Yellow, true);
 				}
 				/*float x = unit.locationX + (float) Math.Cos((unit.rotation - 90) * (Math.PI / 180)) * 20;
 				float y = unit.locationY - (float) Math.Sin((unit.rotation - 90) * (Math.PI / 180)) * 20;
@@ -1208,7 +1000,7 @@ namespace maphack_external_directx
 			}
 		}
 
-		private void DrawUnitPositionsOnMap(float radiusFactor)
+		private void DrawUnitPositionsOnMap()
 		{
 			float MinimumRadius = 1f / MainWindow.minimap_scale;
 			float AddToRadius = 1f / MainWindow.minimap_scale;
@@ -1220,7 +1012,8 @@ namespace maphack_external_directx
 					continue;
 				}
 
-				if (MainWindow.player_teams[unit.playerNumber] != MainWindow.localteam && MainWindow.player_teams[unit.playerNumber] != 16)
+				uint uOwner = unit.playerNumber;
+				if (MainWindow.player_teams[uOwner] != MainWindow.localteam && MainWindow.player_teams[uOwner] != 16)
 				{
 					if (this.drawUnitsEnemies)
 					{
@@ -1228,11 +1021,11 @@ namespace maphack_external_directx
 					}
 					continue;
 				}
-				if (unit.playerNumber == MainWindow.neutralplayer)
+				if (uOwner == MainWindow.neutralplayer)
 				{
 					goto Label_005A;
 				}
-				if (unit.playerNumber == MainWindow.localplayer)
+				if (uOwner == MainWindow.localplayer)
 				{
 					if (this.drawUnitsSelf)
 					{
@@ -1244,60 +1037,46 @@ namespace maphack_external_directx
 				{
 					continue;
 				}
+
 			Label_005A:
 				float Radius = unit.minimapRadius;
-				/*if (Radius < 0.5)
-				{
-					Radius *= 2.5f;
-				}
-				else if (Radius < 1f)
-				{
-					Radius *= 1.5f;
-				}
-				/*else
-				{
-					Radius *= 1.5f;
-				}*/
-				/*float x = MainWindow.x_coords[i] - ((UnitRadius * radiusFactor) / 2f);
-				float y = (MainWindow.map_height - MainWindow.y_coords[i]) - ((UnitRadius * radiusFactor) / 2f);
-
-				if(UnitRadius != 0 && radiusFactor != 0)
-				{
-					this.DrawRectangle(x, y, UnitRadius * radiusFactor, UnitRadius * radiusFactor, GameData.player_colors[index], true);
-					this.DrawRectangleOutline(x, y, UnitRadius * radiusFactor, UnitRadius * radiusFactor, Color.Black, true);
-				}*/
-
+				
 				if (Radius < MinimumRadius)
 					Radius = MinimumRadius;
 				Radius += AddToRadius;
 
+				float uX = unit.locationX;
+				float uY = MainWindow.map_height - unit.locationY;
+				bool uDetect = unit.detector;
+				bool uCloak = unit.cloaked;
+				Color uColor = GameData.player_colors[uOwner];
 
-				if (unit.cloaked)
+				if (uCloak)
 				{
-					if (unit.detector)
+					if (uDetect)
 					{
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius + AddToRadius * 2) * 2, (Radius + AddToRadius * 2) * 2, Color.Black, true, true, 108.4f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Gold, true, true, 108.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, Radius * 2, Radius * 2, Color.Gray, true, true, 109.4f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, GameData.player_colors[unit.playerNumber], true, true, 109.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+						this.DrawRectangle(uX, uY, (Radius + AddToRadius * 2) * 2, (Radius + AddToRadius * 2) * 2, Color.Black, true, true, 108.4f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
+						this.DrawRectangle(uX, uY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Gold, true, true, 108.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
+						this.DrawRectangle(uX, uY, Radius * 2, Radius * 2, Color.Gray, true, true, 109.4f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
+						this.DrawRectangle(uX, uY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, uColor, true, true, 109.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
 					}
 					else
 					{
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Black, true, true, 98.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, Radius * 2, Radius * 2, Color.Gray, true, true, 99.4f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-						this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, GameData.player_colors[unit.playerNumber], true, true, 99.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+						this.DrawRectangle(uX, uY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Black, true, true, 98.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
+						this.DrawRectangle(uX, uY, Radius * 2, Radius * 2, Color.Gray, true, true, 99.4f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
+						this.DrawRectangle(uX, uY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, uColor, true, true, 99.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
 					}
 				}
-				else if (unit.detector)
+				else if (uDetect)
 				{
-					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Black, true, true, 48.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, Radius * 2, Radius * 2, Color.Gold, true, true, 49.4f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, GameData.player_colors[unit.playerNumber], true, true, 49.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+					this.DrawRectangle(uX, uY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Black, true, true, 48.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
+					this.DrawRectangle(uX, uY, Radius * 2, Radius * 2, Color.Gold, true, true, 49.4f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
+					this.DrawRectangle(uX, uY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, uColor, true, true, 49.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
 				}
 				else
 				{
-					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, Radius * 2, Radius * 2, Color.Black, true, true, 0.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
-					this.DrawRectangle(unit.locationX, MainWindow.map_height - unit.locationY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, GameData.player_colors[unit.playerNumber], true, true, 1.9f + (unit.playerNumber == MainWindow.neutralplayer ? 0 : (16 - unit.playerNumber)));
+					this.DrawRectangle(uX, uY, Radius * 2, Radius * 2, Color.Black, true, true, 0.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
+					this.DrawRectangle(uX, uY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, uColor, true, true, 1.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
 				}
 			}
 		}
@@ -1642,13 +1421,6 @@ namespace maphack_external_directx
 				}
 				try
 				{
-					this.drawRanks = bool.Parse(file["OptionsDrawing"]["chkRank"]);
-				}
-				catch
-				{
-				}
-				try
-				{
 					this.drawCameraEnemies = bool.Parse(file["OptionsDrawing"]["chkCameraEnemies"]);
 				}
 				catch
@@ -1837,7 +1609,7 @@ namespace maphack_external_directx
 		private static extern int SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 		private void tmrRefreshRate_Tick(object sender, EventArgs e)
 		{
-			if (!_2csAPI.InGame() || (_2csAPI.Player.LocalPlayer.victoryStatus != VictoryStatus.Playing))
+			if (this._HUDType != HUDType.Info && (!_2csAPI.InGame() || _2csAPI.Player.LocalPlayer.victoryStatus != VictoryStatus.Playing))
 			{
 				base.Hide();
 			}
@@ -1919,7 +1691,8 @@ namespace maphack_external_directx
 			Observer = 1,
 			PerimeterWithRamp = 6,
 			Ramps = 5,
-			Resources = 2
+			Resources = 2,
+			Info = 11
 		}
 
 		[StructLayout(LayoutKind.Sequential)]

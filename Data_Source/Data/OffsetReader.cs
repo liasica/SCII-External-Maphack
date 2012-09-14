@@ -45,6 +45,11 @@ namespace Data
 			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.Timer().ToString("X");
 			Current =
 				from el in File.Root.Elements("Struct")
+				where el.Attribute("Name").Value == "Timer2"
+				select el;
+			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.Timer2().ToString("X");
+			Current =
+				from el in File.Root.Elements("Struct")
 				where el.Attribute("Name").Value == "MapInfo"
 				select el;
 			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.MapInfoPtr().ToString("X");
@@ -70,7 +75,11 @@ namespace Data
 		{
 			get
 			{
-				if (_mem == null)
+				if (!GameData.SC2Opened)
+				{
+					_mem = new ReadWriteMemory(0);
+				}
+				else if (_mem == null || _mem.m_lpHandle == IntPtr.Zero)
 				{
 					_mem = new ReadWriteMemory(GameData.SC2Handle);
 				}

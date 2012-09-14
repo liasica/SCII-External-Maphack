@@ -9,6 +9,7 @@ namespace PatternScanner
 	public class PatternScan
 	{
 		private uint _Timer;
+		private uint _Timer2;
 		private uint _LocalPlayerNumber;
 		private uint _LocalSelection;
 		private uint _MapInfoPtr;
@@ -98,7 +99,7 @@ namespace PatternScanner
 			return list;
 		}
 
-		public uint Timer()
+		public uint Timer() //the source for Galaxy_GameGetMissionTime
 		{
 			if (this.Process == null)
 			{
@@ -107,15 +108,35 @@ namespace PatternScanner
 			if (this._Timer == 0)
 			{
 				byte[] bPattern = new byte[] { 
-					0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x2B, 0xC1,  0x8B, 0xD8, 0x03, 0xCB, 0x89, 0x0D,
+					0x8B, 0x00, 0x8B, 0x0D, 0xE4, 0xAC, 0x65, 0x02, 0x81, 0x05, 0xC8, 0xAC, 0x65, 0x02, 0x00, 0x01, 0x00, 0x00, 0x01, 0x0D, 0xDC, 0xAC, 0x65, 0x02, 0xF7, 0x05, 0x8C, 0xAC, 0x65, 0x02, 0x00, 0x02, 0x00, 0x00, 0xA3, 0xD0, 0xB1, 0x69, 0x01, 0x75, 0x0A, 0x81, 0x05, 0xCC, 0xAC, 0x65, 0x02, 0x00, 0x01, 0x00, 0x00, 0xC7, 0x05, 0xF4, 0xAC, 0x65, 0x02, 0x01, 0x00, 0x00, 0x00
+				 };
+				uint num = this.Process.FindPattern(bPattern, "xxxx????xx????xxxxxx????xx????xxxxx????xxxx????xxxxxx????xxxx");
+				if (num != 0x800000)
+				{
+					this._Timer = this.Process.ReadUInt(num + 43);
+				}
+			}
+			return this._Timer;
+		}
+
+		public uint Timer2() //seems to be the amount of time the GUI is on the screen.
+		{
+			if (this.Process == null)
+			{
+				return 0;
+			}
+			if (this._Timer2 == 0)
+			{
+				byte[] bPattern = new byte[] { 
+					0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x2B, 0xC1,  0x8B, 0xD8, 0x03, 0xCB, 0x89, 0x0D
 				 };
 				uint num = this.Process.FindPattern(bPattern, "xx????xxxxxxxx");
 				if (num != 0x800000)
 				{
-					this._Timer = this.Process.ReadUInt(num + 2);
+					this._Timer2 = this.Process.ReadUInt(num + 2);
 				}
 			}
-			return this._Timer;
+			return this._Timer2;
 		}
 
 		public uint LocalPlayerNumber()

@@ -35,7 +35,7 @@ namespace Data
 		[FieldOffset(0x9c)]
 		public uint racePointer;
 		[FieldOffset(0xa4)]
-		public uint slot_number;
+		public uint color_index;
 		[FieldOffset(0xa8)]
 		public fixed32 supply_limit;
 		[FieldOffset(0xac)] //same offset?!

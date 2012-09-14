@@ -17,17 +17,24 @@ namespace maphack_external_directx
 {
 	public partial class Trainer : Form
 	{
+		bool Ingame = true;
 		string[] PlayerDisplay;
 		bool[] PlayerCheck;
 		bool[] NewPlayerCheck;
 
+		List<int> CheckedPlayers;
+		List<int> NewCheckedPlayers;
+
+		bool FreezeTS = false;
 		int FreezeMins = -1;
 		int FreezeGas = -1;
 		int FreezeTerra = -1;
 		int FreezeCustom = -1;
+		
 		fixed32 FreezeSupply = -1;
 		fixed32 DDMultiplier = 1;
 		fixed32 DTMultiplier = 1;
+		fixed32 TSMultiplier = 1;
 
 		public Trainer()
 		{
@@ -38,6 +45,7 @@ namespace maphack_external_directx
 		public void ApplyChanges()
 		{
 			PlayerCheck = NewPlayerCheck;
+			CheckedPlayers = NewCheckedPlayers;
 
 			int Mins = (int)boxMins.Value;
 			int Gas = (int)boxGas.Value;
@@ -51,8 +59,11 @@ namespace maphack_external_directx
 			FreezeCustom = cfCustom.Checked ? Custom : -1;
 			FreezeSupply = cfSupply.Checked ? Supply : -1;
 
+			FreezeTS = cbFreezeUnits.Checked;
+
 			bool ChangeDD = false;
 			bool ChangeDT = false;
+			bool ChangeTS = false;
 
 			if (!rDDNoChange.Checked)
 			{
@@ -74,6 +85,17 @@ namespace maphack_external_directx
 					DTMultiplier = 1;
 				if (rDTCustom.Checked)
 					DTMultiplier = (float)boxDTCustom.Value;
+			}
+
+			if (!rTSNoChange.Checked)
+			{
+				ChangeTS = true;
+				if (rTSNone.Checked)
+					TSMultiplier = 0;
+				if (rTSNormal.Checked)
+					TSMultiplier = 1;
+				if (rTSCustom.Checked)
+					TSMultiplier = (float)boxTSCustom.Value;
 			}
 
 			for (int i = 0; i < 16; i++)
@@ -99,10 +121,20 @@ namespace maphack_external_directx
 						GameData.offsets.WriteArrayElementMember("Players", i, "defense_multiplier", DTMultiplier);
 				}
 			}
+
+			List<Unit> AffectedUnits = GameData.GetPlayersUnits(CheckedPlayers);
+			foreach (Unit unit in AffectedUnits)
+			{
+				if (ChangeTS)
+					unit.timeScale = TSMultiplier;
+			}
 		}
 
 		public void UpdatePlayers()
 		{
+			while (MainWindow.players.Count == 0)
+				Thread.Sleep(0);
+
 			PlayerDisplay = new string[16];
 			for (int i = 0; i < 16; i++)
 				PlayerDisplay[i] = i.ToString() + ": (none)";
@@ -111,9 +143,15 @@ namespace maphack_external_directx
 				if (p.number < 16)
 					PlayerDisplay[p.number] = p.number.ToString() + ": " + p.name;
 			}
+
 			PlayerCheck = new bool[16];
-			PlayerCheck[MainWindow.localplayer] = true;
+			if(MainWindow.localplayer != 0)
+				PlayerCheck[MainWindow.localplayer] = true;
 			NewPlayerCheck = new bool[16];
+
+			CheckedPlayers = new List<int>();
+			CheckedPlayers.Add((int)MainWindow.localplayer);
+			NewCheckedPlayers = new List<int>();
 			
 			PlayerSelectionBox.Items.Clear();
 			for (int i = 0; i < 16; i++)
@@ -124,6 +162,24 @@ namespace maphack_external_directx
 
 		private void timer1_Tick(object sender, EventArgs e)
 		{
+			if (Ingame && !_2cs_API._2csAPI.InGame())
+			{
+				Ingame = false;
+				buttonApply.Enabled = false;
+				buttonApply.Text = "Cannot use out of game.";
+				UpdatePlayers();
+				return;
+			}
+			if (!Ingame && _2cs_API._2csAPI.InGame())
+			{
+				Ingame = true;
+				buttonApply.Enabled = true;
+				buttonApply.Text = "Apply Changes Now";
+				UpdatePlayers();
+				return;
+			}
+
+
 			for (int i = 0; i < 16; i++)
 			{
 				if (PlayerCheck[i])
@@ -140,6 +196,14 @@ namespace maphack_external_directx
 						GameData.offsets.WriteArrayElementMember("Players", i, "supply_cap", FreezeSupply);
 				}
 			}
+
+			List<Unit> AffectedUnits = GameData.GetPlayersUnits(CheckedPlayers);
+			foreach (Unit unit in AffectedUnits)
+			{
+				if (FreezeTS)
+					unit.timeScale = TSMultiplier;
+			}
+			MainWindow.UpdateRefreshes("Trainer Freeze");
 		}
 
 		private void buttonApply_Click(object sender, EventArgs e)
@@ -150,6 +214,10 @@ namespace maphack_external_directx
 		private void PlayerSelectionBox_ItemCheck(object sender, ItemCheckEventArgs e)
 		{
 			NewPlayerCheck[e.Index] = e.NewValue == CheckState.Checked;
+			if (e.NewValue == CheckState.Checked && !NewCheckedPlayers.Contains(e.Index))
+				NewCheckedPlayers.Add(e.Index);
+			if (e.NewValue != CheckState.Checked && NewCheckedPlayers.Contains(e.Index))
+				NewCheckedPlayers.RemoveAll(it => it == e.Index);
 		}
 
 		private void PlayerSelectionBox_SelectedValueChanged(object sender, EventArgs e)
@@ -170,6 +238,11 @@ namespace maphack_external_directx
 		private void rDTCustom_CheckedChanged(object sender, EventArgs e)
 		{
 			boxDTCustom.Enabled = ((RadioButton)sender).Checked;
+		}
+
+		private void rTSCustom_CheckedChanged(object sender, EventArgs e)
+		{
+			boxTSCustom.Enabled = ((RadioButton)sender).Checked;
 		}
 	}
 }

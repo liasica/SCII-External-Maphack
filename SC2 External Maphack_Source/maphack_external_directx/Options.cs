@@ -17,7 +17,6 @@ namespace maphack_external_directx
 		private CheckBox chkCameraAllies;
 		private CheckBox chkCameraEnemies;
 		private CheckBox chkCameraSelf;
-		private CheckBox chkRank;
 		private CheckBox chkSpectator;
 		private CheckBox chkUnitDestinationAllies;
 		private CheckBox chkUnitDestinationEnemies;
@@ -85,7 +84,6 @@ namespace maphack_external_directx
 			this.tbDrawing = new System.Windows.Forms.TabPage();
 			this.label4 = new System.Windows.Forms.Label();
 			this.cbObserverPanelDrawDirection = new System.Windows.Forms.ComboBox();
-			this.chkRank = new System.Windows.Forms.CheckBox();
 			this.groupBox5 = new System.Windows.Forms.GroupBox();
 			this.groupBox7 = new System.Windows.Forms.GroupBox();
 			this.chkUnitDestinationEnemiesScreen = new System.Windows.Forms.CheckBox();
@@ -157,7 +155,6 @@ namespace maphack_external_directx
 			// 
 			this.tbDrawing.Controls.Add(this.label4);
 			this.tbDrawing.Controls.Add(this.cbObserverPanelDrawDirection);
-			this.tbDrawing.Controls.Add(this.chkRank);
 			this.tbDrawing.Controls.Add(this.groupBox5);
 			this.tbDrawing.Controls.Add(this.groupBox4);
 			this.tbDrawing.Location = new System.Drawing.Point(4, 22);
@@ -188,18 +185,6 @@ namespace maphack_external_directx
 			this.cbObserverPanelDrawDirection.Name = "cbObserverPanelDrawDirection";
 			this.cbObserverPanelDrawDirection.Size = new System.Drawing.Size(121, 21);
 			this.cbObserverPanelDrawDirection.TabIndex = 8;
-			// 
-			// chkRank
-			// 
-			this.chkRank.AutoSize = true;
-			this.chkRank.Checked = true;
-			this.chkRank.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.chkRank.Location = new System.Drawing.Point(221, 170);
-			this.chkRank.Name = "chkRank";
-			this.chkRank.Size = new System.Drawing.Size(52, 17);
-			this.chkRank.TabIndex = 7;
-			this.chkRank.Text = "Rank";
-			this.chkRank.UseVisualStyleBackColor = true;
 			// 
 			// groupBox5
 			// 
@@ -738,13 +723,6 @@ namespace maphack_external_directx
 				}
 				try
 				{
-					this.chkRank.Checked = bool.Parse(file["OptionsDrawing"]["chkRank"]);
-				}
-				catch
-				{
-				}
-				try
-				{
 					this.chkCameraEnemies.Checked = bool.Parse(file["OptionsDrawing"]["chkCameraEnemies"]);
 				}
 				catch
@@ -865,7 +843,6 @@ namespace maphack_external_directx
 				file.Remove("OptionsDrawing");
 			}
 			section.Add("cbObserverPanelDrawDirection", this.cbObserverPanelDrawDirection.SelectedItem.ToString());
-			section.Add("chkRank", this.chkRank.Checked.ToString());
 			section.Add("chkCameraEnemies", this.chkCameraEnemies.Checked.ToString());
 			section.Add("chkCameraAllies", this.chkCameraAllies.Checked.ToString());
 			section.Add("chkCameraSelf", this.chkCameraSelf.Checked.ToString());

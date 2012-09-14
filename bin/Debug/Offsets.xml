@@ -6,13 +6,17 @@
   <Struct Name="AccountNumber" Size="0x4b0">
     <Member Name="id_string" Type="String" Size="32" Offset="0" />
   </Struct>
-  <Struct Name="Timer" Size="4" Address="0x16AD36C">
+  <Struct Name="Timer" Size="4" Address="0x265ACCC">
+    <Member Name="timer" Type="Fixed" Size="4" Offset="0" />
+  </Struct>
+  <Struct Name="Timer2" Size="4" Address="0x16AD36C">
     <Member Name="timer" Type="Unsigned" Size="4" Offset="0" />
   </Struct>
   <Struct Name="LocalPlayer" Size="1" Address="0x01684e30">
     <Member Name="LocalPlayer" Type="Unsigned" Size="1" Offset="0" />
   </Struct>
   <Struct Name="MapInfo" Size="-1" Address="0x265AC20">
+    <Member Name="dynamic_pointer" Type="Unsigned" Size="4" Offset="0x0" />
     <Member Name="full_width" Type="Fixed" Size="4" Offset="0xf0" />
     <Member Name="full_height" Type="Fixed" Size="4" Offset="full_width+4" />
     <Member Name="left_precise" Type="Fixed" Size="4" Offset="0x120" />
@@ -44,8 +48,8 @@
     <Member Name="name_length" Type="Unsigned" Size="4" Offset="time_since_resource_changed+4" />
     <Member Name="name" Type="String" Size="50" Offset="name_length+8" />
     <Member Name="racePointer" Type="Unsigned" Size="4" Offset="name+80" />
-    <Member Name="slot_number" Type="Unsigned" Size="4" Offset="racePointer+8" />
-    <Member Name="supply_limit" Type="Fixed" Size="4" Offset="slot_number+4" />
+    <Member Name="color_index" Type="Unsigned" Size="4" Offset="racePointer+8" />
+    <Member Name="supply_limit" Type="Fixed" Size="4" Offset="color_index+4" />
     <Member Name="credits" Type="Unsigned" Size="4" Offset="supply_limit+4" />
     <Member Name="credits_spent" Type="Unsigned" Size="4" Offset="credits+0" />
     <Member Name="research_points" Type="Unsigned" Size="4" Offset="credits+4" />
@@ -85,8 +89,8 @@
   <Struct Name="Unit" Size="0x1c0">
     <Member Name="times_used" Type="Unsigned" Size="2" Offset="0" />
     <Member Name="token" Type="Unsigned" Size="2" Offset="times_used+2" />
-    <Member Name="Prev_unit" Type="Unsigned" Size="2" Offset="token+2" />
-    <Member Name="next_unit" Type="Unsigned" Size="2" Offset="Prev_unit+2" />
+    <Member Name="prev_unit" Type="Unsigned" Size="2" Offset="token+2" />
+    <Member Name="next_unit" Type="Unsigned" Size="2" Offset="prev_unit+2" />
     <Member Name="unit_model" Type="Unsigned" Size="4" Offset="next_unit+2" />
     <Member Name="targetFilter_flags" Type="Unsigned" Size="8" Offset="unit_model+12" />
     <Member Name="sub_move_state" Type="Unsigned" Size="1" Offset="targetFilter_flags+13" />

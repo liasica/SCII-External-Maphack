@@ -13,8 +13,17 @@ namespace Data
 	using Utilities.TextProcessing;
 	using Utilities.WinControl;
 
+	public static class Imports
+	{
+		[DllImport("kernel32.dll")]
+		public static extern bool QueryPerformanceCounter(out long lpPerformanceCount);
+		[DllImport("kernel32.dll")]
+		public static extern bool QueryPerformanceFrequency(out long lpFrequency);
+	}
+
 	public static class GameData
 	{
+		private static bool _useTimer2 = false;
 		private static OffsetReader _offsets;
 		public static OffsetReader offsets
 		{
@@ -28,6 +37,7 @@ namespace Data
 						_offsets.UpdateAddresses();
 						_offsets = new OffsetReader("Offsets.xml");
 					}
+					_useTimer2 = _offsets.GetStructAddress("Timer") == 0;
 				}
 				return _offsets;
 			}
@@ -84,7 +94,7 @@ namespace Data
 			MapInfo info = new MapInfo {
 				secondsElapsed = SecondsElapsed
 			};
-			mem.ReadMemory(Offsets.OFFSET_MAPHACK_WIDTH, 4, out info.width);
+			/*mem.ReadMemory(Offsets.OFFSET_MAPHACK_WIDTH, 4, out info.width);
 			mem.ReadMemory(Offsets.OFFSET_MAPHACK_HEIGHT, 4, out info.height);
 			info.width = (int) Math.Round((double) (((double) info.width) / 4096.0));
 			info.height = (int) Math.Round((double) (((double) info.height) / 4096.0));
@@ -97,8 +107,8 @@ namespace Data
 			info.edgeRight = (int) Math.Round((double) (((double) info.edgeRight) / 4096.0));
 			info.edgeBottom = (int) Math.Round((double) (((double) info.edgeBottom) / 4096.0));
 			info.playableX = info.edgeRight - info.edgeLeft;
-			info.playableY = info.edgeTop - info.edgeBottom;
-			mem.ReadMemory(Pointers.MapInformation, 4, out num);
+			info.playableY = info.edgeTop - info.edgeBottom;*/
+			num = (uint)offsets.ReadStructMember("MapInfo", "dynamic_pointer");
 			if (num == 0)
 			{
 				map.mapInfo = new MapInfo();
@@ -151,93 +161,9 @@ namespace Data
 			mapRect = new Utilities.WinControl.RECT(minimapRect.Left + num6, minimapRect.Top + num5, (minimapRect.Left + num6) + ((int) num4), (minimapRect.Top + num5) + ((int) num3));
 		}
 
-		public static Player GetPlayer(int numplayer)
+		public static Player GetPlayer(int number)
 		{
-			byte[] buffer;
-			Player p = new Player {
-				memoryAddress = (uint)offsets.GetArrayElementAddress("Players", numplayer)
-			};
-
-			string AccountNumber = "";
-			if (numplayer < 16)
-			{
-				AccountNumber = (String)offsets.ReadArrayElementMember("AccountNumbers", numplayer, "id_string");
-			}
-
-			if (!AccountNumber.Contains("-S2-"))
-				AccountNumber = "(none)";
-
-			p.accountNumber = AccountNumber;
-			p.rankIconTooltip = "Unranked";
-
-			p.number = (uint)numplayer;
-			p.slotNumber = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "slot_number");
-			p.playerStatus = (PlayerStatus)(uint)offsets.ReadArrayElementMember("Players", numplayer, "active");
-			p.victoryStatus = (VictoryStatus)(byte)offsets.ReadArrayElementMember("Players", numplayer, "status");
-			p.playerType = (PlayerType)(byte)offsets.ReadArrayElementMember("Players", numplayer, "player_type");
-			p.team = (byte)offsets.ReadArrayElementMember("Players", numplayer, "team");
-			p.name = (string)offsets.ReadArrayElementMember("Players", numplayer, "name");
-			p.nameLength = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "name_length");
-			p.playerColor = (PlayerColor)p.slotNumber;
-			p.drawingColor = possible_colors[p.slotNumber < 16 ? p.slotNumber : 0];
-			p.minerals = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "minerals_current");
-			p.gas = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "vespene_current");
-			p.terrazine = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "terrazine_current");
-			p.custom = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "custom_resource_current");
-			p.mineralRate = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "mineral_rate");
-			p.gasRate = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "vespene_rate");
-			p.mineralTotal = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "minerals_total");
-			p.gasTotal = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "vespene_total");
-			p.difficulty = (PlayerDifficulty)(byte)offsets.ReadArrayElementMember("Players", numplayer, "difficulty");
-			//p.actionsTotal = (int) offsets.ReadArrayElementMember("Players", numplayer, "actions_total");
-			//p.apmCurrent = (int) offsets.ReadArrayElementMember("Players", numplayer, "apm_current");
-			p.armySize = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "army_size");
-			p.unitsLostMineralWorth = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "units_lost_mineral_worth");
-			p.unitsLostVespeneWorth = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "units_lost_vespene_worth");
-			p.buildingsConstructing = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "buildings_constructing");
-			p.cameraDistance = (int)(fixed32)offsets.ReadArrayElementMember("Players", numplayer, "camera_distance");
-			p.cameraX = (fixed32)offsets.ReadArrayElementMember("Players", numplayer, "camera_x");
-			p.cameraY = (fixed32)offsets.ReadArrayElementMember("Players", numplayer, "camera_y");
-			p.cameraRotation = (fixed32)offsets.ReadArrayElementMember("Players", numplayer, "camera_rotation");
-			p.workersBuilt = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "harvesters_built");
-			p.workersCurrent = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "harvesters_current");
-			//p.unitsKilled = (int) offsets.ReadArrayElementMember("Players", numplayer, "units_killed");
-			//p.unitsLost = (int) offsets.ReadArrayElementMember("Players", numplayer, "units_lost");
-			p.buildingQueueLength = (int)(uint)offsets.ReadArrayElementMember("Players", numplayer, "building_queue_length");
-			p.supply = (fixed32)offsets.ReadArrayElementMember("Players", numplayer, "supply_current");
-			p.supplyCap = (fixed32)offsets.ReadArrayElementMember("Players", numplayer, "supply_cap");
-			p.supplyLimit = (fixed32)offsets.ReadArrayElementMember("Players", numplayer, "supply_limit");
-			uint num = (uint) mem.ReadMemory((uint)offsets.ReadArrayElementMember("Players", numplayer, "racePointer") + 4, typeof(uint));
-			mem.ReadMemory((uint) num, 4, out buffer);
-			if (buffer[0] == 0)
-			{
-				p.race = Race.Neutral;
-			}
-			else
-			{
-				string str2 = TP.HexAsciiConvert(BitConverter.ToString(buffer).Replace("-", ""));
-				if (str2 != null)
-				{
-					if (!(str2 == "Zerg"))
-					{
-						if (str2 == "Prot")
-						{
-							p.race = Race.Protoss;
-						}
-						else if (str2 == "Terr")
-						{
-							p.race = Race.Terran;
-						}
-					}
-					else
-					{
-						p.race = Race.Zerg;
-					}
-				}
-			}
-			//p.unit_selections = GetPlayerSelections(p);
-			//p.units = new List<Unit>();
-			return p;
+			return new Player(number);
 		}
 
 		public static List<Player> getPlayersData()
@@ -258,7 +184,7 @@ namespace Data
 		public static PlayerSelections GetPlayerSelections()
 		{
 			uint pNumber = (byte) mem.ReadMemory(Offsets.LocalPlayerNumber, typeof(byte));
-			return GetPlayerSelections(pNumber);
+			return GetPlayerSelections((int)pNumber);
 		}
 
 		public static PlayerSelections GetPlayerSelections(Player p)
@@ -270,7 +196,7 @@ namespace Data
 			return GetPlayerSelections(p.number);
 		}
 
-		public static PlayerSelections GetPlayerSelections(uint pNumber)
+		public static PlayerSelections GetPlayerSelections(int pNumber)
 		{
 			//BROKEN! DO NOT USE!
 
@@ -284,7 +210,7 @@ namespace Data
 				selections.control_groups[i].selected_unit_ids = new List<int>();
 				selections.control_groups[i].groupNumber = (int) i;
 			}
-			uint num2 = pNumber;
+			uint num2 = (uint)pNumber;
 			if (num2 > 0)
 			{
 				uint num3;
@@ -322,20 +248,20 @@ namespace Data
 
 		public static List<Unit> getUnitData()
 		{
-			List<Unit> list = new List<Unit>();
-			int MaxUnits = offsets.GetArrayCount("Units");
-			for (int i = 0; i <MaxUnits; i++)
+			lock (Unit.Units)
 			{
-				Unit item = ParseUnit((int)i);
-				if (item.modelPtr == 0)
-				{
-					//GetUnitModels();
-					return list;
-				}
-				
-				list.Add(item);
+				return Unit.Units.Values.ToList();
 			}
-			return list;
+		}
+
+		public static List<Unit> GetPlayerUnits(int playerNumber)
+		{
+			return getUnitData().FindAll(u => u.playerNumber == playerNumber);
+		}
+
+		public static List<Unit> GetPlayersUnits(List<int> playerNumbers)
+		{
+			return getUnitData().FindAll(u => playerNumbers.Contains((int)u.playerNumber));
 		}
 
 		public static Map getUnits(Map map, uint playerNumber)
@@ -390,116 +316,7 @@ namespace Data
 
 		public static Unit ParseUnit(int Index)
 		{
-			Unit unit = new Unit();
-			unit.modelPtr = (uint)offsets.ReadArrayElementMember("Units", Index, "unit_model");
-
-			if (unit.modelPtr == 0)
-				return unit;
-
-			unit_model_s ums = (unit_model_s)mem.ReadMemory((uint)(unit.modelPtr << 5), typeof(unit_model_s));
-
-			string NameAsText = null;
-			string UINameAsText = null;
-			if ((uint)offsets.ReadStructMember("UnitModel", "pName_address", (int)(unit.modelPtr << 5)) != 0)
-			{
-				uint NameDataAddress = (uint)mem.ReadMemory((uint)offsets.ReadStructMember("UnitModel", "pName_address", (int)(unit.modelPtr << 5)), typeof(uint));
-				uint NameLength = (uint)mem.ReadMemory(NameDataAddress, typeof(uint));
-				if (NameDataAddress != 0 && NameLength > 10)
-				{
-					byte[] NameAsBytes = new byte[NameLength];
-					mem.ReadMemory((IntPtr)NameDataAddress + 0x24, (int)NameLength, out NameAsBytes);
-					NameAsText = System.Text.Encoding.UTF8.GetString(NameAsBytes).Remove(0, 10);
-
-					uint pUINameAddress = (uint)mem.ReadMemory(NameDataAddress + 0x1c, typeof(uint));
-					if (pUINameAddress != 0)
-					{
-						uint UINameLength = (uint)mem.ReadMemory(pUINameAddress + 0x8, typeof(uint));
-						uint UINameAddress = pUINameAddress + 0x10;
-
-						byte fail = 0;
-						if (((fail = (byte)mem.ReadMemory(pUINameAddress + 12, typeof(byte))) & 4) != 0) //sometimes the string is right in this struct, other times it's a pointer.
-							UINameAddress = (uint)mem.ReadMemory(pUINameAddress + 16, typeof(uint));
-
-						if (UINameAddress != 0 && UINameLength > 0)
-						{
-							byte[] UINameAsBytes = new byte[UINameLength];
-							mem.ReadMemory((IntPtr)UINameAddress, (int)UINameLength, out UINameAsBytes);
-							UINameAsText = System.Text.Encoding.UTF8.GetString(UINameAsBytes);
-						}
-					}
-
-				}
-			}
-			if (NameAsText == null)
-				NameAsText = string.Empty;
-			if (UINameAsText == null)
-				UINameAsText = string.Empty;
-
-			unit.name = UINameAsText;
-			unit.textID = NameAsText;
-			unit.minimapRadius = (fixed32)offsets.ReadStructMember("UnitModel", "minimap_radius", (int)(unit.modelPtr << 5));
-
-			unit.timeScale = (fixed32)offsets.ReadArrayElementMember("Units", Index, "time_scale");
-
-			unit.ID = (ushort)offsets.ReadArrayElementMember("Units", Index, "token");
-			unit.playerNumber = (byte)offsets.ReadArrayElementMember("Units", Index, "player_owner");
-			unit.unitType = (UnitType)(ushort)offsets.ReadStructMember("UnitModel", "unit_type", (int)(unit.modelPtr << 5));
-			unit.state = (UnitStateOld)((byte)offsets.ReadArrayElementMember("Units", Index, "state"));
-
-			unit.isImmobile = (byte)offsets.ReadArrayElementMember("Units", Index, "isImmobile") != 0;
-			unit.targetFilterFlags = (TargetFilter)offsets.ReadArrayElementMember("Units", Index, "targetFilter_flags");
-			unit.isAlive = (unit.targetFilterFlags & TargetFilter.Dead) == 0;
-			unit.cloaked = (unit.targetFilterFlags & TargetFilter.Cloaked) != 0;
-			unit.detector = (unit.targetFilterFlags & TargetFilter.Detector) != 0;
-
-			unit.moveState = (UnitMoveState)((byte)offsets.ReadArrayElementMember("Units", Index, "move_state"));
-			unit.subMoveState = (UnitSubMoveState)((byte)offsets.ReadArrayElementMember("Units", Index, "sub_move_state"));
-			unit.lastOrder = (UnitLastOrder)((uint)offsets.ReadArrayElementMember("Units", Index, "last_order"));
-			unit.deathType = (DeathType)((uint)offsets.ReadArrayElementMember("Units", Index, "death_type"));
-
-			//unit.energyRegenDelay = offsets.ReadStructMember("UnitModel", "energy_regen_delay", (int)(unit.modelPtr << 5)) / 65536f;
-			//unit.energyRegenRate = (offsets.ReadStructMember("UnitModel", "energy_regen_rate", (int)(unit.modelPtr << 5)) + (fixed32)offsets.ReadArrayElementMember("Units", Index, "energy_regen_bonus")) / 256f;
-			//unit.energyDamage = offsets.ReadStructMember("UnitModel", "max_energy", (int)(unit.modelPtr << 5)) * (fixed32)offsets.ReadArrayElementMember("Units", Index, "energy_multiplier") + (fixed32)offsets.ReadArrayElementMember("Units", Index, "bonus_max_energy") - (fixed32)offsets.ReadArrayElementMember("Units", Index, "energy");
-			unit.currentEnergy = (fixed32)offsets.ReadArrayElementMember("Units", Index, "energy");
-			//unit.maxEnergy = offsets.ReadStructMember("UnitModel", "m", (int)(unit.modelPtr << 5))ax_energy * (fixed32)offsets.ReadArrayElementMember("Units", Index, "energy_multiplier") + (fixed32)offsets.ReadArrayElementMember("Units", Index, "bonus_max_energy");
-
-			//unit.shieldRegenDelay = offsets.ReadStructMember("UnitModel", "shield_regen_delay", (int)(unit.modelPtr << 5)) / 65536f;
-			//unit.shieldRegenRate = (offsets.ReadStructMember("UnitModel", "shield_regen_rate", (int)(unit.modelPtr << 5)) + (fixed32)offsets.ReadArrayElementMember("Units", Index, "shield_regen_bonus")) / 256f;
-			unit.shieldDamage = (fixed32)offsets.ReadArrayElementMember("Units", Index, "shield_damage");
-			//unit.currentShield = offsets.ReadStructMember("UnitModel", "max_shield", (int)(unit.modelPtr << 5)) * (fixed32)offsets.ReadArrayElementMember("Units", Index, "shields_multiplier") + (fixed32)offsets.ReadArrayElementMember("Units", Index, "bonus_max_shields") - (fixed32)offsets.ReadArrayElementMember("Units", Index, "shield_damage");
-			//unit.maxShield = offsets.ReadStructMember("UnitModel", "max_shield", (int)(unit.modelPtr << 5)) * (fixed32)offsets.ReadArrayElementMember("Units", Index, "shields_multiplier") + (fixed32)offsets.ReadArrayElementMember("Units", Index, "bonus_max_shields");
-
-			//unit.healthRegenDelay = offsets.ReadStructMember("UnitModel", "health_regen_delay", (int)(unit.modelPtr << 5)) / 65536f;
-			//unit.healthRegenRate = (offsets.ReadStructMember("UnitModel", "health_regen_rate", (int)(unit.modelPtr << 5)) + (fixed32)offsets.ReadArrayElementMember("Units", Index, "energy_regen_bonus")) / 256f;
-			unit.healthDamage = (fixed32)offsets.ReadArrayElementMember("Units", Index, "health_damage");
-			//unit.currentHealth = offsets.ReadStructMember("UnitModel", "max_health", (int)(unit.modelPtr << 5)) * (fixed32)offsets.ReadArrayElementMember("Units", Index, "health_multiplier") + (fixed32)offsets.ReadArrayElementMember("Units", Index, "bonus_max_health") - (fixed32)offsets.ReadArrayElementMember("Units", Index, "health_damage");
-			//unit.maxHealth = offsets.ReadStructMember("UnitModel", "max_health", (int)(unit.modelPtr << 5)) * (fixed32)offsets.ReadArrayElementMember("Units", Index, "health_multiplier") + (fixed32)offsets.ReadArrayElementMember("Units", Index, "bonus_max_health");
-
-			unit.locationX = (fixed32)offsets.ReadArrayElementMember("Units", Index, "position_x");
-			unit.locationY = (fixed32)offsets.ReadArrayElementMember("Units", Index, "position_y");
-			unit.locationZ = (fixed32)offsets.ReadArrayElementMember("Units", Index, "position_z");
-
-			unit.destinationX = (fixed32)offsets.ReadArrayElementMember("Units", Index, "destination_x");
-			unit.destinationY = (fixed32)offsets.ReadArrayElementMember("Units", Index, "destination_y");
-			unit.destinationZ = (fixed32)offsets.ReadArrayElementMember("Units", Index, "destination_z");
-
-			unit.destination2X = (fixed32)offsets.ReadArrayElementMember("Units", Index, "destination2_x");
-			unit.destination2Y = (fixed32)offsets.ReadArrayElementMember("Units", Index, "destination2_y");
-
-			unit.kills = (ushort)offsets.ReadArrayElementMember("Units", Index, "kills");
-
-				/*rotation = (int)(offsets.ReadArrayElementMember("Units", Index, "rotation") * 0.010987669527379678),
-				rotationX = (int)offsets.ReadArrayElementMember("Units", Index, "rotation_x"),
-				rotationY = (int)offsets.ReadArrayElementMember("Units", Index, "rotation_y"),*/
-			unit.rotation = 180 - (fixed32)offsets.ReadArrayElementMember("Units", Index, "rotation") * 45;
-			unit.rotationX = 180 - (fixed32)offsets.ReadArrayElementMember("Units", Index, "rotation_x") * 45;
-			unit.rotationY = 180 - (fixed32)offsets.ReadArrayElementMember("Units", Index, "rotation_y") * 45;
-
-			unit.moveSpeed = (int)((uint)offsets.ReadArrayElementMember("Units", Index, "move_speed"));
-			unit.memoryLocation = (uint)offsets.GetArrayElementAddress("Units", Index);
-			unit.commandQueuePointer = (uint)offsets.ReadArrayElementMember("Units", Index, "commandQueue_pointer");
-
-			return unit;
+			return new Unit(Index);
 		}
 
 		public static string removeBlanksFromByteString(byte[] byteString)
@@ -793,18 +610,21 @@ namespace Data
 		{
 			get
 			{
-				return (SC2Process != null && SC2Handle != IntPtr.Zero);
+				return (SC2Process != null);
 			}
+		}
+
+		public static void ResetProcess()
+		{
+			_SC2Process = null;
 		}
 
 		public static Process SC2Process
 		{
 			get
 			{
-				if (_SC2Process == null || _SC2Process.HasExited)
+				if (_SC2Process == null)
 				{
-					_SC2Process = null;
-
 					Process[] processesByName = Process.GetProcessesByName("SC2");
 					if (processesByName.Length != 0)
 					{
@@ -837,7 +657,11 @@ namespace Data
 			{
 				if (SC2Process == null || SC2Process.HasExited)
 					return 0;
-				return ((uint)offsets.ReadStructMember("Timer", "timer")) / 832f;
+
+				if(_useTimer2)
+					return ((uint)offsets.ReadStructMember("Timer2", "timer")) / 832f;
+				else
+					return (fixed32)offsets.ReadStructMember("Timer", "timer");
 			}
 		}
 
