@@ -1924,7 +1924,11 @@ namespace _2cs_API
 				get
 				{
 					uint playerNumber = LocalPlayerNumber;
-					return GameData.getPlayersData().Find(p => p.number == playerNumber).team;
+					Data.Player local = GameData.getPlayersData().Find(p => p.number == playerNumber);
+					if (local != null)
+						return local.team;
+					else
+						return 0;
 				}
 			}
 			public static List<Data.Player> Enemies
@@ -1946,7 +1950,8 @@ namespace _2cs_API
 			{
 				get
 				{
-					return (byte)GameData.offsets.ReadStructMember("LocalPlayer", "LocalPlayer");
+					byte num = (byte)GameData.offsets.ReadStructMember("LocalPlayer", "LocalPlayer");
+					return num < 16 ? num : 0u;
 				}
 			}
 			public static bool LocalPlayerGameOver

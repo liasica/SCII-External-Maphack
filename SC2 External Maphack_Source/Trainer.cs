@@ -132,8 +132,8 @@ namespace maphack_external_directx
 
 		public void UpdatePlayers()
 		{
-			while (MainWindow.players.Count == 0)
-				Thread.Sleep(0);
+			for (int i = 0; i < 1000 && MainWindow.players.Count == 0 && _2csAPI.InGame(); i++)
+				Thread.Sleep(5);
 
 			PlayerDisplay = new string[16];
 			for (int i = 0; i < 16; i++)

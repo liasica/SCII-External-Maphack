@@ -18,7 +18,7 @@ namespace Data
 		public static string GetItemFilename(string DatabaseItem, bool GetNew)
 		{
 			MpqManager manager;
-			string Filename = "Database\\" + DatabaseItem.Replace('/', '\\');
+			string Filename = GameData.path + "Database\\" + DatabaseItem.Replace('/', '\\');
 
 			if(!Directory.Exists(Filename.Remove(Filename.LastIndexOf('\\'))))
 				Directory.CreateDirectory(Filename.Remove(Filename.LastIndexOf('\\')));

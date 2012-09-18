@@ -40,12 +40,10 @@ namespace Data
 							continue;
 
 						Unit Current = new Unit(i);
+						if (Current.modelPtr == 0 || !Current.isAlive)
+							continue;
 
-						if (Current.modelPtr == 0)
-							break;
-
-						if (Current.isAlive)
-							Units.Add(i, Current);
+						Units.Add(i, Current);
 					}
 				}
 				finally

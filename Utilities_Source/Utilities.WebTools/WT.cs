@@ -313,7 +313,7 @@ namespace Utilities.WebTools
 				return;
 			}
 
-			if (ex is FileNotFoundException && ex.Message.Contains("Microsoft.DirectX.Direct3DX.dll"))
+			if ((ex is FileNotFoundException || ex is FileLoadException) && ex.Message.Contains("Microsoft.DirectX.Direct3DX"))
 			{
 				DialogResult ShowDownloadPage = MessageBox.Show("The module \"Microsoft.DirectX.Direct3DX.dll\" could not be loaded. This is probably because you're missing something required by Direct3D.\nInstalling the Microsoft DirectX End-User Runtime should fix the problem.\nDo you want to open the download page in a web browser?", "Missing File", MessageBoxButtons.YesNo, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
 				if (ShowDownloadPage == DialogResult.Yes)

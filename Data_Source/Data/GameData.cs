@@ -23,6 +23,27 @@ namespace Data
 
 	public static class GameData
 	{
+		private static string _path = null;
+		public static string path
+		{
+			get
+			{
+				if (_path == null || _path == string.Empty)
+				{
+					try
+					{
+						string modulename = Process.GetCurrentProcess().MainModule.FileName;
+						_path = modulename.Remove(modulename.LastIndexOf('\\') + 1); // add 1 so it doesn't remove the \
+					}
+					catch
+					{
+						_path = string.Empty;
+					}
+				}
+				return _path;
+			}
+		}
+
 		private static bool _useTimer2 = false;
 		private static OffsetReader _offsets;
 		public static OffsetReader offsets
@@ -31,11 +52,11 @@ namespace Data
 			{
 				if (_offsets == null)
 				{
-					_offsets = new OffsetReader("Offsets.xml");
+					_offsets = new OffsetReader(path + "Offsets.xml");
 					if (!_offsets.CheckVersion())
 					{
 						_offsets.UpdateAddresses();
-						_offsets = new OffsetReader("Offsets.xml");
+						_offsets = new OffsetReader(path + "Offsets.xml");
 					}
 					_useTimer2 = _offsets.GetStructAddress("Timer") == 0;
 				}
@@ -505,7 +526,7 @@ namespace Data
 			{
 				if (_SC2FilePath == null)
 				{
-					_SC2FilePath = SC2Process.MainModule.FileVersionInfo.FileName.Replace("SC2.exe", "");
+					_SC2FilePath = SC2Process.MainModule.FileName.Replace("SC2.exe", "");
 				}
 				return _SC2FilePath;
 			}
@@ -570,7 +591,14 @@ namespace Data
 			{
 				if ((SC2Process != null))
 				{
-					_SC2Handle = SC2Process.MainWindowHandle;
+					try
+					{
+						_SC2Handle = SC2Process.MainWindowHandle;
+					}
+					catch (NullReferenceException)
+					{
+						_SC2Handle = IntPtr.Zero;
+					}
 				}
 				else
 					_SC2Handle = IntPtr.Zero;
@@ -641,8 +669,18 @@ namespace Data
 			{
 				if ((_SC2Version == null) && (SC2Process != null))
 				{
-					_SC2Version = SC2Process.MainModule.FileVersionInfo.FileVersion;
+					try
+					{
+						_SC2Version = SC2Process.MainModule.FileVersionInfo.FileVersion;
+					}
+					catch(System.ComponentModel.Win32Exception)
+					{
+						_SC2Version = null;
+					}
 				}
+				if (SC2Process == null)
+					_SC2Version = null;
+
 				if (_SC2Version == null)
 				{
 					return "SC2 Closed";
