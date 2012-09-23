@@ -40,7 +40,7 @@ namespace maphack_external_directx
 						}
 						this.cbObserverPanel.Items.Add(str2.Replace("_", " "));
 					}
-					this.cbObserverPanel.SelectedIndex = 0;
+					this.cbObserverPanel.SelectedIndex = (int)DirectX_HUDs.CurrentObserverPanelTab;
 					this.cbObserverPanel.SelectedIndexChanged += new EventHandler(this.cb_SelectedIndexChanged);
 					base.Controls.Add(this.cbObserverPanel);
 					int num2 = names.Max<string>((Func<string, int>) (x => x.Length));

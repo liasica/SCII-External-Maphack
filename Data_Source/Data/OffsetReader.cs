@@ -64,7 +64,16 @@ namespace Data
 				select el;
 			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.LocalPlayerNumber().ToString("X");
 
-			File.Save(Filename);
+			try
+			{
+				File.Save(Filename);
+			}
+			catch (IOException)
+			{
+				System.Windows.Forms.MessageBox.Show("Failed to save Offsets.xml after updating it. It may be in use by another process, or the program may not have permission to write to that location. \nPlease close any other programs that may be using it and start SCIIEMH again.",
+					"Failed to update offsets", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+				System.Windows.Forms.Application.Exit();
+			}
 		}
 	}
 

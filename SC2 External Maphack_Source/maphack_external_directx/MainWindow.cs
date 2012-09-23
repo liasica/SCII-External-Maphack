@@ -497,8 +497,14 @@ namespace maphack_external_directx
 					uint unitOwner = unit.playerNumber;
 					int unitType = (int)unit.unitType;
 
-					if ((unitFlags & TargetFilter.Structure) != 0 && !MainWindow.buildings.Contains(unitID))
-						MainWindow.buildings.Add(unitID);
+					lock (MainWindow.buildings)
+					{
+						if ((unitFlags & TargetFilter.Structure) != 0 && !MainWindow.buildings.Contains(unitID))
+						{
+							string fail = TFToString.AsList(unitFlags);
+							MainWindow.buildings.Add(unitID);
+						}
+					}
 
 					if ((unitFlags & (TargetFilter.Missile | TargetFilter.Dead)) != 0 || unitID.StartsWith("Beacon"))
 						continue;

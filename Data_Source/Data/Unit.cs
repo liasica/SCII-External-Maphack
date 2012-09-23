@@ -34,7 +34,7 @@ namespace Data
 							Units.Remove(key);
 
 					int max = GameData.offsets.GetArrayCount("Units");
-					for (ushort i = 0; i < max; i++)
+					for (ushort i = 0; i < max - 1; i++) //it seems that unit 16383 is sometimes messed up, and no map should ever have that many units anyway.
 					{
 						if (Units.ContainsKey(i))
 							continue;
@@ -90,9 +90,8 @@ namespace Data
 			_name = string.Empty;
 			_textID = string.Empty;
 			_unitType = 0;
-			_memoryLocation = 0;
 			_modelPtr = 0;
-
+			_memoryLocation = (uint)GameData.offsets.GetArrayElementAddress("Units", index);
 			_ID = (uint)((ushort)GameData.offsets.ReadArrayElementMember("Units", Index, "times_used") + ((ushort)GameData.offsets.ReadArrayElementMember("Units", Index, "token") << 16));
 
 			if (modelPtr != 0)

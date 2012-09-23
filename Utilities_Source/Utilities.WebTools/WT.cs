@@ -131,7 +131,15 @@ namespace Utilities.WebTools
 
 		public static void ReportCrash(Exception ex, string appplicationTitle, IntPtr? handleToScreenShot = new IntPtr?(), Size? screenShotSize = new Size?(), bool messageBox = true)
 		{
+			System.Globalization.CultureInfo TCurrent = Thread.CurrentThread.CurrentCulture;
+			System.Globalization.CultureInfo UICurrent = Thread.CurrentThread.CurrentUICulture;
+			System.Globalization.CultureInfo enUS = new System.Globalization.CultureInfo("en-US");
+
+			Thread.CurrentThread.CurrentCulture = enUS;
+			Thread.CurrentThread.CurrentUICulture = enUS;
 			ReportCrashToGitHub(ex, appplicationTitle, handleToScreenShot, screenShotSize, messageBox);
+			Thread.CurrentThread.CurrentCulture = TCurrent;
+			Thread.CurrentThread.CurrentUICulture = UICurrent;
 			return;
 
 			Func<string, bool> predicate = null;

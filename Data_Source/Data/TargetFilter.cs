@@ -2,54 +2,6 @@ namespace Data
 {
 	using System;
 
-	/*public enum TargetFilterFail
-	{
-		Self,
-		Player,
-		Ally,
-		Neutral,
-		Enemy,
-		Air,
-		Ground,
-		Light,
-		Armored,
-		Biological,
-		Robotic,
-		Mechanical,
-		Psionic,
-		Massive,
-		Structure,
-		Hover,
-		Heroic,
-		Worker,
-		RawResource,
-		HarvestableResource,
-		Missile,
-		Destructible,
-		Item,
-		Uncommandable,
-		CanHaveEnergy,
-		CanHaveShields,
-		PreventDefeat,
-		PreventReveal,
-		Buried,
-		Cloaked,
-		Visible,
-		Stasis,
-		UnderConstruction,
-		Dead,
-		Revivable,
-		Hidden,
-		Hallucination,
-		Invulnerable,
-		HasEnergy,
-		HasShields,
-		Benign,
-		Passive,
-		Detector,
-		Radar
-	}*/
-
 	public enum TargetFilter : ulong
 	{
 		Radar =					0x0000080000000000,
@@ -96,6 +48,26 @@ namespace Data
 		Unknown04 =				0x0000000000000004,
 		Unknown02 =				0x0000000000000002,
 		Unknown01 =				0x0000000000000001
+	}
+
+	public static class TFToString
+	{
+		public static string AsList(TargetFilter tf)
+		{
+			string ReturnVal = string.Empty;
+			ulong flag = 0;
+			for(int i = 0; i < 64; i++)
+			{
+				flag = 1ul << i;
+				if (((ulong)tf & flag) != 0)
+				{
+					if (ReturnVal.Length > 0)
+						ReturnVal += ", ";
+					ReturnVal += Enum.GetName(typeof(TargetFilter), (TargetFilter)flag);
+				}
+			}
+			return ReturnVal;
+		}
 	}
 }
 

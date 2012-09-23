@@ -31,7 +31,7 @@
   <Struct Name="UnitModel" Size="-1">
     <Member Name="unit_type" Type="Unsigned" Size="2" Offset="0x18" />
     <Member Name="pName_address" Type="Unsigned" Size="4" Offset="0x6c" />
-    <Member Name="minimap_radius" Type="Fixed" Size="4" Offset="0x3d8" />
+    <Member Name="minimap_radius" Type="Fixed" Size="4" Offset="0x3d4" />
   </Struct>
   <Struct Name="Player" Size="0xA68">
     <Member Name="active" Type="Unsigned" Size="4" Offset="0" />
