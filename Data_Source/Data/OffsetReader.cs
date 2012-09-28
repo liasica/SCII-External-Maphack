@@ -79,6 +79,7 @@ namespace Data
 
 	public class OffsetReader
 	{
+		private Type StringType = typeof(string);
 		private ReadWriteMemory _mem;
 		private ReadWriteMemory mem
 		{
@@ -98,8 +99,8 @@ namespace Data
 
 		XDocument _File;
 		XElement _BaseElement;
-		Dictionary<string, ORArray> _Arrays;
-		Dictionary<string, ORStruct> _Structs;
+		Dictionary<ORNames, ORArray> _Arrays;
+		Dictionary<ORNames, ORStruct> _Structs;
 		string _Filename;
 		string _Version;
 		string Version
@@ -123,117 +124,75 @@ namespace Data
 			UpdateFile.Update(_Filename);
 		}
 
-		public int GetStructSize(string Struct)
+		public int GetStructSize(ORNames Struct)
 		{
 			return _Structs[Struct].size;
 		}
-		public int GetStructAddress(string Struct)
+		public int GetStructAddress(ORNames Struct)
 		{
 			return _Structs[Struct].address;
 		}
 
-		public Type GetStructMemberType(string StructDotMember)
-		{
-			string[] Split = StructDotMember.Split('.');
-			return GetStructMemberType(Split[0], Split[1]);
-		}
-		public Type GetStructMemberType(string Struct, string Member)
+		public Type GetStructMemberType(ORNames Struct, ORNames Member)
 		{
 			return _Structs[Struct].members[Member].type;
 		}
 
-		public int GetStructMemberOffset(string StructMember)
-		{
-			string[] Split = StructMember.Split('.');
-			return GetStructMemberOffset(Split[0], Split[1]);
-		}
-		public int GetStructMemberOffset(string Struct, string Member)
+		public int GetStructMemberOffset(ORNames Struct, ORNames Member)
 		{
 			return _Structs[Struct].members[Member].offset;
 		}
 
-		public int GetStructMemberSize(string StructMember)
-		{
-			string[] Split = StructMember.Split('.');
-			return GetStructMemberSize(Split[0], Split[1]);
-		}
-		public int GetStructMemberSize(string Struct, string Member)
+		public int GetStructMemberSize(ORNames Struct, ORNames Member)
 		{
 			return _Structs[Struct].members[Member].size;
 		}
 
-		public string GetArrayType(string Array)
+		public ORNames GetArrayType(ORNames Array)
 		{
 			return _Arrays[Array].type;
 		}
-		public int GetArrayCount(string Array)
+		public int GetArrayCount(ORNames Array)
 		{
 			return  _Arrays[Array].size;
 		}
-		public int GetArrayTotalSize(string Array)
+		public int GetArrayTotalSize(ORNames Array)
 		{
 			return GetArrayCount(Array) * GetArrayElementSize(Array);
 		}
-		public int GetArrayAddress(string Array)
+		public int GetArrayAddress(ORNames Array)
 		{
 			return _Arrays[Array].address;
 		}
 
-		public int GetArrayElementAddress(string ArrayElement)
-		{
-			string[] Split = ArrayElement.Split('[', ']');
-			return GetArrayElementAddress(Split[0], ImprovedParse.Parse(Split[1]));
-		}
-		public int GetArrayElementAddress(string Array, int Index)
+		public int GetArrayElementAddress(ORNames Array, int Index)
 		{
 			return _Arrays[Array].address + Index * _Structs[GetArrayType(Array)].size;
 		}
 
-		public int GetArrayElementSize(string Array)
+		public int GetArrayElementSize(ORNames Array)
 		{
 			return _Structs[GetArrayType(Array)].size;
 		}
 
-		public int GetArrayElementMemberAddress(string ArrayElementMember)
-		{
-			char[] splitters = new char[] { '[', ']', '.' };
-			string[] Split = ArrayElementMember.Split(splitters, StringSplitOptions.RemoveEmptyEntries);
-			return GetArrayElementMemberAddress(Split[0], ImprovedParse.Parse(Split[1]), Split[2]);
-		}
-		public int GetArrayElementMemberAddress(string Array, int Index, string Member)
+		public int GetArrayElementMemberAddress(ORNames Array, int Index, ORNames Member)
 		{
 			return GetArrayElementAddress(Array, Index) + GetStructMemberOffset(GetArrayType(Array), Member);
 		}
 
-		public Type GetArrayElementMemberType(string ArrayElementMember)
-		{
-			string[] Split = ArrayElementMember.Split('.');
-			return GetArrayElementMemberType(Split[0], Split[1]);
-		}
-		public Type GetArrayElementMemberType(string Array, string Member)
+		public Type GetArrayElementMemberType(ORNames Array, ORNames Member)
 		{
 			return GetStructMemberType(GetArrayType(Array), Member);
 		}
 
-		public int GetArrayElementMemberSize(string ArrayElementMember)
-		{
-			string[] Split = ArrayElementMember.Split('.');
-			return GetArrayElementMemberSize(Split[0], Split[1]);
-		}
-		public int GetArrayElementMemberSize(string Array, string Member)
+		public int GetArrayElementMemberSize(ORNames Array, ORNames Member)
 		{
 			return GetStructMemberSize(GetArrayType(Array), Member);
 		}
 
-		public Object ReadArrayElementMember(string ArrayElementMember)
+		public Object ReadArrayElementMember(ORNames Array, int Index, ORNames Member)
 		{
-			char[] splitters = new char[] { '[', ']', '.' };
-			string[] Split = ArrayElementMember.Split(splitters, StringSplitOptions.RemoveEmptyEntries);
-			return ReadArrayElementMember(Split[0], ImprovedParse.Parse(Split[1]), Split[2]);
-		}
-		public Object ReadArrayElementMember(string Array, int Index, string Member)
-		{
-			if (GetArrayElementMemberType(Array, Member) == typeof(string))
+			if (GetArrayElementMemberType(Array, Member) == StringType)
 			{
 				int Length = GetArrayElementMemberSize(Array, Member);
 				byte[] buffer = new byte[Length];
@@ -244,15 +203,9 @@ namespace Data
 				return mem.ReadMemory((uint)GetArrayElementMemberAddress(Array, Index, Member), GetArrayElementMemberType(Array, Member));
 		}
 
-		public bool WriteArrayElementMember(string ArrayElementMember, Object NewValue)
+		public bool WriteArrayElementMember(ORNames array, int Index, ORNames Member, Object NewValue)
 		{
-			char[] splitters = new char[] { '[', ']', '.' };
-			string[] Split = ArrayElementMember.Split(splitters, StringSplitOptions.RemoveEmptyEntries);
-			return WriteArrayElementMember(Split[0], ImprovedParse.Parse(Split[1]), Split[2], NewValue);
-		}
-		public bool WriteArrayElementMember(string array, int Index, string Member, Object NewValue)
-		{
-			if (GetArrayElementMemberType(array, Member) == typeof(string))
+			if (GetArrayElementMemberType(array, Member) == StringType)
 			{
 				int Length = GetArrayElementMemberSize(array, Member);
 				byte[] StringAsBytes = Encoding.UTF8.GetBytes((string)NewValue);
@@ -269,12 +222,12 @@ namespace Data
 			}
 		}
 
-		public Object ReadStructMember(string Struct, string Member, int Address = 0)
+		public Object ReadStructMember(ORNames Struct, ORNames Member, int Address = 0)
 		{
 			if (Address == 0)
 				Address = GetStructAddress(Struct);
 
-			if (GetStructMemberType(Struct, Member) == typeof(string))
+			if (GetStructMemberType(Struct, Member) == StringType)
 			{
 				int Length = GetStructMemberSize(Struct, Member);
 				byte[] buffer = new byte[Length];
@@ -285,12 +238,45 @@ namespace Data
 				return mem.ReadMemory((uint)(GetStructMemberOffset(Struct, Member) + Address), GetStructMemberType(Struct, Member));
 		}
 
-		public bool WriteStructMember(string Struct, string Member, Object NewValue, int Address = 0)
+		public Object ReadStructMember(ORNames Struct, ORNames Member, byte[] Data)
+		{
+			int Offset = GetStructMemberOffset(Struct, Member);
+			int Size = GetStructMemberSize(Struct, Member);
+			Type type = GetStructMemberType(Struct, Member);
+
+			if (Data == null)
+				throw new NullReferenceException("OffsetReader.ReadStructMember: Data was null. Struct: " + Struct
+					+ " Member: " + Member);
+
+			if (Data.Length < Offset + Size)
+			{
+				char[] hex = new char[16]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+				string HexData = string.Empty;
+				foreach (byte b in Data)
+				{
+					HexData += hex[b >> 4];
+					HexData += hex[b & 0x0F] + " ";
+				}
+
+				throw new IndexOutOfRangeException("OffsetReader.ReadStructMember: Data was too small to read all data.\nData.Length: "
+					+ Data.Length.ToString() + " Offset: " + Offset.ToString() + " Size: " + Size.ToString() + " Struct: " + Struct.ToString()
+					+ " Member: " + Member.ToString() + "\n Data: " + HexData);
+			}
+
+			if (type == StringType)
+			{
+				return System.Text.Encoding.UTF8.GetString(Data, Offset, Size).TrimEnd('\0');
+			}
+			else
+				return ReadWriteMemory.RawDeserialize(Data, Offset, type);
+		}
+
+		public bool WriteStructMember(ORNames Struct, ORNames Member, Object NewValue, int Address = 0)
 		{
 			if (Address == 0 )
 				Address = GetStructAddress(Struct);
 
-			if (GetStructMemberType(Struct, Member) == typeof(string))
+			if (GetStructMemberType(Struct, Member) == StringType)
 			{
 				int Length = GetStructMemberSize(Struct, Member);
 				byte[] StringAsBytes = Encoding.UTF8.GetBytes((string)NewValue);
@@ -306,6 +292,16 @@ namespace Data
 				return mem.WriteMemory((uint)(GetStructMemberOffset(Struct, Member) + Address), buffer.Length, ref buffer);
 			}
 		}
+
+		public byte[] ReadArrayElement(ORNames Array, int Index)
+		{
+			int Address = GetArrayElementAddress(Array, Index);
+			int Size = GetArrayElementSize(Array);
+			
+			byte[] buffer = new byte[Size];
+			mem.ReadMemory((IntPtr)Address, Size, out buffer);
+			return buffer;
+		}
 		
 		public OffsetReader(string Filename)
 		{
@@ -314,8 +310,8 @@ namespace Data
 
 		private void Parse(string Filename)
 		{
-			_Arrays = new Dictionary<string, ORArray>();
-			_Structs = new Dictionary<string, ORStruct>();
+			_Arrays = new Dictionary<ORNames, ORArray>();
+			_Structs = new Dictionary<ORNames, ORStruct>();
 
 			_Filename = Filename;
 
@@ -329,19 +325,19 @@ namespace Data
 			if (_BaseElement.HasElements && _BaseElement.Element("Array") != null)
 			{
 				foreach (XElement element in _BaseElement.Elements("Array"))
-					_Arrays.Add(element.Attribute("Name").Value, new ORArray(element));
+					_Arrays.Add((ORNames)Enum.Parse(typeof(ORNames), element.Attribute("Name").Value), new ORArray(element));
 			}
 			if (_BaseElement.HasElements && _BaseElement.Element("Struct") != null)
 			{
 				foreach (XElement element in _BaseElement.Elements("Struct"))
-					_Structs.Add(element.Attribute("Name").Value, new ORStruct(element));
+					_Structs.Add((ORNames)Enum.Parse(typeof(ORNames), element.Attribute("Name").Value), new ORStruct(element));
 			}
 		}
 	}
 
 	class ORStructMember
 	{
-		public string name
+		public ORNames name
 		{ get; set; }
 		public Type type
 		{ get; set; }
@@ -350,9 +346,9 @@ namespace Data
 		public int offset
 		{ get; set; }
 		
-		public ORStructMember(XElement data, Dictionary<string, ORStructMember> others)
+		public ORStructMember(XElement data, Dictionary<ORNames, ORStructMember> others)
 		{
-			name = data.Attribute("Name").Value;
+			name = (ORNames)Enum.Parse(typeof(ORNames), data.Attribute("Name").Value);
 			offset = 0;
 
 			string Offset = data.Attribute("Offset").Value;
@@ -364,8 +360,8 @@ namespace Data
 				if (Split.Length == 2)
 				{
 					int BaseOffset = 0;
-					if(others.ContainsKey(Split[0]))
-						BaseOffset = others[Split[0]].offset;
+					if(others.ContainsKey((ORNames)Enum.Parse(typeof(ORNames), Split[0])))
+						BaseOffset = others[(ORNames)Enum.Parse(typeof(ORNames), Split[0])].offset;
 
 					offset = BaseOffset + ImprovedParse.Parse(Split[1]);
 				}
@@ -373,10 +369,10 @@ namespace Data
 
 			int Size = ImprovedParse.Parse(data.Attribute("Size").Value);
 			string Type = data.Attribute("Type").Value;
+			size = Size;
 			switch (Type)
 			{
 				case "Signed":
-					size = 1;
 					switch (Size)
 					{
 						case 1:
@@ -397,7 +393,6 @@ namespace Data
 					}
 					break;
 				case "Unsigned":
-					size = 1;
 					switch (Size)
 					{
 						case 1:
@@ -418,7 +413,6 @@ namespace Data
 					}
 					break;
 				case "Fixed":
-					size = 1;
 					switch (Size)
 					{
 						case 1:
@@ -436,16 +430,13 @@ namespace Data
 					}
 					break;
 				case "String":
-					type = typeof(String);
-					size = Size;
+					type = typeof(string);
 					break;
 				case "Bool":
 					type = typeof(bool);
-					size = 1;
 					break;
 				default:
 					type = typeof(byte);
-					size = Size;
 					break;
 			}
 		}
@@ -453,48 +444,48 @@ namespace Data
 
 	class ORStruct
 	{
-		public string name
+		public ORNames name
 		{ get; set; }
 		public int size
 		{ get; set; }
 		public int address
 		{ get; set; }
-		public Dictionary<string, ORStructMember> members
+		public Dictionary<ORNames, ORStructMember> members
 		{ get; set; }
 
 		public ORStruct(XElement data)
 		{
-			name = data.Attribute("Name").Value;
+			name = (ORNames)Enum.Parse(typeof(ORNames), data.Attribute("Name").Value);
 			size = ImprovedParse.Parse(data.Attribute("Size").Value);
 			if (data.Attribute("Address") != null)
 				address = ImprovedParse.Parse(data.Attribute("Address").Value);
 			else
 				address = 0;
-			members = new Dictionary<string, ORStructMember>();
+			members = new Dictionary<ORNames, ORStructMember>();
 			foreach (XElement member in data.Elements("Member"))
 			{
-				members.Add(member.Attribute("Name").Value, new ORStructMember(member, members));
+				members.Add((ORNames)Enum.Parse(typeof(ORNames), member.Attribute("Name").Value), new ORStructMember(member, members));
 			}
 		}
 	}
 
 	class ORArray
 	{
-		public string name
+		public ORNames name
 		{ get; set; }
 		public int size
 		{ get; set; }
 		public int address
 		{ get; set; }
-		public string type
+		public ORNames type
 		{ get; set; }
 
 		public ORArray(XElement data)
 		{
-			name = data.Attribute("Name").Value;
+			name = (ORNames)Enum.Parse(typeof(ORNames), data.Attribute("Name").Value);
 			size = ImprovedParse.Parse(data.Attribute("Size").Value);
 			address = ImprovedParse.Parse(data.Attribute("Address").Value);
-			type = data.Attribute("Type").Value;
+			type = (ORNames)Enum.Parse(typeof(ORNames), data.Attribute("Type").Value);
 		}
 	}
 }

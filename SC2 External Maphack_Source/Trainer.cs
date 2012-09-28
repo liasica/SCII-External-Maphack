@@ -103,22 +103,22 @@ namespace maphack_external_directx
 				if (PlayerCheck[i])
 				{
 					if (Mins >= 0)
-						GameData.offsets.WriteArrayElementMember("Players", i, "minerals_current", (uint)Mins);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.minerals_current, (uint)Mins);
 					if (Gas >= 0)
-						GameData.offsets.WriteArrayElementMember("Players", i, "vespene_current", (uint)Gas);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.vespene_current, (uint)Gas);
 					if (Terra >= 0)
-						GameData.offsets.WriteArrayElementMember("Players", i, "terrazine_current", (uint)Terra);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.terrazine_current, (uint)Terra);
 					if (Custom >= 0)
-						GameData.offsets.WriteArrayElementMember("Players", i, "custom_resource_current", (uint)Custom);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.custom_resource_current, (uint)Custom);
 					if (MaxSupply >= 0)
-						GameData.offsets.WriteArrayElementMember("Players", i, "supply_limit", MaxSupply);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.supply_limit, MaxSupply);
 					if (Supply >= 0)
-						GameData.offsets.WriteArrayElementMember("Players", i, "supply_cap", Supply);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.supply_cap, Supply);
 
 					if (ChangeDD)
-						GameData.offsets.WriteArrayElementMember("Players", i, "attack_multiplier", DDMultiplier);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.attack_multiplier, DDMultiplier);
 					if (ChangeDT)
-						GameData.offsets.WriteArrayElementMember("Players", i, "defense_multiplier", DTMultiplier);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.defense_multiplier, DTMultiplier);
 				}
 			}
 
@@ -185,15 +185,15 @@ namespace maphack_external_directx
 				if (PlayerCheck[i])
 				{
 					if (FreezeMins >= 0)
-						GameData.offsets.WriteArrayElementMember("Players", i, "minerals_current", (uint)FreezeMins);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.minerals_current, (uint)FreezeMins);
 					if (FreezeGas >= 0)
-						GameData.offsets.WriteArrayElementMember("Players", i, "vespene_current", (uint)FreezeGas);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.vespene_current, (uint)FreezeGas);
 					if (FreezeTerra >= 0)
-						GameData.offsets.WriteArrayElementMember("Players", i, "terrazine_current", (uint)FreezeTerra);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.terrazine_current, (uint)FreezeTerra);
 					if (FreezeCustom >= 0)
-						GameData.offsets.WriteArrayElementMember("Players", i, "custom_resource_current", (uint)FreezeCustom);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.custom_resource_current, (uint)FreezeCustom);
 					if (FreezeSupply >= 0)
-						GameData.offsets.WriteArrayElementMember("Players", i, "supply_cap", FreezeSupply);
+						GameData.offsets.WriteArrayElementMember(ORNames.Players, i, ORNames.supply_cap, FreezeSupply);
 				}
 			}
 

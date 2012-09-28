@@ -87,7 +87,7 @@ namespace maphack_external_directx
 		public static string[] player_supply = new string[0x10];
 		public static uint[] player_teams = new uint[0x10];
 		public static PlayerType[] player_types = new PlayerType[0x10];
-		private Thread readMemory;
+		public Thread readMemory;
 		private ToolStripMenuItem resetToolStripMenuItem;
 		public static DirectX_HUDs ResourcesHUD;
 		public static DirectX_HUDs InfoHUD;
@@ -889,8 +889,10 @@ namespace maphack_external_directx
 
 		private void initThreads()
 		{
+			//Overlay.CreateMain();
 			this.readMemory = new Thread(new ThreadStart(this.ReadMemory));
 			this.readMemory.IsBackground = true;
+			this.readMemory.Name = "Data Updater";
 			this.readMemory.Start();
 		}
 
@@ -1094,7 +1096,7 @@ namespace maphack_external_directx
 		{
 			try
 			{
-				if (hud == null)
+				if (hud == null || hud.Closed)
 				{
 					button.Text = hudType.ToString() + " Off";
 					button.BackColor = Color.FromArgb(0x80, 0xff, 0x80);
@@ -1252,20 +1254,9 @@ namespace maphack_external_directx
 					}
 					else
 					{
-						ThreadStart ts = new ThreadStart(UpdateMapSize);
-						Thread t = new Thread(ts);
-						t.Start();
-						//this.UpdateMapSize();
-
-						ts = new ThreadStart(GetPlayers);
-						t = new Thread(ts);
-						t.Start();
-						//this.GetPlayers();
-
-						ts = new ThreadStart(GetUnits);
-						t = new Thread(ts);
-						t.Start();
-						//this.GetUnits();
+						this.UpdateMapSize();
+						this.GetPlayers();
+						this.GetUnits();
 					}
 				}
 			}

@@ -168,12 +168,12 @@ namespace Utilities.MemoryHandling
 		public static unsafe object RawDeserialize(byte[] rawData, int position, Type anyType)
 		{
 			int cb = Marshal.SizeOf(anyType);
-			if (cb > rawData.Length)
+			if (cb + position > rawData.Length)
 			{
 				return null;
 			}
 			object obj2;
-			fixed(void* ptr = &rawData[0])
+			fixed(void* ptr = &rawData[position])
 			{
 				IntPtr destination = new IntPtr(ptr);
 				obj2 = Marshal.PtrToStructure(destination, anyType);

@@ -8,6 +8,7 @@ namespace Data
 	using System.IO;
 	using System.Linq;
 	using System.Runtime.InteropServices;
+	using System.Threading;
 	using System.Text;
 	using Utilities.MemoryHandling;
 	using Utilities.TextProcessing;
@@ -19,6 +20,13 @@ namespace Data
 		public static extern bool QueryPerformanceCounter(out long lpPerformanceCount);
 		[DllImport("kernel32.dll")]
 		public static extern bool QueryPerformanceFrequency(out long lpFrequency);
+	}
+
+	public static class Locks
+	{
+		public static ReaderWriterLockSlim Units = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+		public static ReaderWriterLockSlim Players = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+		public static ReaderWriterLockSlim Map = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 	}
 
 	public static class GameData
@@ -58,7 +66,7 @@ namespace Data
 						_offsets.UpdateAddresses();
 						_offsets = new OffsetReader(path + "Offsets.xml");
 					}
-					_useTimer2 = _offsets.GetStructAddress("Timer") == 0;
+					_useTimer2 = _offsets.GetStructAddress(ORNames.Timer) == 0;
 				}
 				return _offsets;
 			}
@@ -129,7 +137,7 @@ namespace Data
 			info.edgeBottom = (int) Math.Round((double) (((double) info.edgeBottom) / 4096.0));
 			info.playableX = info.edgeRight - info.edgeLeft;
 			info.playableY = info.edgeTop - info.edgeBottom;*/
-			num = (uint)offsets.ReadStructMember("MapInfo", "dynamic_pointer");
+			num = (uint)offsets.ReadStructMember(ORNames.MapInfo, ORNames.dynamic_pointer);
 			if (num == 0)
 			{
 				map.mapInfo = new MapInfo();
@@ -269,10 +277,10 @@ namespace Data
 
 		public static List<Unit> getUnitData()
 		{
-			lock (Unit.Units)
-			{
-				return Unit.Units.Values.ToList();
-			}
+			Locks.Units.EnterReadLock();
+			List<Unit> ReturnVal = Unit.Units.Values.ToList();
+			Locks.Units.ExitReadLock();
+			return ReturnVal;
 		}
 
 		public static List<Unit> GetPlayerUnits(int playerNumber)
@@ -379,7 +387,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)((fixed32)offsets.ReadStructMember("MapInfo", "bottom_precise") + 0.5);
+				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapInfo, ORNames.bottom_precise) + 0.5);
 			}
 		}
 
@@ -387,7 +395,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)((fixed32)offsets.ReadStructMember("MapInfo", "left_precise") + 0.5);
+				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapInfo, ORNames.left_precise) + 0.5);
 			}
 		}
 
@@ -395,7 +403,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)((fixed32)offsets.ReadStructMember("MapInfo", "right_precise") + 0.5);
+				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapInfo, ORNames.right_precise) + 0.5);
 			}
 		}
 
@@ -403,7 +411,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)((fixed32)offsets.ReadStructMember("MapInfo", "top_precise") + 0.5);
+				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapInfo, ORNames.top_precise) + 0.5);
 			}
 		}
 
@@ -411,7 +419,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)offsets.ReadStructMember("MapInfo", "bottom");
+				return (int)offsets.ReadStructMember(ORNames.MapInfo, ORNames.bottom);
 			}
 		}
 
@@ -419,7 +427,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)offsets.ReadStructMember("MapInfo", "left");
+				return (int)offsets.ReadStructMember(ORNames.MapInfo, ORNames.left);
 			}
 		}
 
@@ -427,7 +435,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)offsets.ReadStructMember("MapInfo", "right");
+				return (int)offsets.ReadStructMember(ORNames.MapInfo, ORNames.right);
 			}
 		}
 
@@ -435,7 +443,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)offsets.ReadStructMember("MapInfo", "top");
+				return (int)offsets.ReadStructMember(ORNames.MapInfo, ORNames.top);
 			}
 		}
 
@@ -443,7 +451,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)((fixed32)offsets.ReadStructMember("MapInfo", "full_height") + 0.5);
+				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapInfo, ORNames.full_height) + 0.5);
 			}
 		}
 
@@ -451,7 +459,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)((fixed32)offsets.ReadStructMember("MapInfo", "full_width") + 0.5);
+				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapInfo, ORNames.full_width) + 0.5);
 			}
 		}
 
@@ -697,9 +705,9 @@ namespace Data
 					return 0;
 
 				if(_useTimer2)
-					return ((uint)offsets.ReadStructMember("Timer2", "timer")) / 832f;
+					return ((uint)offsets.ReadStructMember(ORNames.Timer2, ORNames.timer)) / 832f;
 				else
-					return (fixed32)offsets.ReadStructMember("Timer", "timer");
+					return (fixed32)offsets.ReadStructMember(ORNames.Timer, ORNames.timer);
 			}
 		}
 

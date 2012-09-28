@@ -4,13 +4,13 @@ namespace maphack_external_directx
 	using Data;
 	using Ini;
 	using Microsoft.CSharp.RuntimeBinder;
-	using Microsoft.DirectX;
 	using Microsoft.DirectX.Direct3D;
 	using ScreenAPI;
 	using System;
 	using System.Collections.Generic;
 	using System.ComponentModel;
 	using System.Diagnostics;
+	using System.Threading;
 	using System.Drawing;
 	using System.IO;
 	using System.Linq;
@@ -24,6 +24,11 @@ namespace maphack_external_directx
 
 	public class DirectX_HUDs : Form
 	{
+		private bool _Closed = false;
+		public bool Closed
+		{ get { return _Closed; } }
+		private int FailedFrames = 0;
+
 		private List<KeyValuePair<Rectangle, string>> Tooltips = new List<KeyValuePair<Rectangle, string>>();
 		private Rectangle DesiredClientRect = new Rectangle(0,0,0,0);
 		private Rectangle DefaultClientRect = new Rectangle(0, 0, 0, 0);
@@ -72,7 +77,7 @@ namespace maphack_external_directx
 		private Sprite textSprite;
 		private SortedDictionary<string, Texture> textures = new SortedDictionary<string, Texture>();
 		private Sprite textureSprite;
-		public Timer tmrRefreshRate;
+		public System.Windows.Forms.Timer tmrRefreshRate;
 		
 		public KeyValuePair<string, int>[] unit_textures = new KeyValuePair<string, int>[] { 
 			new KeyValuePair<string, int>(@"Assets\btn-unit-protoss-colossus.dds", 0x1d), new KeyValuePair<string, int>(@"Assets\btn-building-terran-techlab.dds", 30), new KeyValuePair<string, int>(@"Assets\btn-building-terran-reactor.dds", 0x1f), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-baneling.dds", 0x22), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-baneling.dds", 0x23), new KeyValuePair<string, int>(@"Assets\btn-unit-protoss-mothership.dds", 0x24), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-changeling.dds", 0x26), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-changeling.dds", 0x27), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-changeling.dds", 40), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-changeling.dds", 0x29), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-changeling.dds", 0x2a), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-changeling.dds", 0x2b), new KeyValuePair<string, int>(@"Assets\btn-unit-zerg-infestedmarine.dds", 0x2c), new KeyValuePair<string, int>(@"Assets\btn-building-terran-commandcenter.dds", 0x2d), new KeyValuePair<string, int>(@"Assets\btn-building-terran-supplydepot.dds", 0x2e), new KeyValuePair<string, int>(@"Assets\btn-building-terran-refinery.dds", 0x2f), 
@@ -123,51 +128,15 @@ namespace maphack_external_directx
 				this.InitializeComponent();
 				this._HUDType = hudType;
 				this.initWindow();
-				this.initDirectX();
 				this.initVariables();
 				this.LoadPositionAndSize();
 				this.initFrame();
 				this.LoadSettings();
 
-				/*if (_HUDType == HUDType.Map)
-				{
-					Rectangle ScreenRect = Screen.GetBounds(new Point(MainWindow.minimap_location_x, MainWindow.minimap_location_y));
-					if (MainWindow.minimap_location_x >= ScreenRect.Right
-					|| MainWindow.minimap_location_y >= ScreenRect.Bottom
-					|| MainWindow.minimap_size_x >= ScreenRect.Width
-					|| MainWindow.minimap_size_y >= ScreenRect.Height)
-					{
-
-						Rectangle MinimapRect = GameData.GetMinimapCoords();
-						MainWindow.minimap_location_x = MinimapRect.X;
-						MainWindow.minimap_location_y = MinimapRect.Y;
-						MainWindow.minimap_size_x = MinimapRect.Width;
-						MainWindow.minimap_size_y = MinimapRect.Height;
-
-						if (MainWindow.minimap_location_x >= ScreenRect.Right
-						|| MainWindow.minimap_location_y >= ScreenRect.Bottom
-						|| MainWindow.minimap_size_x >= ScreenRect.Width
-						|| MainWindow.minimap_size_y >= ScreenRect.Height)
-						{
-							MainWindow.minimap_location_x = ScreenRect.Width / 2;
-							MainWindow.minimap_location_y = ScreenRect.Height / 2;
-							MainWindow.minimap_size_x = 262;
-							MainWindow.minimap_size_y = 258;
-						}
-
-						SaveMapSettings(MainWindow.minimap_location_x, MainWindow.minimap_location_y, MainWindow.minimap_size_x, MainWindow.minimap_size_y);
-					}
-
-					Rectangle WindowRect = this.frame.DesktopBounds;
-					Rectangle ClientRect = this.frame.RectangleToScreen(this.frame.ClientRectangle);
-
-					this.frame.Location = new Point(MainWindow.minimap_location_x - (ClientRect.Left - WindowRect.Left), MainWindow.minimap_location_y - (ClientRect.Top - WindowRect.Top));
-					this.frame.ClientSize = new Size(MainWindow.minimap_size_x, MainWindow.minimap_size_y);
-				}*/
-
 				this.tmrRefreshRate.Interval = MainWindow.HUDRefreshRate;
 				this.tmrRefreshRate.Enabled = true;
-
+				
+				this.initDirectX();
 			}
 			catch (Exception ex)
 			{
@@ -189,6 +158,8 @@ namespace maphack_external_directx
 			this.frame.Dispose();
 			DirectX_HUDs hud = this;
 			Program.MainWindow.closeHUD(ref hud);
+
+			_Closed = true;
 		}
 
 		private void DirectX_HUDs_Paint(object sender, PaintEventArgs e)
@@ -206,6 +177,7 @@ namespace maphack_external_directx
 		private void DirectX_HUDs_Shown(object sender, EventArgs e)
 		{
 			this.frame.Show();
+			Program.MainWindow.Activate();
 			//if (this._HUDType != HUDType.Map)
 				//this.frame.loadHUDLocation();
 		}
@@ -214,20 +186,16 @@ namespace maphack_external_directx
 		{
 			if (this.device != null)
 			{
-				PresentParameters parameters = new PresentParameters
+				lock (this.device)
 				{
-					EnableAutoDepthStencil = true,
-					AutoDepthStencilFormat = DepthFormat.D16,
-					Windowed = true,
-					SwapEffect = SwapEffect.Discard,
-					BackBufferFormat = Microsoft.DirectX.Direct3D.Format.A8R8G8B8
-				};
-				try
-				{
-					this.device.Reset(new PresentParameters[] { parameters });
-				}
-				catch
-				{
+					try
+					{
+						if (!this.Disposing)
+							CreateOrResetDevice();
+					}
+					catch
+					{
+					}
 				}
 			}
 			if (this._HUDType == HUDType.Map)
@@ -383,7 +351,8 @@ namespace maphack_external_directx
 			this.DrawUnitDestinations();
 
 			this.device.RenderState.ZBufferEnable = true;
-			this.device.RenderState.ZBufferFunction = Compare.GreaterEqual;
+			if(this.device.RenderState.ZBufferFunction != Compare.GreaterEqual)
+				this.device.RenderState.ZBufferFunction = Compare.GreaterEqual;
 			this.device.RenderState.ZBufferWriteEnable = true;
 			this.device.Clear(ClearFlags.ZBuffer, Color.FromArgb(0, 1, 1, 1), 0.0f, 0);
 
@@ -1167,19 +1136,54 @@ namespace maphack_external_directx
 
 		[DllImport("user32.dll", SetLastError = true)]
 		private static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
-		private void initDirectX()
+
+		private void CreateOrResetDevice()
 		{
 			PresentParameters parameters = new PresentParameters
 			{
+				MultiSampleQuality = 0,
+				MultiSample = MultiSampleType.None,
+				DeviceWindow = this,
 				EnableAutoDepthStencil = true,
 				AutoDepthStencilFormat = DepthFormat.D16,
 				Windowed = true,
 				SwapEffect = SwapEffect.Discard,
-				BackBufferFormat = Microsoft.DirectX.Direct3D.Format.A8R8G8B8
+				BackBufferFormat = Microsoft.DirectX.Direct3D.Format.A8R8G8B8,
+				BackBufferCount = 1
 			};
+
+			//Locks.Units.EnterWriteLock();
 			try
 			{
-				this.device = new Device(0, DeviceType.Hardware, base.Handle, CreateFlags.HardwareVertexProcessing, new PresentParameters[] { parameters });
+				int CL;
+				if (device == null || device.Disposed)
+				{
+					this.device = new Device(0, DeviceType.Hardware, this, CreateFlags.HardwareVertexProcessing, new PresentParameters[3] { parameters, parameters, parameters });
+					this.device.RenderState.AlphaBlendEnable = true;
+					this.device.RenderState.SourceBlend = Blend.SourceAlpha;
+					this.device.RenderState.DestinationBlend = Blend.InvSourceAlpha;
+					this.textSprite = new Sprite(this.device);
+					this.textureSprite = new Sprite(this.device);
+				}
+				else if (!device.CheckCooperativeLevel(out CL))
+				{
+					if (CL == (int)ResultCode.DeviceNotReset)
+						this.device.Reset(parameters);
+				}
+			}
+			catch (Exception ex)
+			{
+				//Locks.Units.ExitWriteLock();
+				throw ex;
+			}
+			//Locks.Units.ExitWriteLock();
+		}
+
+		private void initDirectX()
+		{
+			try
+			{
+				CreateOrResetDevice();
 			}
 			catch(Exception ex)
 			{
@@ -1188,11 +1192,6 @@ namespace maphack_external_directx
 				Process.GetCurrentProcess().Kill();
 				return;
 			}
-			this.device.RenderState.AlphaBlendEnable = true;
-			this.device.RenderState.SourceBlend = Blend.SourceAlpha;
-			this.device.RenderState.DestinationBlend = Blend.InvSourceAlpha;
-			this.textSprite = new Sprite(this.device);
-			this.textureSprite = new Sprite(this.device);
 		}
 
 		private void initFrame()
@@ -1217,8 +1216,7 @@ namespace maphack_external_directx
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.AutoSize = true;
-			this.BackColor = System.Drawing.Color.FromArgb(255, 1, 1, 1);
+			this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(1)))), ((int)(((byte)(1)))), ((int)(((byte)(1)))));
 			this.ClientSize = new System.Drawing.Size(150, 150);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -1501,11 +1499,14 @@ namespace maphack_external_directx
 				{
 					if (this._HUDType == HUDType.Observer)
 					{
-						Keys key = (Keys)Enum.Parse(typeof(Keys), file["OptionsHotkeys"]["cbPreviousPanelHotkey"]);
-						if (this.previousObserverPanelHotkey.HotKey != key)
+						Keys key;
+						if (Enum.TryParse<Keys>(file["OptionsHotkeys"]["cbPreviousPanelHotkey"], out key))
 						{
-							this.previousObserverPanelHotkey.RegisterHotKey(key);
-							this.previousObserverPanelHotkey.KeyPressed += new EventHandler<KeyPressedEventArgs>(this.previousObserverPanelHotkey_KeyPressed);
+							if (this.previousObserverPanelHotkey.HotKey != key)
+							{
+								this.previousObserverPanelHotkey.RegisterHotKey(key);
+								this.previousObserverPanelHotkey.KeyPressed += new EventHandler<KeyPressedEventArgs>(this.previousObserverPanelHotkey_KeyPressed);
+							}
 						}
 					}
 				}
@@ -1516,11 +1517,14 @@ namespace maphack_external_directx
 				{
 					if (this._HUDType == HUDType.Observer)
 					{
-						Keys keys2 = (Keys)Enum.Parse(typeof(Keys), file["OptionsHotkeys"]["cbNextPanelHotkey"]);
-						if (this.nextObserverPanelHotkey.HotKey != keys2)
+						Keys keys2;
+						if (Enum.TryParse<Keys>(file["OptionsHotkeys"]["cbNextPanelHotkey"], out keys2))
 						{
-							this.nextObserverPanelHotkey.RegisterHotKey(keys2);
-							this.nextObserverPanelHotkey.KeyPressed += new EventHandler<KeyPressedEventArgs>(this.nextObserverPanelHotkey_KeyPressed);
+							if (this.nextObserverPanelHotkey.HotKey != keys2)
+							{
+								this.nextObserverPanelHotkey.RegisterHotKey(keys2);
+								this.nextObserverPanelHotkey.KeyPressed += new EventHandler<KeyPressedEventArgs>(this.nextObserverPanelHotkey_KeyPressed);
+							}
 						}
 					}
 				}
@@ -1613,24 +1617,38 @@ namespace maphack_external_directx
 			if (this._HUDType != HUDType.Info && (!_2csAPI.InGame() || _2csAPI.Player.LocalPlayer.victoryStatus != VictoryStatus.Playing))
 			{
 				base.Hide();
+				this.pause = true;
 			}
 			else if (!base.Visible)
 			{
+				this.pause = false;
 				base.Show();
 				this.frame.Show();
 			}
 			if (!this.pause)
 			{
-				this.device.Clear(ClearFlags.Target, Color.FromArgb(0, 1, 1, 1), 0f, 0);
-				this.device.BeginScene();
-				this.DrawStuff();
-				this.device.EndScene();
 				try
 				{
+					this.device.Clear(ClearFlags.Target, Color.FromArgb(0, 1, 1, 1), 0f, 0);
+					this.device.BeginScene();
+					this.DrawStuff();
+					this.device.EndScene();
 					this.device.Present();
+					FailedFrames = 0;
 				}
-				catch
+				catch(Exception ex)
 				{
+					if(++FailedFrames >= 100)
+						WT.ReportCrash(ex, null);
+
+					try
+					{
+						CreateOrResetDevice();
+					}
+					catch(Exception ex2)
+					{
+						WT.ReportCrash(ex, null);
+					}
 				}
 			}
 		}

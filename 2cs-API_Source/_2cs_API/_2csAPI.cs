@@ -1950,7 +1950,7 @@ namespace _2cs_API
 			{
 				get
 				{
-					byte num = (byte)GameData.offsets.ReadStructMember("LocalPlayer", "LocalPlayer");
+					byte num = (byte)GameData.offsets.ReadStructMember(ORNames.LocalPlayer, ORNames.LocalPlayer);
 					return num < 16 ? num : 0u;
 				}
 			}

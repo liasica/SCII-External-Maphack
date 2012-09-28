@@ -22,37 +22,40 @@ namespace Data
 
 		public static void UpdateUnits()
 		{
-			if (Monitor.TryEnter(Units))
+			if(Locks.Units.TryEnterWriteLock(100))
 			{
-				try
+				ushort[] keys = new ushort[Units.Keys.Count];
+				Units.Keys.CopyTo(keys, 0);
+
+				foreach (ushort key in keys)
+					if (Units[key].Outdated || !Units[key].isAlive)
+						Units.Remove(key);
+
+				int max = GameData.offsets.GetArrayCount(ORNames.Units);
+				int numInvalid = 0;
+				for (ushort i = 0; i < max; i++) //it seems that unit 16383 is sometimes messed up, and no map should ever have that many units anyway.
 				{
-					ushort[] keys = new ushort[Units.Keys.Count];
-					Units.Keys.CopyTo(keys, 0);
-
-					foreach (ushort key in keys)
-						if (Units[key].Outdated || !Units[key].isAlive)
-							Units.Remove(key);
-
-					int max = GameData.offsets.GetArrayCount("Units");
-					for (ushort i = 0; i < max - 1; i++) //it seems that unit 16383 is sometimes messed up, and no map should ever have that many units anyway.
+					if (Units.ContainsKey(i))
 					{
-						if (Units.ContainsKey(i))
-							continue;
-
-						Unit Current = new Unit(i);
-						if (Current.modelPtr == 0 || !Current.isAlive)
-							continue;
-
-						Units.Add(i, Current);
+						Units[i].Update();
+						continue;
 					}
+
+					Unit Current = new Unit(i);
+					if (Current.modelPtr == 0)
+					{
+						if (++numInvalid >= 50 && numInvalid >= i/5)
+							break;
+						continue;
+					}
+
+					if (!Current.isAlive)
+						continue;
+
+					Units.Add(i, Current);
 				}
-				finally
-				{
-					Monitor.Exit(Units);
-				}
+				Locks.Units.ExitWriteLock();
 			}
-			else
-			{ }
 		}
 
 		public float healthRegenDelay;
@@ -79,9 +82,19 @@ namespace Data
 		private string _name;
 		private string _textID;
 		private uint _memoryLocation;
-		private uint _modelPtr;
 		private ushort _Index;
 		private ushort _unitType;
+		private byte[] _Data;
+		private ReaderWriterLockSlim _DataLock;
+
+		public void Update()
+		{
+			if(_DataLock.TryEnterWriteLock(25))
+			{
+				_Data = GameData.offsets.ReadArrayElement(ORNames.Units, Index);
+				_DataLock.ExitWriteLock();
+			}
+		}
 
 		public Unit(int index)
 		{
@@ -90,72 +103,46 @@ namespace Data
 			_name = string.Empty;
 			_textID = string.Empty;
 			_unitType = 0;
-			_modelPtr = 0;
-			_memoryLocation = (uint)GameData.offsets.GetArrayElementAddress("Units", index);
-			_ID = (uint)((ushort)GameData.offsets.ReadArrayElementMember("Units", Index, "times_used") + ((ushort)GameData.offsets.ReadArrayElementMember("Units", Index, "token") << 16));
 
-			if (modelPtr != 0)
-			{
-				string NameAsText = null;
-				string UINameAsText = null;
-				if ((uint)GameData.offsets.ReadStructMember("UnitModel", "pName_address", (int)(modelPtr << 5)) != 0)
-				{
-					uint NameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember("UnitModel", "pName_address", (int)(modelPtr << 5)), typeof(uint));
-					uint NameLength = (uint)GameData.mem.ReadMemory(NameDataAddress, typeof(uint));
-					if (NameDataAddress != 0 && NameLength > 10)
-					{
-						byte[] NameAsBytes = new byte[NameLength];
-						GameData.mem.ReadMemory((IntPtr)NameDataAddress + 0x24, (int)NameLength, out NameAsBytes);
-						NameAsText = System.Text.Encoding.UTF8.GetString(NameAsBytes).Remove(0, 10);
+			_DataLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+			_DataLock.EnterWriteLock();
 
-						uint pUINameAddress = (uint)GameData.mem.ReadMemory(NameDataAddress + 0x1c, typeof(uint));
-						if (pUINameAddress != 0)
-						{
-							uint UINameLength = (uint)GameData.mem.ReadMemory(pUINameAddress + 0x8, typeof(uint));
-							uint UINameAddress = pUINameAddress + 0x10;
+			_memoryLocation = 0;
 
-							byte fail = 0;
-							if (((fail = (byte)GameData.mem.ReadMemory(pUINameAddress + 12, typeof(byte))) & 4) != 0) //sometimes the string is right in this struct, other times it's a pointer.
-								UINameAddress = (uint)GameData.mem.ReadMemory(pUINameAddress + 16, typeof(uint));
+			_Data = new byte[1];
+			Update();
 
-							if (UINameAddress != 0 && UINameLength > 0)
-							{
-								byte[] UINameAsBytes = new byte[UINameLength];
-								GameData.mem.ReadMemory((IntPtr)UINameAddress, (int)UINameLength, out UINameAsBytes);
-								UINameAsText = System.Text.Encoding.UTF8.GetString(UINameAsBytes);
-							}
-						}
-
-					}
-				}
-				if (NameAsText == null)
-					NameAsText = string.Empty;
-				if (UINameAsText == null)
-					UINameAsText = string.Empty;
-
-				_textID = NameAsText;
-				_name = UINameAsText;
-			}
+			_ID = (uint)((ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.times_used, _Data) + ((ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.token, _Data) << 16));
+			_DataLock.ExitWriteLock();
 		}
 
 		public bool Outdated
 		{
 			get
 			{
-				return timesUsed != (ushort)GameData.offsets.ReadArrayElementMember("Units", Index, "times_used");
+				_DataLock.EnterReadLock();
+				ushort newTU = (ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.times_used, _Data);
+				_DataLock.ExitReadLock();
+				return timesUsed != newTU;
 			}
 		}
 		public Unit PreviousUnit
 		{
 			get
 			{
-				ushort PrevIndex = (ushort)GameData.offsets.ReadArrayElementMember("Units", Index, "prev_unit");
+				_DataLock.EnterReadLock();
+				ushort PrevIndex = (ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.prev_unit, _Data);
+				_DataLock.ExitReadLock();
 				if (PrevIndex != 0xffff)
 				{
-					if(Units.ContainsKey(PrevIndex))
-						return Units[PrevIndex];
+					Unit ReturnVal;
+					Locks.Units.EnterReadLock();
+					if (Units.ContainsKey(PrevIndex))
+						ReturnVal = Units[PrevIndex];
 					else
-						return new Unit(PrevIndex);
+						ReturnVal = new Unit(PrevIndex);
+					Locks.Units.ExitReadLock();
+					return ReturnVal;
 				}
 				else
 					return null;
@@ -165,13 +152,29 @@ namespace Data
 		{
 			get
 			{
-				ushort NextIndex = (ushort)GameData.offsets.ReadArrayElementMember("Units", Index, "next_unit");
+				_DataLock.EnterReadLock();
+				ushort NextIndex = (ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.next_unit, _Data);
+				_DataLock.ExitReadLock();
 				if (NextIndex != 0xffff)
 				{
-					if (Units.ContainsKey(NextIndex))
-						return Units[NextIndex];
+					if (!Locks.Units.IsWriteLockHeld && !Locks.Units.IsUpgradeableReadLockHeld)
+					{
+						Unit ReturnVal;
+						Locks.Units.EnterReadLock();
+						if (Units.ContainsKey(NextIndex))
+							ReturnVal = Units[NextIndex];
+						else
+							ReturnVal = new Unit(NextIndex);
+						Locks.Units.ExitReadLock();
+						return ReturnVal;
+					}
 					else
-						return new Unit(NextIndex);
+					{
+						if (Units.ContainsKey(NextIndex))
+							return Units[NextIndex];
+						else
+							return new Unit(NextIndex);
+					}
 				}
 				else
 					return null;
@@ -182,14 +185,20 @@ namespace Data
 		{
 			get
 			{
-				return (ushort)GameData.offsets.ReadArrayElementMember("Units", Index, "prev_unit");
+				_DataLock.EnterReadLock();
+				ushort PrevIndex = (ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.prev_unit, _Data);
+				_DataLock.ExitReadLock();
+				return PrevIndex;
 			}
 		}
 		public ushort NextIndex
 		{
 			get
 			{
-				return (ushort)GameData.offsets.ReadArrayElementMember("Units", Index, "next_unit");
+				_DataLock.EnterReadLock();
+				ushort NextIndex = (ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.next_unit, _Data);
+				_DataLock.ExitReadLock();
+				return NextIndex;
 			}
 		}
 
@@ -204,9 +213,10 @@ namespace Data
 		{
 			get
 			{
-				if(_modelPtr == 0)
-					_modelPtr = (uint)GameData.offsets.ReadArrayElementMember("Units", Index, "unit_model");
-				return _modelPtr;
+				_DataLock.EnterReadLock();
+				uint ReturnVal = (uint)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.unit_model, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public string name
@@ -216,7 +226,7 @@ namespace Data
 				if (_name == string.Empty && modelPtr != 0)
 				{
 					string UINameAsText = null;
-					uint NameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember("UnitModel", "pName_address", (int)(modelPtr << 5)), typeof(uint));
+					uint NameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, (int)(modelPtr << 5)), typeof(uint));
 					if (NameDataAddress != 0)
 					{	
 						uint pUINameAddress = (uint)GameData.mem.ReadMemory(NameDataAddress + 0x1c, typeof(uint));
@@ -251,7 +261,7 @@ namespace Data
 				if (_textID == string.Empty && modelPtr != 0)
 				{
 					string NameAsText = null;
-					uint NameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember("UnitModel", "pName_address", (int)(modelPtr << 5)), typeof(uint));
+					uint NameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, (int)(modelPtr << 5)), typeof(uint));
 					if (NameDataAddress != 0)
 					{
 						uint NameLength = (uint)GameData.mem.ReadMemory(NameDataAddress, typeof(uint));
@@ -274,18 +284,22 @@ namespace Data
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadStructMember("UnitModel", "minimap_radius", (int)(modelPtr << 5));
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.minimap_radius, (int)(modelPtr << 5));
+				return ReturnVal;
 			}
 		}
 		public float timeScale
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "time_scale");
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.time_scale, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 			set
 			{
-				GameData.offsets.WriteArrayElementMember("Units", Index, "time_scale", (fixed32)value);
+				GameData.offsets.WriteArrayElementMember(ORNames.Units, Index, ORNames.time_scale, (fixed32)value);
 			}
 		}
 		public uint ID
@@ -313,7 +327,10 @@ namespace Data
 		{
 			get
 			{
-				return (byte)GameData.offsets.ReadArrayElementMember("Units", Index, "player_owner");
+				_DataLock.EnterReadLock();
+				byte ReturnVal = (byte)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.player_owner, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public ushort unitType
@@ -321,7 +338,7 @@ namespace Data
 			get
 			{
 				if(_unitType == 0)
-					_unitType = (ushort)GameData.offsets.ReadStructMember("UnitModel", "unit_type", (int)(modelPtr << 5));
+					_unitType = (ushort)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.unit_type, (int)(modelPtr << 5));
 				return _unitType;
 			}
 		}
@@ -329,7 +346,10 @@ namespace Data
 		{
 			get
 			{
-				return (UnitStateOld)((byte)GameData.offsets.ReadArrayElementMember("Units", Index, "state"));
+				_DataLock.EnterReadLock();
+				UnitStateOld ReturnVal = (UnitStateOld)((byte)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.state, _Data));
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 
@@ -337,14 +357,20 @@ namespace Data
 		{
 			get
 			{
-				return (byte)GameData.offsets.ReadArrayElementMember("Units", Index, "isImmobile") != 0;
+				_DataLock.EnterReadLock();
+				byte ReturnVal = (byte)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.isImmobile, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal != 0;
 			}
 		}
 		public TargetFilter targetFilterFlags
 		{
 			get
 			{
-				return (TargetFilter)GameData.offsets.ReadArrayElementMember("Units", Index, "targetFilter_flags");
+				_DataLock.EnterReadLock();
+				TargetFilter ReturnVal = (TargetFilter)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.targetFilter_flags, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public bool isAlive
@@ -373,28 +399,40 @@ namespace Data
 		{
 			get
 			{
-				return (UnitMoveState)((byte)GameData.offsets.ReadArrayElementMember("Units", Index, "move_state"));
+				_DataLock.EnterReadLock();
+				UnitMoveState ReturnVal = (UnitMoveState)((byte)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.move_state, _Data));
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public UnitSubMoveState subMoveState
 		{
 			get
 			{
-				return (UnitSubMoveState)((byte)GameData.offsets.ReadArrayElementMember("Units", Index, "sub_move_state"));
+				_DataLock.EnterReadLock();
+				UnitSubMoveState ReturnVal = (UnitSubMoveState)((byte)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.sub_move_state, _Data));
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public UnitLastOrder lastOrder
 		{
 			get
 			{
-				return (UnitLastOrder)((uint)GameData.offsets.ReadArrayElementMember("Units", Index, "last_order"));
+				_DataLock.EnterReadLock();
+				UnitLastOrder ReturnVal = (UnitLastOrder)((uint)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.last_order, _Data));
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public DeathType deathType
 		{
 			get
 			{
-				return (DeathType)((uint)GameData.offsets.ReadArrayElementMember("Units", Index, "death_type"));
+				_DataLock.EnterReadLock();
+				DeathType ReturnVal = (DeathType)((uint)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.death_type, _Data));
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 
@@ -402,21 +440,30 @@ namespace Data
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "energy");
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.energy, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public float shieldDamage
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "shield_damage");
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.shield_damage, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public float healthDamage
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "health_damage");
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.health_damage, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		
@@ -424,21 +471,30 @@ namespace Data
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "position_x");
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.position_x, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public float locationY
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "position_y");
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.position_y, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public float locationZ
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "position_z");
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.position_z, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 
@@ -446,21 +502,30 @@ namespace Data
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "destination_x");
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.destination_x, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public float destinationY
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "destination_y");
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.destination_y, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public float destinationZ
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "destination_z");
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.destination_z, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 
@@ -468,14 +533,20 @@ namespace Data
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "destination2_x");
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.destination2_x, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public float destination2Y
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "destination2_y");
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.destination2_y, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 
@@ -483,7 +554,10 @@ namespace Data
 		{
 			get
 			{
-				return (ushort)GameData.offsets.ReadArrayElementMember("Units", Index, "kills");
+				_DataLock.EnterReadLock();
+				ushort ReturnVal = (ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.kills, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 
@@ -491,21 +565,30 @@ namespace Data
 		{
 			get
 			{
-				return 180 - (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "rotation") * 45;
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.rotation, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public float rotationX
 		{
 			get
 			{
-				return 180 - (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "rotation_x") * 45;
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.rotation_x, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public float rotationY
 		{
 			get
 			{
-				return 180 - (fixed32)GameData.offsets.ReadArrayElementMember("Units", Index, "rotation_y") * 45;
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.rotation_y, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 
@@ -513,7 +596,10 @@ namespace Data
 		{
 			get
 			{
-				return (int)((uint)GameData.offsets.ReadArrayElementMember("Units", Index, "move_speed"));
+				_DataLock.EnterReadLock();
+				int ReturnVal = (int)((uint)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.move_speed, _Data));
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public uint memoryLocation
@@ -521,7 +607,7 @@ namespace Data
 			get
 			{
 				if(_memoryLocation == 0)
-					_memoryLocation = (uint)GameData.offsets.GetArrayElementAddress("Units", Index);
+					_memoryLocation = (uint)GameData.offsets.GetArrayElementAddress(ORNames.Units, Index);
 				return _memoryLocation;
 			}
 		}
@@ -529,22 +615,26 @@ namespace Data
 		{
 			get
 			{
-				return (uint)GameData.offsets.ReadArrayElementMember("Units", Index, "commandQueue_pointer");
+				_DataLock.EnterReadLock();
+				uint ReturnVal = (uint)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.commandQueue_pointer, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 
 		public override string ToString()
 		{
 			string ReturnValue = base.ToString();
+			TargetFilter tf = targetFilterFlags;
 			if (textID != null && textID != string.Empty)
 				ReturnValue = textID;
-			if ((targetFilterFlags & TargetFilter.Dead) != 0)
+			if ((tf & TargetFilter.Dead) != 0)
 				ReturnValue += " (Dead)";
 			else
 			{
-				if((targetFilterFlags & TargetFilter.Cloaked) != 0)
+				if((tf & TargetFilter.Cloaked) != 0)
 					ReturnValue += " (Cloaked)";
-				if ((targetFilterFlags & TargetFilter.Detector) != 0)
+				if ((tf & TargetFilter.Detector) != 0)
 					ReturnValue += " (Detector)";
 			}
 

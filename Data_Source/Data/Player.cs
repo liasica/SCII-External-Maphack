@@ -26,16 +26,16 @@ namespace Data
 
 			string AccountNumber = "";
 			if (number < 16)
-				AccountNumber = (String)GameData.offsets.ReadArrayElementMember("AccountNumbers", number, "id_string");
+				AccountNumber = (String)GameData.offsets.ReadArrayElementMember(ORNames.AccountNumbers, number, ORNames.id_string);
 			if (!AccountNumber.Contains("-S2-"))
 				AccountNumber = "(none)";
 
 			_accountNumber = AccountNumber;
-			_name = (string)GameData.offsets.ReadArrayElementMember("Players", number, "name");
-			_nameLength = (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "name_length");
-			_memoryAddress = (uint)GameData.offsets.GetArrayElementAddress("Players", number);
+			_name = (string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.name);
+			_nameLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.name_length);
+			_memoryAddress = (uint)GameData.offsets.GetArrayElementAddress(ORNames.Players, number);
 
-			uint num = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadArrayElementMember("Players", number, "racePointer") + 4, typeof(uint));
+			uint num = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.racePointer) + 4, typeof(uint));
 			byte[] buffer;
 			GameData.mem.ReadMemory((uint)num, 4, out buffer);
 			if (buffer == null || buffer.Length <= 0 || buffer[0] == 0)
@@ -84,21 +84,21 @@ namespace Data
 		{
 			get
 			{
-				return (PlayerStatus)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "active");
+				return (PlayerStatus)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.active);
 			}
 		}
 		public VictoryStatus victoryStatus
 		{
 			get
 			{
-				return (VictoryStatus)(byte)GameData.offsets.ReadArrayElementMember("Players", number, "status");
+				return (VictoryStatus)(byte)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.status);
 			}
 		}
 		public PlayerDifficulty difficulty
 		{
 			get
 			{
-				return (PlayerDifficulty)(byte)GameData.offsets.ReadArrayElementMember("Players", number, "difficulty");
+				return (PlayerDifficulty)(byte)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.difficulty);
 			}
 		}
 		public PlayerSelections unit_selections;
@@ -113,49 +113,49 @@ namespace Data
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "color_index");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.color_index);
 			}
 		}
 		public int workersCurrent
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "harvesters_current");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.harvesters_current);
 			}
 		}
 		public int workersBuilt
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "harvesters_built");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.harvesters_built);
 			}
 		}
 		public int buildingQueueLength
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "building_queue_length");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.building_queue_length);
 			}
 		}
 		public int buildingsConstructing
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "buildings_constructing");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.buildings_constructing);
 			}
 		}
 		public int buildingsCurrent
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "buildings_current");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.buildings_current);
 			}
 		}
 		public int armySize
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "army_size");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.army_size);
 			}
 		}
 		public Color drawingColor
@@ -191,77 +191,77 @@ namespace Data
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "minerals_current");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.minerals_current);
 			}
 		}
 		public int gas
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "vespene_current");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.vespene_current);
 			}
 		}
 		public int terrazine
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "terrazine_current");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.terrazine_current);
 			}
 		}
 		public int custom
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "custom_resource_current");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.custom_resource_current);
 			}
 		}
 		public int mineralTotal
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "minerals_total");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.minerals_total);
 			}
 		}
 		public int gasTotal
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "vespene_total");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.vespene_total);
 			}
 		}
 		public int terrazineTotal
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "terrazine_total");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.terrazine_total);
 			}
 		}
 		public int customTotal
 		{
 			get
 			{
-				return (int)(uint)GameData.offsets.ReadArrayElementMember("Players", number, "custom_resource_total");
+				return (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.custom_resource_total);
 			}
 		}
 		public float supply
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Players", number, "supply_current");
+				return (fixed32)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.supply_current);
 			}
 		}
 		public float supplyCap
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Players", number, "supply_cap");
+				return (fixed32)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.supply_cap);
 			}
 		}
 		public float supplyLimit
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Players", number, "supply_limit");
+				return (fixed32)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.supply_limit);
 			}
 		}
 		public int unitCount;
@@ -269,35 +269,35 @@ namespace Data
 		{
 			get
 			{
-				return (byte)GameData.offsets.ReadArrayElementMember("Players", number, "team");
+				return (byte)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.team);
 			}
 		}
 		public PlayerType playerType
 		{
 			get
 			{
-				return (PlayerType)(byte)GameData.offsets.ReadArrayElementMember("Players", number, "player_type");
+				return (PlayerType)(byte)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.player_type);
 			}
 		}
 		public float cameraX
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Players", number, "camera_x");
+				return (fixed32)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.camera_x);
 			}
 		}
 		public float cameraY
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Players", number, "camera_y");
+				return (fixed32)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.camera_y);
 			}
 		}
 		public float cameraDistance
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Players", number, "camera_distance");
+				return (fixed32)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.camera_distance);
 			}
 		}
 		public float cameraPitch;
@@ -305,7 +305,7 @@ namespace Data
 		{
 			get
 			{
-				return (fixed32)GameData.offsets.ReadArrayElementMember("Players", number, "camera_rotation");
+				return (fixed32)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.camera_rotation);
 			}
 		}
 		public string accountNumber
