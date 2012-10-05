@@ -20,6 +20,8 @@ namespace maphack_external_directx
 		private static bool atGameStart = true;
 
 		public static Dictionary<string, Queue<long>> Refreshes = new Dictionary<string, Queue<long>>();
+		public static Dictionary<string, double> AverageRefreshRates = new Dictionary<string, double>();
+		public static ReaderWriterLockSlim RefreshLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
 		public static Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
 		public static string version_string = "v" + version.Major + "." + version.Minor + "." + version.Build;
@@ -394,6 +396,7 @@ namespace maphack_external_directx
 
 		public void GameStart()
 		{
+			Unit.ResetUnits();
 			GameData.mapDat = new MapData(GameData.getMapData().mapInfo.filePath);
 			buildings = new HashSet<string>();
 			unit_pictures = new Dictionary<string, string>();
@@ -1176,39 +1179,7 @@ namespace maphack_external_directx
 
 		private void UpdateMapSize()
 		{
-			int left1 = GameData.MapEdgeLeft;
-			int right1 = GameData.MapEdgeRight;
-			int top1 = GameData.MapEdgeTop;
-			int bottom1 = GameData.MapEdgeBottom;
-			int left2 = GameData.MapEdgeLeft2;
-			int right2 = GameData.MapEdgeRight2;
-			int top2 = GameData.MapEdgeTop2;
-			int bottom2 = GameData.MapEdgeBottom2;
-
-			if (left1 <= left2 + 3 && left1 >= left2 - 3)
-				playable_map_left = left1;
-			else
-				playable_map_left = left2;
-
-			if (right1 <= right2 + 3 && right1 >= right2 - 3)
-				playable_map_right = right1;
-			else
-				playable_map_right = right2;
-
-			if (top1 <= top2 + 3 && top1 >= top2 - 3)
-				playable_map_top = top1;
-			else
-				playable_map_top = top2;
-
-			if (bottom1 <= bottom2 + 3 && bottom1 >= bottom2 - 3)
-				playable_map_bottom = bottom1;
-			else
-				playable_map_bottom = bottom2;
-
-			playable_map_width = playable_map_right - playable_map_left;
-			playable_map_height = playable_map_top - playable_map_bottom;
-
-
+			Locks.Map.EnterWriteLock();
 			map_width = GameData.MapFullWidth;
 			map_height = GameData.MapFullHeight;
 			playable_map_width = GameData.MapPlayableWidth2;
@@ -1218,13 +1189,7 @@ namespace maphack_external_directx
 			playable_map_top = GameData.MapEdgeTop2;
 			playable_map_bottom = GameData.MapEdgeBottom2;
 			int lol = 0;
-
-			/*playable_map_width += 5;
-			playable_map_height += 5;
-			playable_map_left -= 2;
-			playable_map_right += 3;
-			playable_map_top += 3;
-			playable_map_bottom -= 2;*/
+			Locks.Map.ExitWriteLock();
 
 			UpdateRefreshes("MapSize");
 		}
@@ -1271,10 +1236,13 @@ namespace maphack_external_directx
 			long freq;
 			Imports.QueryPerformanceFrequency(out freq);
 
-			lock (Refreshes)
+			if(RefreshLock.TryEnterWriteLock(500))
 			{
 				if (!Refreshes.ContainsKey(type))
+				{
 					Refreshes.Add(type, new Queue<long>());
+					AverageRefreshRates.Add(type, 0);
+				}
 				Refreshes[type].Enqueue(timer);
 				
 				List<string> keys = Refreshes.Keys.ToList();
@@ -1285,9 +1253,12 @@ namespace maphack_external_directx
 						Refreshes[key].Dequeue();
 
 					if (Refreshes[key].Count == 0)
+					{
 						Refreshes.Remove(key);
+						AverageRefreshRates.Remove(key);
+					}
 				}
-				
+				RefreshLock.ExitWriteLock();
 			}
 		}
 

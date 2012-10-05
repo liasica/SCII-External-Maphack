@@ -26,7 +26,7 @@ namespace Data
 	{
 		public static ReaderWriterLockSlim Units = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 		public static ReaderWriterLockSlim Players = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-		public static ReaderWriterLockSlim Map = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+		public static ReaderWriterLockSlim Map = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion); //Not used consistantly for performance reasons.
 	}
 
 	public static class GameData
@@ -63,8 +63,12 @@ namespace Data
 					_offsets = new OffsetReader(path + "Offsets.xml");
 					if (!_offsets.CheckVersion())
 					{
-						_offsets.UpdateAddresses();
-						_offsets = new OffsetReader(path + "Offsets.xml");
+						Thread.Sleep(1000); //Sometimes the version check will fail right when SC2 is started, so waiting a second and checking again should help.
+						if (!_offsets.CheckVersion())
+						{
+							_offsets.UpdateAddresses();
+							_offsets = new OffsetReader(path + "Offsets.xml");
+						}
 					}
 					_useTimer2 = _offsets.GetStructAddress(ORNames.Timer) == 0;
 				}

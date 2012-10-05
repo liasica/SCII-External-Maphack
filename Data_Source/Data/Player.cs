@@ -163,7 +163,7 @@ namespace Data
 			get
 			{
 				int Index = colorIndex;
-				return possible_colors[Index < 16 ? Index : 0];
+				return possible_colors[Index < 16 && Index >= 0 ? Index : 0];
 			}
 		}
 		public PlayerColor playerColor

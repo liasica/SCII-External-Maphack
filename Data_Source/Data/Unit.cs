@@ -20,31 +20,38 @@ namespace Data
 			}
 		}
 
+		public static void ResetUnits()
+		{
+			Locks.Units.EnterWriteLock();
+			_Units = new Dictionary<ushort, Unit>();
+			Locks.Units.ExitWriteLock();
+		}
+
 		public static void UpdateUnits()
 		{
-			if(Locks.Units.TryEnterWriteLock(100))
+			if(Locks.Units.TryEnterWriteLock(250))
 			{
-				ushort[] keys = new ushort[Units.Keys.Count];
-				Units.Keys.CopyTo(keys, 0);
-
-				foreach (ushort key in keys)
-					if (Units[key].Outdated || !Units[key].isAlive)
-						Units.Remove(key);
-
 				int max = GameData.offsets.GetArrayCount(ORNames.Units);
 				int numInvalid = 0;
-				for (ushort i = 0; i < max; i++) //it seems that unit 16383 is sometimes messed up, and no map should ever have that many units anyway.
+				for (ushort i = 0; i < max; i++) //it seems that unit 16383 is sometimes messed up, but no map should ever have that many units anyway.
 				{
 					if (Units.ContainsKey(i))
 					{
-						Units[i].Update();
-						continue;
+						if (Units[i].Outdated)
+							Units.Remove(i);
+						else
+						{
+							Units[i].Update();
+							if (!Units[i].isAlive)
+								Units.Remove(i);
+							continue;
+						}
 					}
 
 					Unit Current = new Unit(i);
 					if (Current.modelPtr == 0)
 					{
-						if (++numInvalid >= 50 && numInvalid >= i/5)
+						if (++numInvalid >= 50 && numInvalid >= i / 10)
 							break;
 						continue;
 					}
@@ -82,6 +89,7 @@ namespace Data
 		private string _name;
 		private string _textID;
 		private uint _memoryLocation;
+		private fixed32 _minimapRadius;
 		private ushort _Index;
 		private ushort _unitType;
 		private byte[] _Data;
@@ -89,7 +97,7 @@ namespace Data
 
 		public void Update()
 		{
-			if(_DataLock.TryEnterWriteLock(25))
+			if(_DataLock.TryEnterWriteLock(50))
 			{
 				_Data = GameData.offsets.ReadArrayElement(ORNames.Units, Index);
 				_DataLock.ExitWriteLock();
@@ -103,6 +111,7 @@ namespace Data
 			_name = string.Empty;
 			_textID = string.Empty;
 			_unitType = 0;
+			_minimapRadius = -1;
 
 			_DataLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 			_DataLock.EnterWriteLock();
@@ -120,9 +129,7 @@ namespace Data
 		{
 			get
 			{
-				_DataLock.EnterReadLock();
-				ushort newTU = (ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.times_used, _Data);
-				_DataLock.ExitReadLock();
+				ushort newTU = (ushort)GameData.offsets.ReadArrayElementMember(ORNames.Units, Index, ORNames.times_used);
 				return timesUsed != newTU;
 			}
 		}
@@ -227,10 +234,10 @@ namespace Data
 				{
 					string UINameAsText = null;
 					uint NameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, (int)(modelPtr << 5)), typeof(uint));
-					if (NameDataAddress != 0)
+					if (NameDataAddress != 0 && NameDataAddress < uint.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
 					{	
 						uint pUINameAddress = (uint)GameData.mem.ReadMemory(NameDataAddress + 0x1c, typeof(uint));
-						if (pUINameAddress != 0)
+						if (pUINameAddress != 0 && pUINameAddress < uint.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
 						{
 							uint UINameLength = (uint)GameData.mem.ReadMemory(pUINameAddress + 0x8, typeof(uint));
 							uint UINameAddress = pUINameAddress + 0x10;
@@ -238,7 +245,7 @@ namespace Data
 							if (((byte)GameData.mem.ReadMemory(pUINameAddress + 12, typeof(byte)) & 4) != 0) //sometimes the string is right in this struct, other times it's a pointer.
 								UINameAddress = (uint)GameData.mem.ReadMemory(pUINameAddress + 16, typeof(uint));
 
-							if (UINameAddress != 0 && UINameLength > 0)
+							if (UINameAddress != 0 && UINameLength > 0 && UINameLength < 1024) //it needs an upper limit incase the length is garbage.
 							{
 								byte[] UINameAsBytes = new byte[UINameLength];
 								GameData.mem.ReadMemory((IntPtr)UINameAddress, (int)UINameLength, out UINameAsBytes);
@@ -262,10 +269,10 @@ namespace Data
 				{
 					string NameAsText = null;
 					uint NameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, (int)(modelPtr << 5)), typeof(uint));
-					if (NameDataAddress != 0)
+					if (NameDataAddress != 0 && NameDataAddress < uint.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
 					{
 						uint NameLength = (uint)GameData.mem.ReadMemory(NameDataAddress, typeof(uint));
-						if (NameLength > 10)
+						if (NameLength > 10 && NameLength < 1024) //it needs an upper limit incase the length is garbage.
 						{
 							byte[] NameAsBytes = new byte[NameLength];
 							GameData.mem.ReadMemory((IntPtr)NameDataAddress + 0x24, (int)NameLength, out NameAsBytes);
@@ -280,12 +287,15 @@ namespace Data
 				return _textID;
 			}
 		}
-		public float minimapRadius
+		public fixed32 minimapRadius
 		{
 			get
 			{
-				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.minimap_radius, (int)(modelPtr << 5));
-				return ReturnVal;
+				if (_minimapRadius < 0)
+				{
+					_minimapRadius = (fixed32)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.minimap_radius, (int)(modelPtr << 5));
+				}
+				return _minimapRadius;
 			}
 		}
 		public float timeScale

@@ -52,6 +52,7 @@ namespace maphack_external_directx
 		private NumericUpDown udData;
 		private NumericUpDown udDrawing;
 		private Button button1;
+		private CheckBox chk0Radius;
 		private NumericUpDown udGUI;
 
 		public Options()
@@ -123,6 +124,7 @@ namespace maphack_external_directx
 			this.label5 = new System.Windows.Forms.Label();
 			this.udGUI = new System.Windows.Forms.NumericUpDown();
 			this.btnSave = new System.Windows.Forms.Button();
+			this.chk0Radius = new System.Windows.Forms.CheckBox();
 			this.tbOptions.SuspendLayout();
 			this.tbDrawing.SuspendLayout();
 			this.groupBox5.SuspendLayout();
@@ -148,7 +150,7 @@ namespace maphack_external_directx
 			this.tbOptions.Location = new System.Drawing.Point(0, 0);
 			this.tbOptions.Name = "tbOptions";
 			this.tbOptions.SelectedIndex = 0;
-			this.tbOptions.Size = new System.Drawing.Size(327, 279);
+			this.tbOptions.Size = new System.Drawing.Size(327, 336);
 			this.tbOptions.TabIndex = 0;
 			// 
 			// tbDrawing
@@ -160,7 +162,7 @@ namespace maphack_external_directx
 			this.tbDrawing.Location = new System.Drawing.Point(4, 22);
 			this.tbDrawing.Name = "tbDrawing";
 			this.tbDrawing.Padding = new System.Windows.Forms.Padding(3);
-			this.tbDrawing.Size = new System.Drawing.Size(319, 253);
+			this.tbDrawing.Size = new System.Drawing.Size(319, 310);
 			this.tbDrawing.TabIndex = 0;
 			this.tbDrawing.Text = "Drawing";
 			this.tbDrawing.UseVisualStyleBackColor = true;
@@ -168,7 +170,7 @@ namespace maphack_external_directx
 			// label4
 			// 
 			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(22, 202);
+			this.label4.Location = new System.Drawing.Point(28, 267);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(156, 13);
 			this.label4.TabIndex = 9;
@@ -181,7 +183,7 @@ namespace maphack_external_directx
 			this.cbObserverPanelDrawDirection.Items.AddRange(new object[] {
             "Left",
             "Down"});
-			this.cbObserverPanelDrawDirection.Location = new System.Drawing.Point(179, 199);
+			this.cbObserverPanelDrawDirection.Location = new System.Drawing.Point(190, 264);
 			this.cbObserverPanelDrawDirection.Name = "cbObserverPanelDrawDirection";
 			this.cbObserverPanelDrawDirection.Size = new System.Drawing.Size(121, 21);
 			this.cbObserverPanelDrawDirection.TabIndex = 8;
@@ -190,7 +192,7 @@ namespace maphack_external_directx
 			// 
 			this.groupBox5.Controls.Add(this.groupBox7);
 			this.groupBox5.Controls.Add(this.groupBox8);
-			this.groupBox5.Location = new System.Drawing.Point(8, 151);
+			this.groupBox5.Location = new System.Drawing.Point(8, 183);
 			this.groupBox5.Name = "groupBox5";
 			this.groupBox5.Size = new System.Drawing.Size(199, 75);
 			this.groupBox5.TabIndex = 6;
@@ -250,14 +252,14 @@ namespace maphack_external_directx
 			this.groupBox4.Controls.Add(this.groupBox2);
 			this.groupBox4.Location = new System.Drawing.Point(8, 6);
 			this.groupBox4.Name = "groupBox4";
-			this.groupBox4.Size = new System.Drawing.Size(303, 139);
+			this.groupBox4.Size = new System.Drawing.Size(303, 171);
 			this.groupBox4.TabIndex = 5;
 			this.groupBox4.TabStop = false;
 			this.groupBox4.Text = "Minimap";
 			// 
 			// button1
 			// 
-			this.button1.Location = new System.Drawing.Point(93, 108);
+			this.button1.Location = new System.Drawing.Point(93, 142);
 			this.button1.Name = "button1";
 			this.button1.Size = new System.Drawing.Size(130, 23);
 			this.button1.TabIndex = 5;
@@ -273,7 +275,7 @@ namespace maphack_external_directx
 			this.groupBox1.Controls.Add(this.chkCameraAllies);
 			this.groupBox1.Location = new System.Drawing.Point(6, 19);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(81, 113);
+			this.groupBox1.Size = new System.Drawing.Size(81, 146);
 			this.groupBox1.TabIndex = 0;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Camera";
@@ -327,9 +329,9 @@ namespace maphack_external_directx
 			this.groupBox3.Controls.Add(this.chkUnitDestinationSelf);
 			this.groupBox3.Controls.Add(this.chkUnitDestinationEnemies);
 			this.groupBox3.Controls.Add(this.chkUnitDestinationAllies);
-			this.groupBox3.Location = new System.Drawing.Point(174, 19);
+			this.groupBox3.Location = new System.Drawing.Point(200, 19);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(97, 91);
+			this.groupBox3.Size = new System.Drawing.Size(97, 117);
 			this.groupBox3.TabIndex = 4;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Unit Destination";
@@ -370,12 +372,13 @@ namespace maphack_external_directx
 			// 
 			// groupBox2
 			// 
+			this.groupBox2.Controls.Add(this.chk0Radius);
 			this.groupBox2.Controls.Add(this.chkUnitsSelf);
 			this.groupBox2.Controls.Add(this.chkUnitsEnemies);
 			this.groupBox2.Controls.Add(this.chkUnitsAllies);
 			this.groupBox2.Location = new System.Drawing.Point(93, 19);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(75, 91);
+			this.groupBox2.Size = new System.Drawing.Size(101, 117);
 			this.groupBox2.TabIndex = 3;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Units";
@@ -621,7 +624,7 @@ namespace maphack_external_directx
 			// btnSave
 			// 
 			this.btnSave.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.btnSave.Location = new System.Drawing.Point(0, 256);
+			this.btnSave.Location = new System.Drawing.Point(0, 313);
 			this.btnSave.Name = "btnSave";
 			this.btnSave.Size = new System.Drawing.Size(327, 23);
 			this.btnSave.TabIndex = 1;
@@ -629,11 +632,23 @@ namespace maphack_external_directx
 			this.btnSave.UseVisualStyleBackColor = true;
 			this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
 			// 
+			// chk0Radius
+			// 
+			this.chk0Radius.AutoSize = true;
+			this.chk0Radius.Checked = true;
+			this.chk0Radius.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.chk0Radius.Location = new System.Drawing.Point(6, 88);
+			this.chk0Radius.Name = "chk0Radius";
+			this.chk0Radius.Size = new System.Drawing.Size(101, 17);
+			this.chk0Radius.TabIndex = 3;
+			this.chk0Radius.Text = "Show if 0 radius";
+			this.chk0Radius.UseVisualStyleBackColor = true;
+			// 
 			// Options
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(327, 279);
+			this.ClientSize = new System.Drawing.Size(327, 336);
 			this.Controls.Add(this.btnSave);
 			this.Controls.Add(this.tbOptions);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -765,6 +780,13 @@ namespace maphack_external_directx
 				}
 				try
 				{
+					this.chk0Radius.Checked = bool.Parse(file["OptionsDrawing"]["chk0Radius"]);
+				}
+				catch
+				{
+				}
+				try
+				{
 					this.chkUnitDestinationEnemies.Checked = bool.Parse(file["OptionsDrawing"]["chkUnitDestinationEnemies"]);
 				}
 				catch
@@ -850,6 +872,7 @@ namespace maphack_external_directx
 			section.Add("chkUnitsEnemies", this.chkUnitsEnemies.Checked.ToString());
 			section.Add("chkUnitsAllies", this.chkUnitsAllies.Checked.ToString());
 			section.Add("chkUnitsSelf", this.chkUnitsSelf.Checked.ToString());
+			section.Add("chk0Radius", this.chk0Radius.Checked.ToString());
 			section.Add("chkUnitDestinationEnemies", this.chkUnitDestinationEnemies.Checked.ToString());
 			section.Add("chkUnitDestinationAllies", this.chkUnitDestinationAllies.Checked.ToString());
 			section.Add("chkUnitDestinationSelf", this.chkUnitDestinationSelf.Checked.ToString());
@@ -886,7 +909,8 @@ namespace maphack_external_directx
 			MainWindow.minimap_size_x = MinimapRect.Width;
 			MainWindow.minimap_size_y = MinimapRect.Height;
 			DirectX_HUDs.SaveMapSettings(MainWindow.minimap_location_x, MainWindow.minimap_location_y, MainWindow.minimap_size_x, MainWindow.minimap_size_y);
-			if (MainWindow.HUDs != null && MainWindow.HUDs[1] != null && MainWindow.HUDs[1].frame != null)
+			if (MainWindow.HUDs != null && MainWindow.HUDs[1] != null && !MainWindow.HUDs[1].Disposing && !MainWindow.HUDs[1].IsDisposed
+				&& MainWindow.HUDs[1].frame != null && !MainWindow.HUDs[1].frame.Disposing && !MainWindow.HUDs[1].frame.IsDisposed)
 			{
 				Rectangle WindowRect = MainWindow.HUDs[1].frame.DesktopBounds;
 				Rectangle ClientRect = MainWindow.HUDs[1].frame.RectangleToScreen(MainWindow.HUDs[1].frame.ClientRectangle);

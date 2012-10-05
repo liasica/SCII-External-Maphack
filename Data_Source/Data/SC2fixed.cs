@@ -7,8 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace Data
 {
-	//not implemented yet. These will be for handling the values the right way, instead of multiplying/dividing an Int32 by 4096.
-
+	//not all of these are implemented yet.
 	
 	/*-----These are for the constructors to know that we want to give them the raw value, instead of the value of an int.-----*/
 	struct f32raw
@@ -46,6 +45,13 @@ namespace Data
 	[StructLayout(LayoutKind.Explicit, Pack = 1)]
 	public struct fixed32
 	{
+		public static fixed32 MaxValue
+		{ get { return new fixed32(new f32raw(Int32.MaxValue)); } }
+		public static fixed32 MinValue
+		{ get { return new fixed32(new f32raw(Int32.MinValue)); } }
+		public static fixed32 Precision
+		{ get { return new fixed32(new f32raw(1)); } }
+
 		[FieldOffset(0)]
 		private Int32 _rawData;
 
@@ -53,9 +59,9 @@ namespace Data
 		{ _rawData = it._rawData; }
 
 		public fixed32(float it)
-		{ _rawData = (Int32)(it * 4096 + (it >= 0 ? 0.5 : -0.5)); } //add half of the minimum precision to minimize rounding errors. We all know that 1.999999 is really 2.0.
+		{ _rawData = (Int32)Math.Round(it * 4096); } //Rounding is necessary becaus we all know that 1.999999 is really 2.0, not 1.999755.
 		public fixed32(double it)
-		{ _rawData = (Int32)(it * 4096 + (it >= 0 ? 0.5 : -0.5)); } //add half of the minimum precision to minimize rounding errors. We all know that 1.999999 is really 2.0.
+		{ _rawData = (Int32)Math.Round(it * 4096); } //Rounding is necessary becaus we all know that 1.999999 is really 2.0, not 1.999755.
 		public fixed32(Int32 it)
 		{ _rawData = (Int32)(it * 4096); }
 		public fixed32(UInt32 it)
@@ -65,7 +71,7 @@ namespace Data
 		/*public fixed32(fixed16 it)
 		{ _rawData = it.RawData * 2; }
 		public fixed32(fixed8 it)
-		{ _rawData = it.RawData * 16; }*/
+		{ _rawData = it.RawData * 16; }*/ //These types are not implemented yet.
 
 		public Int32 RawData
 		{

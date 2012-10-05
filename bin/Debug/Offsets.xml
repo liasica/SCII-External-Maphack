@@ -97,7 +97,7 @@
     <Member Name="move_state" Type="Unsigned" Size="1" Offset="sub_move_state+1" />
     <Member Name="state" Type="Unsigned" Size="1" Offset="move_state+4" />
     <Member Name="player_owner" Type="Unsigned" Size="1" Offset="state+4" />
-    <Member Name="isImmobile" Type="Unsigned" Size="1" Offset="player_owner+2" />
+    <Member Name="isImmobile" Type="Bool" Size="1" Offset="player_owner+2" />
     <Member Name="kills" Type="Unsigned" Size="2" Offset="isImmobile+10" />
     <Member Name="player_owner2" Type="Unsigned" Size="1" Offset="kills+2" />
     <Member Name="player_owner3" Type="Unsigned" Size="1" Offset="player_owner2+1" />

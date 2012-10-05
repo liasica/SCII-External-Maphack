@@ -36,7 +36,7 @@ namespace maphack_external_directx
 			try
 			{
 				if (!DirectX_HUDs.AeroEnabled)
-					MessageBox.Show("Desktop Window Manager (DWM) is not enabled. Without DWM, the DirectX overlays used by this program will have a significant performance penalty.\n\nDWM is only available on Windows Vista and later, and cannot be used with the Windows Classic or High Contrast themes.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					MessageBox.Show("Desktop Window Manager (DWM) is not enabled. Without DWM, the DirectX overlays used by this program will have a significant performance penalty and may not work properly.\n\nDWM is only available on Windows Vista and later, and cannot be used with the Windows Classic or High Contrast themes.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				runApplication();
 			}
 			catch (ThreadAbortException)

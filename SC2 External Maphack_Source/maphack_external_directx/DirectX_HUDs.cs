@@ -54,6 +54,7 @@ namespace maphack_external_directx
 		private bool drawUnitsAllies;
 		private bool drawUnitsEnemies = true;
 		private bool drawUnitsSelf;
+		private bool draw0Radius = true;
 		private SortedDictionary<int, Microsoft.DirectX.Direct3D.Font> fonts = new SortedDictionary<int, Microsoft.DirectX.Direct3D.Font>();
 		public HUDFrame frame;
 		public const int GWL_EXSTYLE = -20;
@@ -327,7 +328,7 @@ namespace maphack_external_directx
 		private void DrawMap()
 		{
 
-
+			Locks.Map.EnterReadLock();
 			if (((float)base.ClientRectangle.Height) / ((float)base.ClientRectangle.Width) >= MainWindow.playable_map_height / MainWindow.playable_map_width)
 			{
 				MainWindow.minimap_scale = (float)base.ClientRectangle.Width / MainWindow.playable_map_width;
@@ -340,9 +341,10 @@ namespace maphack_external_directx
 				MainWindow.minimap_offset_y = 0;
 				MainWindow.minimap_offset_x = ((float)base.ClientRectangle.Width - MainWindow.minimap_scale * MainWindow.playable_map_width) / 2;
 			}
+			Locks.Map.ExitReadLock();
 
-			Color OutlineColor = Color.FromArgb(0, 255, 0, 0);
-			Color OutlineColor2 = Color.FromArgb(0, 0, 255, 0);
+			Color OutlineColor = Color.FromArgb(127, 255, 0, 0);
+			Color OutlineColor2 = Color.FromArgb(127, 0, 255, 0);
 
 			this.DrawRectangleOutline(0, 0, this.ClientSize.Width - 1, this.ClientSize.Height - 1, OutlineColor, false);
 			this.DrawRectangleOutline(MainWindow.minimap_offset_x, MainWindow.minimap_offset_y, this.ClientSize.Width - MainWindow.minimap_offset_x * 2 - 1
@@ -452,7 +454,7 @@ namespace maphack_external_directx
 			Imports.QueryPerformanceFrequency(out freq);
 			
 			MainWindow.UpdateRefreshes("Info");
-			lock (MainWindow.Refreshes)
+			if(MainWindow.RefreshLock.TryEnterReadLock(250))
 			{
 				int y = 0;
 				foreach (KeyValuePair<string, Queue<long>> pair in MainWindow.Refreshes)
@@ -460,6 +462,13 @@ namespace maphack_external_directx
 					double FPS = 0;
 					if(pair.Value.Count >= 2)
 						FPS = (double)pair.Value.Count / ((double)(pair.Value.Last() - pair.Value.First()) / (double)freq);
+
+					if (MainWindow.AverageRefreshRates[pair.Key] == double.NaN)
+						MainWindow.AverageRefreshRates[pair.Key] = 0;
+
+					MainWindow.AverageRefreshRates[pair.Key] = MainWindow.AverageRefreshRates[pair.Key] * (1.0 - (1.0 / (pair.Value.Count / 10.0))) + FPS * 1.0 / (pair.Value.Count / 10.0);
+					FPS = MainWindow.AverageRefreshRates[pair.Key];
+
 					string text = pair.Key + ": " + FPS.ToString("F1");
 
 					if (!this.fonts.ContainsKey(this.arial4.GetHashCode()))
@@ -475,6 +484,7 @@ namespace maphack_external_directx
 
 					y++;
 				}
+				MainWindow.RefreshLock.ExitReadLock();
 			}
 		}
 
@@ -972,6 +982,7 @@ namespace maphack_external_directx
 
 		private void DrawUnitPositionsOnMap()
 		{
+			float MaximumRadius = 10f / MainWindow.minimap_scale;
 			float MinimumRadius = 1f / MainWindow.minimap_scale;
 			float AddToRadius = 1f / MainWindow.minimap_scale;
 
@@ -1010,8 +1021,11 @@ namespace maphack_external_directx
 
 			Label_005A:
 				float Radius = unit.minimapRadius;
-				
-				if (Radius < MinimumRadius)
+
+				if (Radius == 0 && !this.draw0Radius)
+					continue;
+
+				if (Radius < MinimumRadius || Radius > MaximumRadius)
 					Radius = MinimumRadius;
 				Radius += AddToRadius;
 
@@ -1152,12 +1166,12 @@ namespace maphack_external_directx
 				BackBufferCount = 1
 			};
 
-			//Locks.Units.EnterWriteLock();
 			try
 			{
 				int CL;
 				if (device == null || device.Disposed)
 				{
+					Device.IsUsingEventHandlers = true;
 					this.device = new Device(0, DeviceType.Hardware, this, CreateFlags.HardwareVertexProcessing, new PresentParameters[3] { parameters, parameters, parameters });
 					this.device.RenderState.AlphaBlendEnable = true;
 					this.device.RenderState.SourceBlend = Blend.SourceAlpha;
@@ -1168,15 +1182,13 @@ namespace maphack_external_directx
 				else if (!device.CheckCooperativeLevel(out CL))
 				{
 					if (CL == (int)ResultCode.DeviceNotReset)
-						this.device.Reset(parameters);
+						this.device.Reset(new PresentParameters[3] { parameters, parameters, parameters });
 				}
 			}
 			catch (Exception ex)
 			{
-				//Locks.Units.ExitWriteLock();
-				throw ex;
+				throw ex; //Can't do much here yet.
 			}
-			//Locks.Units.ExitWriteLock();
 		}
 
 		private void initDirectX()
@@ -1462,6 +1474,13 @@ namespace maphack_external_directx
 				}
 				try
 				{
+					this.draw0Radius = bool.Parse(file["OptionsDrawing"]["chk0Radius"]);
+				}
+				catch
+				{
+				}
+				try
+				{
 					this.drawUnitDestinationEnemies = bool.Parse(file["OptionsDrawing"]["chkUnitDestinationEnemies"]);
 				}
 				catch
@@ -1614,6 +1633,7 @@ namespace maphack_external_directx
 		private static extern int SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 		private void tmrRefreshRate_Tick(object sender, EventArgs e)
 		{
+			((System.Windows.Forms.Timer)sender).Interval = MainWindow.HUDRefreshRate;
 			if (this._HUDType != HUDType.Info && (!_2csAPI.InGame() || _2csAPI.Player.LocalPlayer.victoryStatus != VictoryStatus.Playing))
 			{
 				base.Hide();
@@ -1625,9 +1645,16 @@ namespace maphack_external_directx
 				base.Show();
 				this.frame.Show();
 			}
-			if (!this.pause)
+
+			try
 			{
-				try
+				int CL;
+				if(!this.device.CheckCooperativeLevel(out CL) && CL == (int)ResultCode.DeviceNotReset)
+				{
+					CreateOrResetDevice();
+					this.device.CheckCooperativeLevel(out CL);
+				}
+				if (!this.pause && CL == (int)ResultCode.Success)
 				{
 					this.device.Clear(ClearFlags.Target, Color.FromArgb(0, 1, 1, 1), 0f, 0);
 					this.device.BeginScene();
@@ -1636,19 +1663,19 @@ namespace maphack_external_directx
 					this.device.Present();
 					FailedFrames = 0;
 				}
-				catch(Exception ex)
-				{
-					if(++FailedFrames >= 100)
-						WT.ReportCrash(ex, null);
+			}
+			catch(Exception ex)
+			{
+				if(++FailedFrames >= 20)
+					WT.ReportCrash(ex, null);
 
-					try
-					{
-						CreateOrResetDevice();
-					}
-					catch(Exception ex2)
-					{
-						WT.ReportCrash(ex, null);
-					}
+				try
+				{
+					CreateOrResetDevice();
+				}
+				catch(Exception ex2)
+				{
+					WT.ReportCrash(ex, null);
 				}
 			}
 		}
