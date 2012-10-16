@@ -195,6 +195,7 @@
     <Compile Include="maphack_external_directx\MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="maphack_external_directx\MapHUDProcessing.cs" />
     <Compile Include="maphack_external_directx\Options.cs">
       <SubType>Form</SubType>
     </Compile>

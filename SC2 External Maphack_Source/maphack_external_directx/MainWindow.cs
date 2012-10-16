@@ -43,7 +43,25 @@ namespace maphack_external_directx
 		public static int dgvHeight = 0x16;
 		public static bool draw = false;
 		public static bool got_local = false;
-		public static int HUDRefreshRate = 500;
+
+		private static int _HUDRefreshRate = 50;
+		public static int HUDRefreshRate
+		{
+			get
+			{
+				return _HUDRefreshRate;
+			}
+			set
+			{
+				if (value <= 0)
+					_HUDRefreshRate = 1;
+				else if (value > 60000)
+					_HUDRefreshRate = 50;
+				else
+					_HUDRefreshRate = value;
+			}
+		}
+
 		public static bool ingame = false;
 		public static uint localplayer = 0;
 		public static int localteam = -1;
@@ -282,7 +300,7 @@ namespace maphack_external_directx
 			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
 			false, false, false, false, false, false, false, false, false, false, false
 		 };
-		public static int UpdateInfoDelay = 500;
+		public static int UpdateInfoDelay = 50;
 		public static float[] x_coords = new float[0x4000];
 		public static float[] x_coordsDest = new float[0x4000];
 		public static float[] y_coords = new float[0x4000];
@@ -498,6 +516,8 @@ namespace maphack_external_directx
 					TargetFilter unitFlags = unit.targetFilterFlags;
 					string unitID = unit.textID;
 					uint unitOwner = unit.playerNumber;
+					if (unitOwner >= 16)
+						unitOwner = 0;
 					int unitType = (int)unit.unitType;
 
 					lock (MainWindow.buildings)
@@ -848,7 +868,7 @@ namespace maphack_external_directx
 			// tmrMain
 			// 
 			this.tmrMain.Enabled = true;
-			this.tmrMain.Interval = 1000;
+			this.tmrMain.Interval = 500;
 			this.tmrMain.Tick += new System.EventHandler(this.tmrMain_Tick);
 			// 
 			// tmrUpdateStatus
@@ -991,7 +1011,7 @@ namespace maphack_external_directx
 		{
 			foreach (DirectX_HUDs ds in HUDs)
 			{
-				if (ds != null)
+				if (ds != null && !ds.IsDisposed && !ds.Disposing)
 				{
 					ds.pause = true;
 				}
@@ -1005,7 +1025,7 @@ namespace maphack_external_directx
 			}
 			foreach (DirectX_HUDs ds2 in HUDs)
 			{
-				if (ds2 != null)
+				if (ds2 != null && !ds2.IsDisposed && !ds2.Disposing)
 				{
 					ds2.pause = false;
 					ds2.Visible = true;
@@ -1217,12 +1237,10 @@ namespace maphack_external_directx
 					{
 						this.GetLocalPlayer();
 					}
-					else
-					{
-						this.UpdateMapSize();
-						this.GetPlayers();
-						this.GetUnits();
-					}
+					
+					this.UpdateMapSize();
+					this.GetPlayers();
+					this.GetUnits();
 				}
 			}
 
@@ -1236,7 +1254,7 @@ namespace maphack_external_directx
 			long freq;
 			Imports.QueryPerformanceFrequency(out freq);
 
-			if(RefreshLock.TryEnterWriteLock(500))
+			if(RefreshLock.TryEnterWriteLock(100))
 			{
 				if (!Refreshes.ContainsKey(type))
 				{

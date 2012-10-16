@@ -67,18 +67,18 @@ namespace Data
 
 		public float healthRegenDelay;
 		public float healthRegenRate;
-		public float currentHealth;
-		public float maxHealth;
+		public fixed32 currentHealth;
+		public fixed32 maxHealth;
 
 		public float shieldRegenDelay;
 		public float shieldRegenRate;
-		public float currentShield;
-		public float maxShield;
+		public fixed32 currentShield;
+		public fixed32 maxShield;
 
 		public float energyRegenDelay;
 		public float energyRegenRate;
-		public float energyDamage;
-		public float maxEnergy;
+		public fixed32 energyDamage;
+		public fixed32 maxEnergy;
 
 		public string status;
 		public List<QueueItem> currentQueueItem;
@@ -234,10 +234,10 @@ namespace Data
 				{
 					string UINameAsText = null;
 					uint NameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, (int)(modelPtr << 5)), typeof(uint));
-					if (NameDataAddress != 0 && NameDataAddress < uint.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+					if (NameDataAddress != 0 && NameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
 					{	
 						uint pUINameAddress = (uint)GameData.mem.ReadMemory(NameDataAddress + 0x1c, typeof(uint));
-						if (pUINameAddress != 0 && pUINameAddress < uint.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+						if (pUINameAddress != 0 && pUINameAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
 						{
 							uint UINameLength = (uint)GameData.mem.ReadMemory(pUINameAddress + 0x8, typeof(uint));
 							uint UINameAddress = pUINameAddress + 0x10;
@@ -269,7 +269,7 @@ namespace Data
 				{
 					string NameAsText = null;
 					uint NameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, (int)(modelPtr << 5)), typeof(uint));
-					if (NameDataAddress != 0 && NameDataAddress < uint.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+					if (NameDataAddress != 0 && NameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
 					{
 						uint NameLength = (uint)GameData.mem.ReadMemory(NameDataAddress, typeof(uint));
 						if (NameLength > 10 && NameLength < 1024) //it needs an upper limit incase the length is garbage.
@@ -298,7 +298,7 @@ namespace Data
 				return _minimapRadius;
 			}
 		}
-		public float timeScale
+		public fixed32 timeScale
 		{
 			get
 			{
@@ -446,7 +446,7 @@ namespace Data
 			}
 		}
 
-		public float currentEnergy
+		public fixed32 currentEnergy
 		{
 			get
 			{
@@ -456,7 +456,7 @@ namespace Data
 				return ReturnVal;
 			}
 		}
-		public float shieldDamage
+		public fixed32 shieldDamage
 		{
 			get
 			{
@@ -466,7 +466,7 @@ namespace Data
 				return ReturnVal;
 			}
 		}
-		public float healthDamage
+		public fixed32 healthDamage
 		{
 			get
 			{
@@ -477,7 +477,7 @@ namespace Data
 			}
 		}
 		
-		public float locationX
+		public fixed32 locationX
 		{
 			get
 			{
@@ -487,7 +487,7 @@ namespace Data
 				return ReturnVal;
 			}
 		}
-		public float locationY
+		public fixed32 locationY
 		{
 			get
 			{
@@ -497,7 +497,7 @@ namespace Data
 				return ReturnVal;
 			}
 		}
-		public float locationZ
+		public fixed32 locationZ
 		{
 			get
 			{
@@ -508,7 +508,7 @@ namespace Data
 			}
 		}
 
-		public float destinationX
+		public fixed32 destinationX
 		{
 			get
 			{
@@ -518,7 +518,7 @@ namespace Data
 				return ReturnVal;
 			}
 		}
-		public float destinationY
+		public fixed32 destinationY
 		{
 			get
 			{
@@ -528,7 +528,7 @@ namespace Data
 				return ReturnVal;
 			}
 		}
-		public float destinationZ
+		public fixed32 destinationZ
 		{
 			get
 			{
@@ -539,7 +539,7 @@ namespace Data
 			}
 		}
 
-		public float destination2X
+		public fixed32 destination2X
 		{
 			get
 			{
@@ -549,7 +549,7 @@ namespace Data
 				return ReturnVal;
 			}
 		}
-		public float destination2Y
+		public fixed32 destination2Y
 		{
 			get
 			{
@@ -571,7 +571,7 @@ namespace Data
 			}
 		}
 
-		public float rotation
+		public fixed32 rotation
 		{
 			get
 			{
@@ -581,7 +581,7 @@ namespace Data
 				return ReturnVal;
 			}
 		}
-		public float rotationX
+		public fixed32 rotationX
 		{
 			get
 			{
@@ -591,7 +591,7 @@ namespace Data
 				return ReturnVal;
 			}
 		}
-		public float rotationY
+		public fixed32 rotationY
 		{
 			get
 			{

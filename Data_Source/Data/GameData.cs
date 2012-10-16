@@ -503,7 +503,7 @@ namespace Data
 		{
 			get
 			{
-				if (_mem == null)
+				if (_mem == null || _mem.m_lpHandle == IntPtr.Zero)
 				{
 					_mem = new ReadWriteMemory(SC2Handle);
 				}
@@ -669,6 +669,8 @@ namespace Data
 					if (processesByName.Length != 0)
 					{
 						_SC2Process = processesByName[processesByName.Length - 1];
+						_SC2Handle = IntPtr.Zero;
+						_mem = null;
 					}
 				}
 				return _SC2Process;
@@ -679,15 +681,17 @@ namespace Data
 		{
 			get
 			{
-				if ((_SC2Version == null) && (SC2Process != null))
+				if (_SC2Version == null && SC2Process != null && !SC2Process.HasExited)
 				{
 					try
 					{
 						_SC2Version = SC2Process.MainModule.FileVersionInfo.FileVersion;
 					}
-					catch(System.ComponentModel.Win32Exception)
+					catch(Exception ex)
 					{
 						_SC2Version = null;
+						if (!(ex is System.ComponentModel.Win32Exception) && !(ex is NullReferenceException))
+							throw ex;
 					}
 				}
 				if (SC2Process == null)
@@ -705,8 +709,8 @@ namespace Data
 		{
 			get
 			{
-				if (SC2Process == null || SC2Process.HasExited)
-					return 0;
+				if (SC2Process == null)
+					return -1;
 
 				if(_useTimer2)
 					return ((uint)offsets.ReadStructMember(ORNames.Timer2, ORNames.timer)) / 832f;

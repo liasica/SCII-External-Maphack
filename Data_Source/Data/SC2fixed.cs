@@ -9,61 +9,30 @@ namespace Data
 {
 	//not all of these are implemented yet.
 	
-	/*-----These are for the constructors to know that we want to give them the raw value, instead of the value of an int.-----*/
-	struct f32raw
-	{
-		public Int32 _rawData;
-		public f32raw(Int32 raw)
-		{ _rawData = raw; }
-
-		public static explicit operator f32raw(Int32 it)
-		{ return new f32raw(it); }
-	}
-
-	struct f16raw
-	{
-		public Int16 _rawData;
-		public f16raw(Int16 raw)
-		{ _rawData = raw; }
-
-		public static explicit operator f16raw(Int16 it)
-		{ return new f16raw(it); }
-	}
-
-	struct f8raw
-	{
-		public byte _rawData;
-		public f8raw(byte raw)
-		{ _rawData = raw; }
-
-		public static explicit operator f8raw(byte it)
-		{ return new f8raw(it); }
-	}
-
-	/*--------------------------------------------------------*/
-	
 	[StructLayout(LayoutKind.Explicit, Pack = 1)]
 	public struct fixed32
 	{
 		public static fixed32 MaxValue
-		{ get { return new fixed32(new f32raw(Int32.MaxValue)); } }
+		{ get { return new fixed32(Int32.MaxValue, true); } }
 		public static fixed32 MinValue
-		{ get { return new fixed32(new f32raw(Int32.MinValue)); } }
+		{ get { return new fixed32(Int32.MinValue, true); } }
 		public static fixed32 Precision
-		{ get { return new fixed32(new f32raw(1)); } }
+		{ get { return new fixed32(1, true); } }
 
 		[FieldOffset(0)]
 		private Int32 _rawData;
-
-		private fixed32(f32raw it)
-		{ _rawData = it._rawData; }
 
 		public fixed32(float it)
 		{ _rawData = (Int32)Math.Round(it * 4096); } //Rounding is necessary becaus we all know that 1.999999 is really 2.0, not 1.999755.
 		public fixed32(double it)
 		{ _rawData = (Int32)Math.Round(it * 4096); } //Rounding is necessary becaus we all know that 1.999999 is really 2.0, not 1.999755.
-		public fixed32(Int32 it)
-		{ _rawData = (Int32)(it * 4096); }
+		public fixed32(Int32 it, bool raw = false)
+		{
+			if (raw)
+				_rawData = it;
+			else
+				_rawData = (Int32)(it * 4096);
+		}
 		public fixed32(UInt32 it)
 		{ _rawData = (Int32)(it * 4096); }
 		public fixed32(fixed32 it)
@@ -103,9 +72,9 @@ namespace Data
 		{ return x._rawData <= y._rawData; }
 
 		public static fixed32 operator +(fixed32 x, fixed32 y)
-		{ return new fixed32(new f32raw(x._rawData + y._rawData)); }
+		{ return new fixed32(x._rawData + y._rawData, true); }
 		public static fixed32 operator -(fixed32 x, fixed32 y)
-		{ return new fixed32(new f32raw(x._rawData - y._rawData)); }
+		{ return new fixed32(x._rawData - y._rawData, true); }
 		public static fixed32 operator *(fixed32 x, fixed32 y)
 		{ return new fixed32((double)x * (double)y); }
 		public static fixed32 operator /(fixed32 x, fixed32 y)

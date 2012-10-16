@@ -80,20 +80,11 @@ namespace Data
 	public class OffsetReader
 	{
 		private Type StringType = typeof(string);
-		private ReadWriteMemory _mem;
 		private ReadWriteMemory mem
 		{
 			get
 			{
-				if (!GameData.SC2Opened)
-				{
-					_mem = new ReadWriteMemory(0);
-				}
-				else if (_mem == null || _mem.m_lpHandle == IntPtr.Zero)
-				{
-					_mem = new ReadWriteMemory(GameData.SC2Handle);
-				}
-				return _mem;
+				return GameData.mem;
 			}
 		}
 
@@ -116,11 +107,12 @@ namespace Data
 
 		public bool CheckVersion()
 		{
-			return GameData.SC2Version == Version;
+			return GameData.SC2Version == Version || GameData.SC2Version == "SC2 Closed";
 		}
 
 		public void UpdateAddresses()
 		{
+			string Version = GameData.SC2Version; // for debugging. This seems to trigger randomly, but GameData.SC2Version is always correct by the time I look.
 			UpdateFile.Update(_Filename);
 		}
 

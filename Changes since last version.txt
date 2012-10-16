@@ -1,0 +1,28 @@
+fixed32:
+*All traces of f32Raw have been removed. That constructor was replaced by an optional argument to the Int32 constructor.
+
+GameData:
+*Several places changed so mem gets reset after restarting SC2
+*Exception handling changed so the program won't crash if it tries to read SC2Version too early.
+*SecondsElapsed now returns -1 if the process isn't open. It also does not check if SC2 has exited for performance reasons.
+
+OffsetReader:
+*Now uses GameData.mem instead of its own.
+*CheckVersion now returns true if GameData.SC2Version is "SC2 Closed".
+
+Unit:
+*When getting name or textID, addresses are checked against Int32.MaxValue instead of uint.MaxValue. Hopefully this will prevent overflows.
+*The type of many properties has been changed from float to fixed32 to minimize unnecessary conversion.
+
+DirectX_HUDs:
+*The program will exit after too many frames have failed and the crash is reported.
+*Exceptions while resetting the device will now be reported before reporting the exception that caused the reset.
+
+MainWindow:
+*Default Data and HUD refresh rates changed from 500 to 50.
+*HUD refresh rate now limited to between 1 and 60000 inclusive. Over 60000 resets to the default of 50.
+*Default GUI refresh rate changed from 1000 to 500.
+*In GetUnits, unitOwner resets to 0 if it's >= 16.
+*The program now checks to make sure a HUD is not disposed before showing or hiding it.
+*The map size, players and units get updated on the first data refresh after the game starts, instead of waiting till the second.
+*In UpdateRefreshes, the timout for getting a write lock has been lowered from 500 to 100.

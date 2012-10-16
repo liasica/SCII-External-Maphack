@@ -986,6 +986,8 @@ namespace maphack_external_directx
 			float MinimumRadius = 1f / MainWindow.minimap_scale;
 			float AddToRadius = 1f / MainWindow.minimap_scale;
 
+			//MapHUDProcessing.Process(MainWindow.units);
+
 			foreach (Unit unit in MainWindow.units)
 			{
 				if (!unit.isAlive || (unit.targetFilterFlags & TargetFilter.Missile) != 0)
@@ -1221,7 +1223,7 @@ namespace maphack_external_directx
 			// 
 			// tmrRefreshRate
 			// 
-			this.tmrRefreshRate.Interval = 500;
+			this.tmrRefreshRate.Interval = 50;
 			this.tmrRefreshRate.Tick += new System.EventHandler(this.tmrRefreshRate_Tick);
 			// 
 			// DirectX_HUDs
@@ -1666,8 +1668,11 @@ namespace maphack_external_directx
 			}
 			catch(Exception ex)
 			{
-				if(++FailedFrames >= 20)
+				if (++FailedFrames >= 20)
+				{
 					WT.ReportCrash(ex, null);
+					Application.Exit();
+				}
 
 				try
 				{
@@ -1675,6 +1680,7 @@ namespace maphack_external_directx
 				}
 				catch(Exception ex2)
 				{
+					WT.ReportCrash(ex2, null);
 					WT.ReportCrash(ex, null);
 				}
 			}
