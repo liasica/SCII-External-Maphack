@@ -130,6 +130,20 @@ namespace maphack_external_directx
 			}
 		}
 
+		public void Reset()
+		{
+			FreezeTS = false;
+			FreezeMins = -1;
+			FreezeGas = -1;
+			FreezeTerra = -1;
+			FreezeCustom = -1;
+
+			FreezeSupply = -1;
+			DDMultiplier = 1;
+			DTMultiplier = 1;
+			TSMultiplier = 1;
+		}
+
 		public void UpdatePlayers()
 		{
 			for (int i = 0; i < 1000 && MainWindow.players.Count == 0 && _2csAPI.InGame(); i++)
@@ -167,6 +181,7 @@ namespace maphack_external_directx
 				Ingame = false;
 				buttonApply.Enabled = false;
 				buttonApply.Text = "Cannot use out of game.";
+				Reset();
 				UpdatePlayers();
 				return;
 			}

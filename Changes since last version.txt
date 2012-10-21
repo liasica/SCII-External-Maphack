@@ -1,5 +1,19 @@
+*GLOBAL CHANGES*
+*This file was added.
+
+*CHANGES TO MODULES*
+Data:
+*Selections have been fixed (but not yet tested). Big thanks to MyTeeWun for much of the new info.
+
+2cs-API:
+*Many things related to selections have been changed to work with the new selection system.
+
+SC2 External Maphack:
+*Started to remove some of the unused variables in MainWindow and DirectX_HUDs.
+
+*CHANGES AFFECTING INDIVIDUAL CLASSES*
 fixed32:
-*All traces of f32Raw have been removed. That constructor was replaced by an optional argument to the Int32 constructor.
+*f32Raw has been removed. That constructor was replaced by an optional argument to the Int32 constructor.
 
 GameData:
 *Several places changed so mem gets reset after restarting SC2
@@ -9,16 +23,25 @@ GameData:
 OffsetReader:
 *Now uses GameData.mem instead of its own.
 *CheckVersion now returns true if GameData.SC2Version is "SC2 Closed".
+*Several functions for handling array elements now call the struct functions with the address of the element.
+*Some other changes to support arrays of basic types in structs.
 
 Unit:
 *When getting name or textID, addresses are checked against Int32.MaxValue instead of uint.MaxValue. Hopefully this will prevent overflows.
 *The type of many properties has been changed from float to fixed32 to minimize unnecessary conversion.
 
+Player:
+*cameraPitch is implemented.
+*Selections are now implemented again.
+
 DirectX_HUDs:
-*The program will exit after too many frames have failed and the crash is reported.
+*Unit destinations will no longer be drawn for units with no current command.
+*The map hud has been changed a bit to use different layering of units.
+*The program will now exit after too many frames have failed and the crash is reported.
 *Exceptions while resetting the device will now be reported before reporting the exception that caused the reset.
 
 MainWindow:
+*The time in the status bar now correctly shows minutes when the time is over an hour.
 *Default Data and HUD refresh rates changed from 500 to 50.
 *HUD refresh rate now limited to between 1 and 60000 inclusive. Over 60000 resets to the default of 50.
 *Default GUI refresh rate changed from 1000 to 500.
@@ -26,3 +49,16 @@ MainWindow:
 *The program now checks to make sure a HUD is not disposed before showing or hiding it.
 *The map size, players and units get updated on the first data refresh after the game starts, instead of waiting till the second.
 *In UpdateRefreshes, the timout for getting a write lock has been lowered from 500 to 100.
+
+Trainer:
+*Added the Reset function to stop things from being frozen after a game ends and another is started.
+
+Options:
+*Added an error messagee when trying to use the Auto-size minimap option out of a game.
+
+WT:
+*The program will now close after reporting an exception. This will prevent endless loops of error messages.
+
+*CHANGES TO OFFSETS.XML*
+*Added an address to the AccountNumber struct. This is the address of the map-maker's account number.
+*Added the CurrentSelections and Player Groups array, and the ControlGroup and Selection structs.

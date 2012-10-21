@@ -409,7 +409,8 @@ namespace PatternScanner
 					if (Address != OldAddress)
 					{
 						byte[] temp = this.Process.ReadBytes(Address, 40);
-						if (temp[0x08] == temp[0x18] && temp[0x09] == temp[0x19]
+						if (temp != null
+						 && temp[0x08] == temp[0x18] && temp[0x09] == temp[0x19]
 						 && temp[0x0c] == temp[0x1c] && temp[0x0d] == temp[0x1d]
 						 && temp[0x10] == temp[0x20] && temp[0x11] == temp[0x21]
 						 && temp[0x14] == temp[0x24] && temp[0x15] == temp[0x25])

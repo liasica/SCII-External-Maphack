@@ -146,7 +146,7 @@ namespace _2cs_API
 			return FindUnit(unitType, Player.LocalPlayerNumber);
 		}
 
-		public static Unit FindUnit(int unitID)
+		public static Unit FindUnit(uint unitID)
 		{
 			return GameData.getUnitData().Find(u => u.ID == unitID);
 		}
@@ -342,7 +342,6 @@ namespace _2cs_API
 		{
 			UnitType workerType = WorkerType;
 			uint localPlayerNumber = Player.LocalPlayerNumber;
-			GameData.GetPlayerSelections((int)localPlayerNumber);
 			return GameData.getUnitData().FindAll(p => ((p.playerNumber == localPlayerNumber) && (p.unitType == (ushort)workerType)) && (p.state != UnitStateOld.WorkerBuilding));
 		}
 
@@ -431,7 +430,7 @@ namespace _2cs_API
 			return GetGameHotkey(gameHotkey);
 		}
 
-		public static bool UnitOutOfTown(int unitID)
+		public static bool UnitOutOfTown(uint unitID)
 		{
 			double num = 25.0;
 			Unit unit = FindUnit(unitID);
@@ -446,7 +445,7 @@ namespace _2cs_API
 			return false;
 		}
 
-		public static bool UnitOutOfTown(int unitID, uint playersTown)
+		public static bool UnitOutOfTown(uint unitID, uint playersTown)
 		{
 			double num = 25.0;
 			Unit unit = FindUnit(unitID);
@@ -467,12 +466,12 @@ namespace _2cs_API
 			{
 				try
 				{
-					ControlGroup currentSelection = GameData.GetPlayerSelections(Player.LocalPlayer).currentSelection;
-					if (currentSelection.selected_unit_ids.Count == 0)
+					Selection currentSelection = PlayerSelections.LocalSelections.CurrentSelection;
+					if (currentSelection.SelectedUnitIDs.Count == 0)
 					{
 						return new Unit(0);
 					}
-					return FindUnit(currentSelection.selected_unit_ids[0]);
+					return FindUnit(currentSelection.SelectedUnitIDs[0]);
 				}
 				catch
 				{

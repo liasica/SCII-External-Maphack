@@ -135,9 +135,24 @@ namespace Data
 			return _Structs[Struct].members[Member].offset;
 		}
 
+		public int GetStructMemberAddress(ORNames Struct, ORNames Member, int Address = 0)
+		{
+			if (Address <= 0)
+				Address = GetStructAddress(Struct);
+			return Address + GetStructMemberOffset(Struct, Member);
+		}
+
 		public int GetStructMemberSize(ORNames Struct, ORNames Member)
 		{
-			return _Structs[Struct].members[Member].size;
+			int Size = _Structs[Struct].members[Member].size;
+			if (_Structs[Struct].members[Member].count > 0)
+				return Size * _Structs[Struct].members[Member].count;
+			return Size;
+		}
+
+		public int GetStructMemberCount(ORNames Struct, ORNames Member)
+		{
+			return _Structs[Struct].members[Member].count;
 		}
 
 		public ORNames GetArrayType(ORNames Array)
@@ -182,58 +197,90 @@ namespace Data
 			return GetStructMemberSize(GetArrayType(Array), Member);
 		}
 
-		public Object ReadArrayElementMember(ORNames Array, int Index, ORNames Member)
+		public int GetArrayElementMemberCount(ORNames Array, ORNames Member)
 		{
-			if (GetArrayElementMemberType(Array, Member) == StringType)
-			{
-				int Length = GetArrayElementMemberSize(Array, Member);
-				byte[] buffer = new byte[Length];
-				mem.ReadMemory((IntPtr)GetArrayElementMemberAddress(Array, Index, Member), Length, out buffer);
-				return System.Text.Encoding.UTF8.GetString(buffer).TrimEnd('\0');
-			}
-			else
-				return mem.ReadMemory((uint)GetArrayElementMemberAddress(Array, Index, Member), GetArrayElementMemberType(Array, Member));
+			return GetStructMemberCount(GetArrayType(Array), Member);
 		}
 
-		public bool WriteArrayElementMember(ORNames array, int Index, ORNames Member, Object NewValue)
+		public byte[] ReadArrayElement(ORNames Array, int Index)
 		{
-			if (GetArrayElementMemberType(array, Member) == StringType)
-			{
-				int Length = GetArrayElementMemberSize(array, Member);
-				byte[] StringAsBytes = Encoding.UTF8.GetBytes((string)NewValue);
-				byte[] buffer = new byte[Length];
-				Array.Copy(StringAsBytes, buffer, StringAsBytes.Length < buffer.Length - 1 ? StringAsBytes.Length : buffer.Length - 1);
-				buffer[buffer.Length - 1] = 0;
+			return ReadStruct(GetArrayType(Array), GetArrayElementAddress(Array, Index));
+		}
 
-				return mem.WriteMemory((uint)GetArrayElementMemberAddress(array, Index, Member), buffer.Length, ref buffer);
-			}
-			else
-			{
-				byte[] buffer = ReadWriteMemory.RawSerialize(NewValue);
-				return mem.WriteMemory((uint)GetArrayElementMemberAddress(array, Index, Member), buffer.Length, ref buffer);
-			}
+		public bool WriteArrayElement(ORNames Array, int Index, byte[] Data)
+		{
+			return WriteStruct(GetArrayType(Array), Data, GetArrayElementAddress(Array, Index));
+		}
+
+		public Object ReadArrayElementMember(ORNames Array, int Index, ORNames Member)
+		{
+			return ReadStructMember(GetArrayType(Array), Member, GetArrayElementAddress(Array, Index));
+		}
+
+		public bool WriteArrayElementMember(ORNames Array, int Index, ORNames Member, Object NewValue)
+		{
+			return WriteStructMember(GetArrayType(Array), Member, NewValue, GetArrayElementAddress(Array, Index));
+		}
+
+		public byte[] ReadStruct(ORNames Struct, int Address = 0)
+		{
+			if(Address <= 0)
+				Address = GetStructAddress(Struct);
+			int Size = GetStructSize(Struct);
+
+			byte[] buffer = new byte[Size];
+			mem.ReadMemory((IntPtr)Address, buffer.Length, out buffer);
+			return buffer;
+		}
+
+		public bool WriteStruct(ORNames Struct, byte[] Data, int Address = 0)
+		{
+			if(Address <= 0)
+				Address = GetStructAddress(Struct);
+			int Size = GetStructSize(Struct);
+
+			if (Data.Length != Size)
+				throw new OverflowException("OffsetReader.WriteStruct: Data.Length != Size. Data.Length: " + Data.Length.ToString() + " Size: " + Size.ToString());
+
+			return mem.WriteMemory((IntPtr)Address, Data.Length, ref Data);
 		}
 
 		public Object ReadStructMember(ORNames Struct, ORNames Member, int Address = 0)
 		{
-			if (Address == 0)
+			if (Address <= 0)
 				Address = GetStructAddress(Struct);
-
-			if (GetStructMemberType(Struct, Member) == StringType)
+			
+			
+			Type type = GetStructMemberType(Struct, Member);
+			if (type == StringType)
 			{
 				int Length = GetStructMemberSize(Struct, Member);
 				byte[] buffer = new byte[Length];
-				mem.ReadMemory((IntPtr)(GetStructMemberOffset(Struct, Member) + Address), Length, out buffer);
+				mem.ReadMemory((IntPtr)(GetStructMemberOffset(Struct, Member) + Address), buffer.Length, out buffer);
 				return System.Text.Encoding.UTF8.GetString(buffer).TrimEnd('\0');
 			}
-			else
+
+			int Count = GetStructMemberCount(Struct, Member);
+			if (Count <= 0)
 				return mem.ReadMemory((uint)(GetStructMemberOffset(Struct, Member) + Address), GetStructMemberType(Struct, Member));
+
+			int Size = GetStructMemberSize(Struct, Member);
+			byte[] Data = new byte[Size];
+			mem.ReadMemory((IntPtr)Address, Data.Length, out Data);
+			Array ReturnVal = Array.CreateInstance(type, Count);
+
+			for (int i = 0; i < Count; i++)
+			{
+				ReturnVal.SetValue(ReadWriteMemory.RawDeserialize(Data, i * Size, type), i);
+			}
+			return ReturnVal;
 		}
 
 		public Object ReadStructMember(ORNames Struct, ORNames Member, byte[] Data)
 		{
 			int Offset = GetStructMemberOffset(Struct, Member);
 			int Size = GetStructMemberSize(Struct, Member);
+			int Count = GetStructMemberCount(Struct, Member);
 			Type type = GetStructMemberType(Struct, Member);
 
 			if (Data == null)
@@ -256,44 +303,91 @@ namespace Data
 			}
 
 			if (type == StringType)
-			{
 				return System.Text.Encoding.UTF8.GetString(Data, Offset, Size).TrimEnd('\0');
-			}
-			else
+			if(Count <= 0)
 				return ReadWriteMemory.RawDeserialize(Data, Offset, type);
+
+			Array ReturnVal = Array.CreateInstance(type, Count);
+			for (int i = 0; i < Count; i++)
+			{
+				ReturnVal.SetValue(ReadWriteMemory.RawDeserialize(Data, Offset + i * Size / Count, type), i);
+			}
+			return ReturnVal;
 		}
 
 		public bool WriteStructMember(ORNames Struct, ORNames Member, Object NewValue, int Address = 0)
 		{
-			if (Address == 0 )
+			if (Address <= 0 )
 				Address = GetStructAddress(Struct);
+			int Offset = GetStructMemberOffset(Struct, Member);
+			int Size = GetStructMemberSize(Struct, Member);
+			int Count = GetStructMemberCount(Struct, Member);
+			Type type = GetStructMemberType(Struct, Member);
+			if (Count <= 0 && NewValue.GetType() != type)
+				throw new InvalidCastException("OffsetReader.WriteStructMember: NewValue is not of the expected type. NewValue type: " + NewValue.GetType().ToString() + " Expected type: " + type.ToString());
 
-			if (GetStructMemberType(Struct, Member) == StringType)
+			if (type == StringType)
 			{
-				int Length = GetStructMemberSize(Struct, Member);
+				int Length = Size;
 				byte[] StringAsBytes = Encoding.UTF8.GetBytes((string)NewValue);
 				byte[] buffer = new byte[Length];
 				Array.Copy(StringAsBytes, buffer, StringAsBytes.Length < buffer.Length - 1 ? StringAsBytes.Length : buffer.Length - 1);
 				buffer[buffer.Length - 1] = 0;
-
-				return mem.WriteMemory((uint)(GetStructMemberOffset(Struct, Member) + Address), buffer.Length, ref buffer);
+				return mem.WriteMemory((uint)(Offset + Address), buffer.Length, ref buffer);
+			}
+			if (Count <= 0)
+			{
+				byte[] buffer = ReadWriteMemory.RawSerialize(NewValue);
+				return mem.WriteMemory((uint)(Offset + Address), buffer.Length, ref buffer);
 			}
 			else
 			{
-				byte[] buffer = ReadWriteMemory.RawSerialize(NewValue);
-				return mem.WriteMemory((uint)(GetStructMemberOffset(Struct, Member) + Address), buffer.Length, ref buffer);
+				Array NewArray = (Array)NewValue;
+				byte[] buffer = new byte[Size];
+				for (int i = 0; i < Count && i < NewArray.Length; i++)
+				{
+					ReadWriteMemory.RawSerialize(NewArray.GetValue(i)).CopyTo(buffer, i * Size / Count);
+				}
+				return mem.WriteMemory((uint)(Offset + Address), buffer.Length, ref buffer);
 			}
 		}
 
-		public byte[] ReadArrayElement(ORNames Array, int Index)
+		public void WriteStructMember(ORNames Struct, ORNames Member, Object NewValue, ref byte[] Data)
 		{
-			int Address = GetArrayElementAddress(Array, Index);
-			int Size = GetArrayElementSize(Array);
-			
-			byte[] buffer = new byte[Size];
-			mem.ReadMemory((IntPtr)Address, Size, out buffer);
-			return buffer;
-		}
+			int Offset = GetStructMemberOffset(Struct, Member);
+			int Size = GetStructMemberSize(Struct, Member);
+			int Count = GetStructMemberCount(Struct, Member);
+			Type type = GetStructMemberType(Struct, Member);
+			if (Count <= 0 && NewValue.GetType() != type)
+				throw new InvalidCastException("OffsetReader.WriteStructMember: NewValue is not of the expected type. NewValue type: " + NewValue.GetType().ToString() + " Expected type: " + type.ToString());
+
+			if (type == StringType)
+			{
+				int Length = Size;
+				byte[] StringAsBytes = Encoding.UTF8.GetBytes((string)NewValue);
+				int CopyLength = StringAsBytes.Length < Length - 1 ? StringAsBytes.Length : Length - 1;
+				Array.Copy(StringAsBytes, 0, Data, Offset, CopyLength);
+				Data[Offset + CopyLength] = 0;
+				return;
+			}
+			if (Count <= 0)
+			{
+				byte[] buffer = ReadWriteMemory.RawSerialize(NewValue);
+				buffer.CopyTo(Data, Offset);
+				return;
+			}
+			else
+			{
+				Array NewArray = (Array)NewValue;
+				byte[] buffer = new byte[Size];
+				for (int i = 0; i < Count && i < NewArray.Length; i++)
+				{
+					ReadWriteMemory.RawSerialize(NewArray.GetValue(i)).CopyTo(buffer, i * Size / Count);
+				}
+				buffer.CopyTo(Data, Offset);
+				return;
+			}
+		}	
 		
 		public OffsetReader(string Filename)
 		{
@@ -335,6 +429,8 @@ namespace Data
 		{ get; set; }
 		public int size
 		{ get; set; }
+		public int count
+		{ get; set; }
 		public int offset
 		{ get; set; }
 		
@@ -362,6 +458,10 @@ namespace Data
 			int Size = ImprovedParse.Parse(data.Attribute("Size").Value);
 			string Type = data.Attribute("Type").Value;
 			size = Size;
+			if (data.Attribute("Count") != null)
+				count = ImprovedParse.Parse(data.Attribute("Count").Value);
+			else
+				count = -1;
 			switch (Type)
 			{
 				case "Signed":

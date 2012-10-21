@@ -127,179 +127,6 @@ namespace maphack_external_directx
 		public static HashSet<string> buildings = new HashSet<string>();
 		public static Dictionary<string, string> unit_names = new Dictionary<string, string>();
 
-		public static int[] unit_count_index = new int[] { 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 
-			-1, -1, 3, 4, 5, -1, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 
-			0x10, 0x11, 0x12, 0x13, 20, 0x15, 0x16, 0x17, -1, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 30, 
-			0x1f, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 40, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 
-			0x2f, 0x30, 0x31, 50, 0x33, 0x34, -1, 0x35, 0x36, 0x37, 0x38, 0x39, 0x3a, 0x3b, 60, 0x3d, 
-			0x3e, 0x3f, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 70, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 
-			0x4e, -1, 0x4f, 80, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57, 0x58, 0x59, 90, 0x5b, 0x5c, 
-			0x5d, 0x5e, 0x5f, -1, 0x60, 0x61, 0x62, 0x63, 100, 0x65, 0x66, 0x67, 0x68, 0x69, 0x6a, 0x6b, 
-			0x6c, 0x6d, 110, 0x6f, -1, -1, -1, -1, -1, 0x70, 0x71, 0x72, 0x73, 0x74, 0x75, 0x76, 
-			0x77, 120, 0x79, -1, 0x7a, 0x7b, 0x7c, 0x7d, 0x7e, 0x7f, -1, -1, -1, -1, -1, -1, 
-			-1, 0x80, -1, -1, -1, -1, -1, -1, -1, 0x81, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 
-			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-		 };
-		public static int[,] unit_counter = new int[0x10, 130];
-		public static bool[] unit_show = new bool[] { 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, true, true, true, 
-			false, false, true, true, true, false, true, true, true, true, true, true, true, true, true, true, 
-			true, true, true, true, true, true, true, true, false, true, true, true, true, true, true, true, 
-			true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, 
-			true, true, true, true, true, true, false, true, true, true, true, true, true, true, true, true, 
-			true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, 
-			true, true, true, false, true, true, true, true, true, true, true, true, true, true, true, true, 
-			true, true, true, false, true, true, true, true, true, true, true, true, true, true, true, true, 
-			true, true, true, true, false, false, false, false, false, true, true, true, true, true, true, true, 
-			true, true, true, false, true, false, true, true, true, true, false, true, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, true, true, false, true, false, false, false, true, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, 
-			false, false, false, false, false, false, false, false, false, false, false
-		 };
 		public static int UpdateInfoDelay = 50;
 		public static float[] x_coords = new float[0x4000];
 		public static float[] x_coordsDest = new float[0x4000];
@@ -499,8 +326,6 @@ namespace maphack_external_directx
 			Unit.UpdateUnits();
 			List<Unit> list = GameData.getUnitData();
 
-			int[,] numArray = new int[0x10, 130];
-
 			List<Data.Player> source = GameData.getPlayersData();
 			if ((list.Count != 0) && (source.Count != 0))
 			{
@@ -511,7 +336,7 @@ namespace maphack_external_directx
 				}
 
 				total_units = list.Count;
-				foreach(Unit unit in list)
+				foreach (Unit unit in list)
 				{
 					TargetFilter unitFlags = unit.targetFilterFlags;
 					string unitID = unit.textID;
@@ -531,7 +356,7 @@ namespace maphack_external_directx
 
 					if ((unitFlags & (TargetFilter.Missile | TargetFilter.Dead)) != 0 || unitID.StartsWith("Beacon"))
 						continue;
-					
+
 					lock (unit_pictures)
 					{
 						if (!unit_pictures.ContainsKey(unitID))
@@ -556,21 +381,6 @@ namespace maphack_external_directx
 					{
 						newUnitCounts[unitOwner].Add(unitID, 1);
 					}
-
-					if (unitType < unit_count_index.Length && unit_count_index[unitType] != -1)
-                    {
-						try
-						{
-							numArray[(int)unitOwner,  unit_count_index[unitType]]++;
-						}
-						catch
-						{
-						}
-					}
-				}
-				lock(unit_counter)
-				{
-					unit_counter = numArray;
 				}
 				lock (unit_counts)
 				{
@@ -1353,7 +1163,7 @@ namespace maphack_external_directx
 			{
 				decimal seconds = (decimal)GameData.SecondsElapsed;
 				int hours = (int)seconds / 3600;
-				int minutes = (int)seconds / 60;
+				int minutes = (int)((seconds / 60) % 60);
 				seconds %= 60;
 				string time = (hours > 0 ? hours.ToString() + ":" : "") + minutes.ToString(hours > 0 ? "D2" : "D") + ":" + seconds.ToString("00.00");
 				this.message = _2csAPI.InGame() ? "In Game: " + time : ("SC2 Version " + GameData.SC2Version);

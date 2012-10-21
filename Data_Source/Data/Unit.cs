@@ -27,6 +27,33 @@ namespace Data
 			Locks.Units.ExitWriteLock();
 		}
 
+		public static Unit GetUnit(uint ID)
+		{
+			ushort Index = (ushort)((ID >> 16) / 4);
+			ushort TimesUsed = (ushort)(ID & 0xFFFF);
+			Unit ReturnVal = null;
+
+			Locks.Units.EnterUpgradeableReadLock();
+			if (Units.ContainsKey(Index))
+				ReturnVal = Units[Index];
+			else
+			{
+				ReturnVal = new Unit(Index);
+				if (ReturnVal.modelPtr != 0 && ReturnVal.isAlive)
+				{
+					Locks.Units.EnterWriteLock();
+					Units.Add(Index, ReturnVal);
+					Locks.Units.ExitWriteLock();
+				}
+			}
+			Locks.Units.ExitUpgradeableReadLock();
+
+			if (ReturnVal.timesUsed != TimesUsed)
+				ReturnVal = null;
+
+			return ReturnVal;
+		}
+
 		public static void UpdateUnits()
 		{
 			if(Locks.Units.TryEnterWriteLock(250))

@@ -45,18 +45,16 @@ namespace Data
 				string str2 =  Encoding.UTF8.GetString(buffer).Trim();
 				if (str2 != null)
 				{
-					if (!(str2 == "Zerg"))
-					{
-						if (str2 == "Prot")
-							_race = Race.Protoss;
-						else if (str2 == "Terr")
-							_race = Race.Terran;
-					}
-					else
+					if (str2 == "Zerg")
 						_race = Race.Zerg;
+					else if (str2 == "Prot")
+						_race = Race.Protoss;
+					else if (str2 == "Terr")
+						_race = Race.Terran;
+					else
+						_race = Race.Neutral;
 				}
 			}
-			unit_selections = new PlayerSelections();
 		}
 
 		public List<Unit> units
@@ -101,7 +99,13 @@ namespace Data
 				return (PlayerDifficulty)(byte)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.difficulty);
 			}
 		}
-		public PlayerSelections unit_selections;
+		public PlayerSelections unit_selections
+		{
+			get
+			{
+				return new PlayerSelections(number);
+			}
+		}
 		public int nameLength
 		{
 			get
@@ -300,7 +304,13 @@ namespace Data
 				return (fixed32)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.camera_distance);
 			}
 		}
-		public float cameraPitch;
+		public float cameraPitch
+		{
+			get
+			{
+				return (fixed32)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.camera_angle_of_attack);
+			}
+		}
 		public float cameraRotation
 		{
 			get

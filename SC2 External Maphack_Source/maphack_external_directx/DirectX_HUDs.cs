@@ -353,10 +353,10 @@ namespace maphack_external_directx
 			this.DrawUnitDestinations();
 
 			this.device.RenderState.ZBufferEnable = true;
-			if(this.device.RenderState.ZBufferFunction != Compare.GreaterEqual)
-				this.device.RenderState.ZBufferFunction = Compare.GreaterEqual;
+			if(this.device.RenderState.ZBufferFunction != Compare.LessEqual)
+				this.device.RenderState.ZBufferFunction = Compare.LessEqual;
 			this.device.RenderState.ZBufferWriteEnable = true;
-			this.device.Clear(ClearFlags.ZBuffer, Color.FromArgb(0, 1, 1, 1), 0.0f, 0);
+			this.device.Clear(ClearFlags.ZBuffer, Color.FromArgb(0, 1, 1, 1), 1.0f, 0);
 
 			this.DrawUnitPositionsOnMap();
 
@@ -970,7 +970,7 @@ namespace maphack_external_directx
 			Label_005A:
 				float uDX = unit.destinationX;
 				float uDY = unit.destinationY;
-				if (/*unit.commandQueuePointer != 0 && */(uDX != 0.0) && (uDY != 0.0))
+				if (unit.commandQueuePointer != 0 && (uDX != 0.0) && (uDY != 0.0))
 				{
 					this.DrawLine(unit.locationX, (MainWindow.map_height - unit.locationY), uDX, (MainWindow.map_height - uDY), Color.Yellow, true);
 				}
@@ -986,16 +986,11 @@ namespace maphack_external_directx
 			float MinimumRadius = 1f / MainWindow.minimap_scale;
 			float AddToRadius = 1f / MainWindow.minimap_scale;
 
-			//MapHUDProcessing.Process(MainWindow.units);
+			List<UnitInfo> Units = MapHUDProcessing.Process(MainWindow.units);
 
-			foreach (Unit unit in MainWindow.units)
+			foreach (UnitInfo unit in Units)
 			{
-				if (!unit.isAlive || (unit.targetFilterFlags & TargetFilter.Missile) != 0)
-				{
-					continue;
-				}
-
-				uint uOwner = unit.playerNumber;
+				int uOwner = unit.Owner;
 				if (MainWindow.player_teams[uOwner] != MainWindow.localteam && MainWindow.player_teams[uOwner] != 16)
 				{
 					if (this.drawUnitsEnemies)
@@ -1022,7 +1017,7 @@ namespace maphack_external_directx
 				}
 
 			Label_005A:
-				float Radius = unit.minimapRadius;
+				float Radius = unit.Radius;
 
 				if (Radius == 0 && !this.draw0Radius)
 					continue;
@@ -1031,43 +1026,45 @@ namespace maphack_external_directx
 					Radius = MinimumRadius;
 				Radius += AddToRadius;
 
-				float uX = unit.locationX;
-				float uY = MainWindow.map_height - unit.locationY;
-				bool uDetect = unit.detector;
-				bool uCloak = unit.cloaked;
+				float uX = unit.X;
+				float uY = MainWindow.map_height - unit.Y;
+				bool uDetect = unit.Detector;
+				bool uCloak = unit.Cloaked;
 				Color uColor = GameData.player_colors[uOwner];
+				float uDepth = unit.FinalDepth;
 
 				if (uCloak)
 				{
 					if (uDetect)
 					{
-						this.DrawRectangle(uX, uY, (Radius + AddToRadius * 2) * 2, (Radius + AddToRadius * 2) * 2, Color.Black, true, true, 108.4f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
-						this.DrawRectangle(uX, uY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Gold, true, true, 108.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
-						this.DrawRectangle(uX, uY, Radius * 2, Radius * 2, Color.Gray, true, true, 109.4f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
-						this.DrawRectangle(uX, uY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, uColor, true, true, 109.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
+						this.DrawRectangle(uX, uY, (Radius + AddToRadius * 2) * 2, (Radius + AddToRadius * 2) * 2, Color.Black, true, true, uDepth + 0.5f);
+						this.DrawRectangle(uX, uY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Gold, true, true, uDepth + 0.25f);
+						this.DrawRectangle(uX, uY, Radius * 2, Radius * 2, Color.Gray, true, true, uDepth + 0.125f);
+						this.DrawRectangle(uX, uY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, uColor, true, true, uDepth);
 					}
 					else
 					{
-						this.DrawRectangle(uX, uY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Black, true, true, 98.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
-						this.DrawRectangle(uX, uY, Radius * 2, Radius * 2, Color.Gray, true, true, 99.4f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
-						this.DrawRectangle(uX, uY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, uColor, true, true, 99.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
+						this.DrawRectangle(uX, uY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Black, true, true, uDepth + 0.5f);
+						this.DrawRectangle(uX, uY, Radius * 2, Radius * 2, Color.Gray, true, true, uDepth + 0.125f);
+						this.DrawRectangle(uX, uY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, uColor, true, true, uDepth);
 					}
 				}
 				else if (uDetect)
 				{
-					this.DrawRectangle(uX, uY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Black, true, true, 48.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
-					this.DrawRectangle(uX, uY, Radius * 2, Radius * 2, Color.Gold, true, true, 49.4f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
-					this.DrawRectangle(uX, uY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, uColor, true, true, 49.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
+					this.DrawRectangle(uX, uY, (Radius + AddToRadius) * 2, (Radius + AddToRadius) * 2, Color.Black, true, true, uDepth + 0.5f);
+					this.DrawRectangle(uX, uY, Radius * 2, Radius * 2, Color.Gold, true, true, uDepth + 0.25f);
+					this.DrawRectangle(uX, uY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, uColor, true, true, uDepth);
 				}
 				else
 				{
-					this.DrawRectangle(uX, uY, Radius * 2, Radius * 2, Color.Black, true, true, 0.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
-					this.DrawRectangle(uX, uY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, uColor, true, true, 1.9f + (uOwner == MainWindow.neutralplayer ? 0 : (16 - uOwner)));
+					this.DrawRectangle(uX, uY, Radius * 2, Radius * 2, Color.Black, true, true, uDepth + 0.5f);
+					this.DrawRectangle(uX, uY, (Radius - AddToRadius) * 2, (Radius - AddToRadius) * 2, uColor, true, true, uDepth);
 				}
 			}
 		}
 
-		private void DrawUnitsOnScreen()
+		//Broken by removing unused variables.
+		/*private void DrawUnitsOnScreen()
 		{
 			SmartClicker instance = SmartClicker.GetInstance(GameData.SC2Handle);
 			if (instance != null)
@@ -1101,12 +1098,13 @@ namespace maphack_external_directx
 					}
 				}
 			}
-		}
+		}*/
 
 		[DllImport("dwmapi.dll")]
 		private static extern void DwmExtendFrameIntoClientArea(IntPtr hWnd, ref Margins pMargins);
 		[DllImport("dwmapi.dll")]
 		private static extern int DwmIsCompositionEnabled(ref int enabled);
+		//Broken by removing unused variables.
 		/*private void GetAbilities()
 		{
 			this.unit_queue_counter = new int[0x10, 130];

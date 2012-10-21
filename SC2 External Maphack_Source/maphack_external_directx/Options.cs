@@ -903,6 +903,12 @@ namespace maphack_external_directx
 
 		private void button1_Click(object sender, EventArgs e)
 		{
+			if (!_2cs_API._2csAPI.InGame())
+			{
+				MessageBox.Show("This option only works when in a game.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				return;
+			}
+
 			Rectangle MinimapRect = Data.GameData.GetMinimapCoords();
 			MainWindow.minimap_location_x = MinimapRect.X;
 			MainWindow.minimap_location_y = MinimapRect.Y;

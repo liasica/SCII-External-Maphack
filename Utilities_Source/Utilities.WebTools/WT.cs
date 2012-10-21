@@ -353,6 +353,7 @@ namespace Utilities.WebTools
 					goto CheeZecake;
 				}
 			}
+			Application.Exit();
 		}
 	}
 }

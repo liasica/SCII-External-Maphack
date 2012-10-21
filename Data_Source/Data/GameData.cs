@@ -90,6 +90,15 @@ namespace Data
 		private static Color[] possible_colors = new Color[] { Color.White, Color.FromArgb(179, 20, 30), Color.FromArgb(0, 66, 254), Color.FromArgb(28, 166, 233), Color.FromArgb(84, 0, 129), Color.FromArgb(234, 224, 41), Color.FromArgb(253, 138, 14), Color.FromArgb(22, 128, 0), Color.FromArgb(203, 165, 251), Color.FromArgb(31, 1, 200), Color.FromArgb(82, 84, 148), Color.FromArgb(16, 98, 70), Color.FromArgb(78, 42, 4), Color.FromArgb(150, 254, 145), Color.FromArgb(35, 35, 35), Color.FromArgb(228, 91, 175) };
 		public static Color[] player_colors = (Color[])possible_colors.Clone();
 
+		public static int LocalPlayerNumber
+		{
+			get
+			{
+				byte num = (byte)GameData.offsets.ReadStructMember(ORNames.LocalPlayer, ORNames.LocalPlayer);
+				return num < 16 ? num : 0;
+			}
+		}
+
 		public static List<Abil> getAbilitiesData()
 		{
 			List<Abil> list = new List<Abil>();
@@ -212,71 +221,6 @@ namespace Data
 				}
 			}
 			return list;
-		}
-
-		public static PlayerSelections GetPlayerSelections()
-		{
-			uint pNumber = (byte) mem.ReadMemory(Offsets.LocalPlayerNumber, typeof(byte));
-			return GetPlayerSelections((int)pNumber);
-		}
-
-		public static PlayerSelections GetPlayerSelections(Player p)
-		{
-			if (p.name == "")
-			{
-				return new PlayerSelections();
-			}
-			return GetPlayerSelections(p.number);
-		}
-
-		public static PlayerSelections GetPlayerSelections(int pNumber)
-		{
-			//BROKEN! DO NOT USE!
-
-			PlayerSelections selections = new PlayerSelections {
-				currentSelection = new ControlGroup()
-			};
-			selections.currentSelection.selected_unit_ids = new List<int>();
-			selections.control_groups = new ControlGroup[10];
-			for (uint i = 0; i < 10; i++)
-			{
-				selections.control_groups[i].selected_unit_ids = new List<int>();
-				selections.control_groups[i].groupNumber = (int) i;
-			}
-			uint num2 = (uint)pNumber;
-			if (num2 > 0)
-			{
-				uint num3;
-				byte[] buffer;
-				selections.currentSelection.groupNumber = 10;
-				mem.ReadMemory((StructStarts.PlayerSelections + (num2 * 0xcf8)) + control_group_s.selected_types, 1, out selections.currentSelection.unitTypesSelected);
-				mem.ReadMemory((StructStarts.PlayerSelections + (num2 * 0xcf8)) + control_group_s.sub_group, 2, out selections.currentSelection.unitSubGroupSelected);
-				mem.ReadMemory((StructStarts.PlayerSelections + (num2 * 0xcf8)) + control_group_s.total_selected, 1, out num3);
-				selections.currentSelection.totalSelected = (int) num3;
-				mem.ReadMemory((uint) ((StructStarts.PlayerSelections + (num2 * 0xcf8)) + control_group_s.selected_units), (int) (num3 * 4), out buffer);
-				for (int j = 0; j < (num3 * 4); j += 4)
-				{
-					byte[] dst = new byte[2];
-					Buffer.BlockCopy(buffer, j, dst, 0, 2);
-					selections.currentSelection.selected_unit_ids.Add(BitConverter.ToInt16(dst, 0));
-				}
-				uint num5 = (StructStarts.PlayerSelections + 0xcf80) + (0x81b0 * num2);
-				for (uint k = 0; k < 10; k++)
-				{
-					mem.ReadMemory((num5 + (0xcf8 * k)) + control_group_s.selected_types, 1, out selections.control_groups[k].unitTypesSelected);
-					mem.ReadMemory((num5 + (0xcf8 * k)) + control_group_s.sub_group, 2, out selections.control_groups[k].unitSubGroupSelected);
-					mem.ReadMemory((num5 + (0xcf8 * k)) + control_group_s.total_selected, 1, out num3);
-					selections.control_groups[k].totalSelected = (int) num3;
-					mem.ReadMemory((uint) ((num5 + (0xcf8 * k)) + control_group_s.selected_units), (int) (num3 * 4), out buffer);
-					for (int m = 0; m < (num3 * 4); m += 4)
-					{
-						byte[] buffer3 = new byte[2];
-						Buffer.BlockCopy(buffer, m, buffer3, 0, 2);
-						selections.control_groups[k].selected_unit_ids.Add(BitConverter.ToInt16(buffer3, 0));
-					}
-				}
-			}
-			return selections;
 		}
 
 		public static List<Unit> getUnitData()
@@ -780,10 +724,9 @@ namespace Data
 			Ability = 120,
 			BnetID = 0x4b0,
 			CameraInfo = 0x24,
-			ControlGroup = 0xcf8,
+			Selection = 0xcf8,
 			Player = 0xA68,
 			SelectedUnits = 4,
-			Selection = 0xcf8,
 			Units = 0x1c0
 		}
 

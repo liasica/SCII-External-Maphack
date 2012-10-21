@@ -194,7 +194,7 @@
     <Compile Include="Data\CmdState.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Data\ControlGroup.cs">
+    <Compile Include="Data\Selection.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Data\control_group_s.cs">

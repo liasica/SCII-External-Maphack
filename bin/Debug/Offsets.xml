@@ -3,7 +3,9 @@
   <Array Name="Players" Type="Player" Size="16" Address="0x270BD88" />
   <Array Name="Units" Type="Unit" Size="0x4000" Address="0x2766B40" />
   <Array Name="AccountNumbers" Type="AccountNumber" Size="16" Address="0x179DB48" />
-  <Struct Name="AccountNumber" Size="0x4b0">
+  <Array Name="CurrentSelections" Type="Selection" Size="16" Address="0x3439908" />
+  <Array Name="PlayerGroups" Type="ControlGroup" Size="16" Address="0x3456A68" />
+  <Struct Name="AccountNumber" Size="0x4b0" Address="0x0179D3AC">
     <Member Name="id_string" Type="String" Size="32" Offset="0" />
   </Struct>
   <Struct Name="Timer" Size="4" Address="0x2659ECC">
@@ -14,6 +16,25 @@
   </Struct>
   <Struct Name="LocalPlayer" Size="1" Address="0x1683E30">
     <Member Name="LocalPlayer" Type="Unsigned" Size="1" Offset="0" />
+  </Struct>
+  <Struct Name="ControlGroup" Size="0x111C0" Address="0x01872860">
+	<Member Name="Group1" Type="Byte" Size="-1" Offset="0" />
+	<Member Name="Group2" Type="Byte" Size="-1" Offset="Group1+0x1B60" />
+	<Member Name="Group3" Type="Byte" Size="-1" Offset="Group2+0x1B60" />
+	<Member Name="Group4" Type="Byte" Size="-1" Offset="Group3+0x1B60" />
+	<Member Name="Group5" Type="Byte" Size="-1" Offset="Group4+0x1B60" />
+	<Member Name="Group6" Type="Byte" Size="-1" Offset="Group5+0x1B60" />
+	<Member Name="Group7" Type="Byte" Size="-1" Offset="Group6+0x1B60" />
+	<Member Name="Group8" Type="Byte" Size="-1" Offset="Group7+0x1B60" />
+	<Member Name="Group9" Type="Byte" Size="-1" Offset="Group8+0x1B60" />
+	<Member Name="Group10" Type="Byte" Size="-1" Offset="Group9+0x1B60" />
+  </Struct>
+  <Struct Name="Selection" Size="0x1B60" Address="0x0186D638">
+    <Member Name="num_selected" Type="Unsigned" Size="2" Offset="0x0" />
+	<Member Name="num_types_selected" Type="Unsigned" Size="2" Offset="num_selected+2" />
+	<Member Name="highlighted_type" Type="Unsigned" Size="2" Offset="num_types_selected+2" />
+	<Member Name="num_pages" Type="Unsigned" Size="2" Offset="highlighted_type+2" />
+	<Member Name="selected_IDs" Type="Unsigned" Size="4" Count="500" Offset="num_pages+2" />
   </Struct>
   <Struct Name="MapInfo" Size="-1" Address="0x2659E20">
     <Member Name="dynamic_pointer" Type="Unsigned" Size="4" Offset="0x0" />
