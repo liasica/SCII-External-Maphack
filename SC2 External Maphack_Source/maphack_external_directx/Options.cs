@@ -53,6 +53,7 @@ namespace maphack_external_directx
 		private NumericUpDown udDrawing;
 		private Button button1;
 		private CheckBox chk0Radius;
+		private CheckBox checkBoxTeamColors;
 		private NumericUpDown udGUI;
 
 		public Options()
@@ -65,6 +66,7 @@ namespace maphack_external_directx
 
 		private void btnSave_Click(object sender, EventArgs e)
 		{
+			Data.Player.UseTeamColors = checkBoxTeamColors.Checked;
 			this.SaveSettings();
 			base.Close();
 		}
@@ -102,6 +104,7 @@ namespace maphack_external_directx
 			this.chkUnitDestinationEnemies = new System.Windows.Forms.CheckBox();
 			this.chkUnitDestinationAllies = new System.Windows.Forms.CheckBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.chk0Radius = new System.Windows.Forms.CheckBox();
 			this.chkUnitsSelf = new System.Windows.Forms.CheckBox();
 			this.chkUnitsEnemies = new System.Windows.Forms.CheckBox();
 			this.chkUnitsAllies = new System.Windows.Forms.CheckBox();
@@ -124,7 +127,7 @@ namespace maphack_external_directx
 			this.label5 = new System.Windows.Forms.Label();
 			this.udGUI = new System.Windows.Forms.NumericUpDown();
 			this.btnSave = new System.Windows.Forms.Button();
-			this.chk0Radius = new System.Windows.Forms.CheckBox();
+			this.checkBoxTeamColors = new System.Windows.Forms.CheckBox();
 			this.tbOptions.SuspendLayout();
 			this.tbDrawing.SuspendLayout();
 			this.groupBox5.SuspendLayout();
@@ -155,6 +158,7 @@ namespace maphack_external_directx
 			// 
 			// tbDrawing
 			// 
+			this.tbDrawing.Controls.Add(this.checkBoxTeamColors);
 			this.tbDrawing.Controls.Add(this.label4);
 			this.tbDrawing.Controls.Add(this.cbObserverPanelDrawDirection);
 			this.tbDrawing.Controls.Add(this.groupBox5);
@@ -259,7 +263,7 @@ namespace maphack_external_directx
 			// 
 			// button1
 			// 
-			this.button1.Location = new System.Drawing.Point(93, 142);
+			this.button1.Location = new System.Drawing.Point(167, 142);
 			this.button1.Name = "button1";
 			this.button1.Size = new System.Drawing.Size(130, 23);
 			this.button1.TabIndex = 5;
@@ -383,6 +387,18 @@ namespace maphack_external_directx
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Units";
 			// 
+			// chk0Radius
+			// 
+			this.chk0Radius.AutoSize = true;
+			this.chk0Radius.Checked = true;
+			this.chk0Radius.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.chk0Radius.Location = new System.Drawing.Point(6, 88);
+			this.chk0Radius.Name = "chk0Radius";
+			this.chk0Radius.Size = new System.Drawing.Size(101, 17);
+			this.chk0Radius.TabIndex = 3;
+			this.chk0Radius.Text = "Show if 0 radius";
+			this.chk0Radius.UseVisualStyleBackColor = true;
+			// 
 			// chkUnitsSelf
 			// 
 			this.chkUnitsSelf.AutoSize = true;
@@ -426,7 +442,7 @@ namespace maphack_external_directx
 			this.tbHotkeys.Location = new System.Drawing.Point(4, 22);
 			this.tbHotkeys.Name = "tbHotkeys";
 			this.tbHotkeys.Padding = new System.Windows.Forms.Padding(3);
-			this.tbHotkeys.Size = new System.Drawing.Size(319, 253);
+			this.tbHotkeys.Size = new System.Drawing.Size(319, 310);
 			this.tbHotkeys.TabIndex = 1;
 			this.tbHotkeys.Text = "Hotkeys";
 			this.tbHotkeys.UseVisualStyleBackColor = true;
@@ -502,7 +518,7 @@ namespace maphack_external_directx
 			this.tbTimers.Location = new System.Drawing.Point(4, 22);
 			this.tbTimers.Name = "tbTimers";
 			this.tbTimers.Padding = new System.Windows.Forms.Padding(3);
-			this.tbTimers.Size = new System.Drawing.Size(319, 253);
+			this.tbTimers.Size = new System.Drawing.Size(319, 310);
 			this.tbTimers.TabIndex = 2;
 			this.tbTimers.Text = "Timers";
 			this.tbTimers.UseVisualStyleBackColor = true;
@@ -632,17 +648,15 @@ namespace maphack_external_directx
 			this.btnSave.UseVisualStyleBackColor = true;
 			this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
 			// 
-			// chk0Radius
+			// checkBoxTeamColors
 			// 
-			this.chk0Radius.AutoSize = true;
-			this.chk0Radius.Checked = true;
-			this.chk0Radius.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.chk0Radius.Location = new System.Drawing.Point(6, 88);
-			this.chk0Radius.Name = "chk0Radius";
-			this.chk0Radius.Size = new System.Drawing.Size(101, 17);
-			this.chk0Radius.TabIndex = 3;
-			this.chk0Radius.Text = "Show if 0 radius";
-			this.chk0Radius.UseVisualStyleBackColor = true;
+			this.checkBoxTeamColors.AutoSize = true;
+			this.checkBoxTeamColors.Location = new System.Drawing.Point(226, 183);
+			this.checkBoxTeamColors.Name = "checkBoxTeamColors";
+			this.checkBoxTeamColors.Size = new System.Drawing.Size(85, 17);
+			this.checkBoxTeamColors.TabIndex = 6;
+			this.checkBoxTeamColors.Text = "Team Colors";
+			this.checkBoxTeamColors.UseVisualStyleBackColor = true;
 			// 
 			// Options
 			// 
@@ -725,6 +739,13 @@ namespace maphack_external_directx
 				try
 				{
 					this.cbObserverPanelDrawDirection.SelectedItem = file["OptionsDrawing"]["cbObserverPanelDrawDirection"];
+				}
+				catch
+				{
+				}
+				try
+				{
+					this.checkBoxTeamColors.Checked = bool.Parse(file["OptionsDrawing"]["chkTeamColors"]);
 				}
 				catch
 				{
@@ -864,6 +885,7 @@ namespace maphack_external_directx
 			{
 				file.Remove("OptionsDrawing");
 			}
+			section.Add("chkTeamColors", this.checkBoxTeamColors.Checked.ToString());
 			section.Add("cbObserverPanelDrawDirection", this.cbObserverPanelDrawDirection.SelectedItem.ToString());
 			section.Add("chkCameraEnemies", this.chkCameraEnemies.Checked.ToString());
 			section.Add("chkCameraAllies", this.chkCameraAllies.Checked.ToString());

@@ -1,6 +1,7 @@
 namespace maphack_external_directx
 {
 	using System;
+	using System.IO;
 	using System.Diagnostics;
 	using System.Security.Principal;
 	using System.Threading;
@@ -15,7 +16,7 @@ namespace maphack_external_directx
 		private static bool? _IsAdministrator = null;
 		private static maphack_external_directx.MainWindow _mainWindow;
 		public static string ApplicationTitle = "SC2 External Maphack";
-		public static string ApplicationVersion = "1.14.4";
+		public static string ApplicationVersion = "?.?.?.?";
 
 		private static void OnUnhandledException(Object sender, UnhandledExceptionEventArgs e)
 		{
@@ -28,7 +29,7 @@ namespace maphack_external_directx
 		}
 
 		[STAThread]
-		private static void Main()
+		private static void Main(string[] args)
 		{
 			AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(OnUnhandledException);
 			Application.ThreadException += new ThreadExceptionEventHandler(OnFormsUnhandledException);
@@ -36,7 +37,7 @@ namespace maphack_external_directx
 			try
 			{
 				if (!DirectX_HUDs.AeroEnabled)
-					MessageBox.Show("Desktop Window Manager (DWM) is not enabled. Without DWM, the DirectX overlays used by this program will have a significant performance penalty and may not work properly.\n\nDWM is only available on Windows Vista and later, and cannot be used with the Windows Classic or High Contrast themes.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+					MessageBox.Show("Desktop Window Manager (DWM) is not enabled. Without DWM, the DirectX overlays used by this program will have a significant performance penalty and may not work properly.\n\nDWM is only available on Windows Vista and later, and requires the Aero theme.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				runApplication();
 			}
 			catch (ThreadAbortException)
@@ -44,7 +45,7 @@ namespace maphack_external_directx
 			}
 			catch (Exception exception)
 			{
-				WT.ReportCrash(exception, ApplicationTitle + " " + ApplicationVersion, null, null, true);
+				WT.ReportCrash(exception, ApplicationTitle + " " + ApplicationVersion);
 			}
 		}
 

@@ -242,6 +242,7 @@ namespace maphack_external_directx
 		public void GameStart()
 		{
 			Unit.ResetUnits();
+			Player.Reset();
 			GameData.mapDat = new MapData(GameData.getMapData().mapInfo.filePath);
 			buildings = new HashSet<string>();
 			unit_pictures = new Dictionary<string, string>();
@@ -1096,6 +1097,13 @@ namespace maphack_external_directx
 			if (file.Exists())
 			{
 				file.Load();
+				try
+				{
+					Player.UseTeamColors = bool.Parse(file["OptionsDrawing"]["chkTeamColors"]);
+				}
+				catch
+				{
+				}
 				try
 				{
 					this.tmrMain.Interval = int.Parse(file["OptionsTimers"]["udGUI"]);

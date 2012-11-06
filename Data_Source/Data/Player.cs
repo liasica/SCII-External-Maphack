@@ -12,6 +12,42 @@ namespace Data
 	public class Player
 	{
 		private static Color[] possible_colors = new Color[] { Color.White, Color.FromArgb(179, 20, 30), Color.FromArgb(0, 66, 254), Color.FromArgb(28, 166, 233), Color.FromArgb(84, 0, 129), Color.FromArgb(234, 224, 41), Color.FromArgb(253, 138, 14), Color.FromArgb(22, 128, 0), Color.FromArgb(203, 165, 251), Color.FromArgb(31, 1, 200), Color.FromArgb(82, 84, 148), Color.FromArgb(16, 98, 70), Color.FromArgb(78, 42, 4), Color.FromArgb(150, 254, 145), Color.FromArgb(35, 35, 35), Color.FromArgb(228, 91, 175) };
+		public static Color SelectedSelfColor = Color.FromArgb(0, 255, 0);
+		public static Color SelfColor = Color.FromArgb(0, 187, 0);
+		public static Color AllyColor = Color.Yellow;
+		public static Color NeutralColor = Color.White;
+		public static Color EnemyColor = Color.Red;
+
+		public static void Reset()
+		{
+			_LocalPlayer = null;
+			_NeutralPlayer = null;
+		}
+
+		private static Player _LocalPlayer = null;
+		public static Player LocalPlayer
+		{
+			get
+			{
+				int Local = GameData.LocalPlayerNumber;
+				if (_LocalPlayer == null || _LocalPlayer.number != Local)
+					_LocalPlayer = new Player(Local);
+				return _LocalPlayer;
+			}
+		}
+		private static Player _NeutralPlayer = null;
+		public static Player NeutralPlayer
+		{
+			get
+			{
+				if (_NeutralPlayer == null)
+					_NeutralPlayer = new Player(0);
+				return _NeutralPlayer;
+			}
+		}
+
+
+		public static bool UseTeamColors = false;
 
 		private int _number;
 		private uint _memoryAddress;
@@ -166,8 +202,22 @@ namespace Data
 		{
 			get
 			{
-				int Index = colorIndex;
-				return possible_colors[Index < 16 && Index >= 0 ? Index : 0];
+				if (!UseTeamColors)
+				{
+					int Index = colorIndex;
+					return possible_colors[Index < 16 && Index >= 0 ? Index : 0];
+				}
+				else
+				{
+					if (number == 0)
+						return NeutralColor;
+					else if (number == LocalPlayer.number)
+						return SelfColor;
+					else if (team == LocalPlayer.team)
+						return AllyColor;
+					else
+						return EnemyColor;
+				}
 			}
 		}
 		public PlayerColor playerColor

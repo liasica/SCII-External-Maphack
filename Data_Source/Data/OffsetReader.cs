@@ -401,7 +401,11 @@ namespace Data
 
 			_Filename = Filename;
 
-			_File = XDocument.Load(Filename);
+			using (FileStream fs = new FileStream(Filename, FileMode.Open, FileAccess.Read, FileShare.Read))
+			{
+				_File = XDocument.Load(fs);
+			}
+
 			_BaseElement = _File.Root;
 			if (_BaseElement.HasAttributes && _BaseElement.Attribute("Version") != null)
 				_Version = _BaseElement.Attribute("Version").Value;

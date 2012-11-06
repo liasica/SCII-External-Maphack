@@ -82,7 +82,7 @@ namespace Ini
 				string str = "";
 				while (reader.Peek() != -1)
 				{
-					string line = reader.ReadLine();
+					string line = reader.ReadLine().Trim();
 					if (!line.StartsWith("[") || !line.EndsWith("]"))
 					{
 						if (str.Length == 0)

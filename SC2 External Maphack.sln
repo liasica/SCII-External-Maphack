@@ -48,6 +48,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackMagic", "BlackMagic_So
 		{61D8CF34-1FD7-4A01-BEC1-1A8E8050A9C6} = {61D8CF34-1FD7-4A01-BEC1-1A8E8050A9C6}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Updater", "Updater\Updater.csproj", "{39D1FFBF-E727-4E3F-A507-F920F6E4BD13}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -178,6 +180,16 @@ Global
 		{79FD54B0-DEAB-459F-83B9-F1CED68D288B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{79FD54B0-DEAB-459F-83B9-F1CED68D288B}.Release|x86.ActiveCfg = Release|x86
 		{79FD54B0-DEAB-459F-83B9-F1CED68D288B}.Release|x86.Build.0 = Release|x86
+		{39D1FFBF-E727-4E3F-A507-F920F6E4BD13}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{39D1FFBF-E727-4E3F-A507-F920F6E4BD13}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{39D1FFBF-E727-4E3F-A507-F920F6E4BD13}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{39D1FFBF-E727-4E3F-A507-F920F6E4BD13}.Debug|x86.ActiveCfg = Debug|x86
+		{39D1FFBF-E727-4E3F-A507-F920F6E4BD13}.Debug|x86.Build.0 = Debug|x86
+		{39D1FFBF-E727-4E3F-A507-F920F6E4BD13}.Release|Any CPU.ActiveCfg = Release|x86
+		{39D1FFBF-E727-4E3F-A507-F920F6E4BD13}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{39D1FFBF-E727-4E3F-A507-F920F6E4BD13}.Release|Mixed Platforms.Build.0 = Release|x86
+		{39D1FFBF-E727-4E3F-A507-F920F6E4BD13}.Release|x86.ActiveCfg = Release|x86
+		{39D1FFBF-E727-4E3F-A507-F920F6E4BD13}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

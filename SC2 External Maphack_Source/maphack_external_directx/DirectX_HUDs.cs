@@ -328,20 +328,22 @@ namespace maphack_external_directx
 		private void DrawMap()
 		{
 
-			Locks.Map.EnterReadLock();
-			if (((float)base.ClientRectangle.Height) / ((float)base.ClientRectangle.Width) >= MainWindow.playable_map_height / MainWindow.playable_map_width)
+			if (Locks.Map.TryEnterReadLock(20))
 			{
-				MainWindow.minimap_scale = (float)base.ClientRectangle.Width / MainWindow.playable_map_width;
-				MainWindow.minimap_offset_x = 0;
-				MainWindow.minimap_offset_y = ((float)base.ClientRectangle.Height - MainWindow.minimap_scale * MainWindow.playable_map_height) / 2;
+				if (((float)base.ClientRectangle.Height) / ((float)base.ClientRectangle.Width) >= MainWindow.playable_map_height / MainWindow.playable_map_width)
+				{
+					MainWindow.minimap_scale = (float)base.ClientRectangle.Width / MainWindow.playable_map_width;
+					MainWindow.minimap_offset_x = 0;
+					MainWindow.minimap_offset_y = ((float)base.ClientRectangle.Height - MainWindow.minimap_scale * MainWindow.playable_map_height) / 2;
+				}
+				else
+				{
+					MainWindow.minimap_scale = (float)base.ClientRectangle.Height / MainWindow.playable_map_height;
+					MainWindow.minimap_offset_y = 0;
+					MainWindow.minimap_offset_x = ((float)base.ClientRectangle.Width - MainWindow.minimap_scale * MainWindow.playable_map_width) / 2;
+				}
+				Locks.Map.ExitReadLock();
 			}
-			else
-			{
-				MainWindow.minimap_scale = (float)base.ClientRectangle.Height / MainWindow.playable_map_height;
-				MainWindow.minimap_offset_y = 0;
-				MainWindow.minimap_offset_x = ((float)base.ClientRectangle.Width - MainWindow.minimap_scale * MainWindow.playable_map_width) / 2;
-			}
-			Locks.Map.ExitReadLock();
 
 			Color OutlineColor = Color.FromArgb(127, 255, 0, 0);
 			Color OutlineColor2 = Color.FromArgb(127, 0, 255, 0);
@@ -442,7 +444,7 @@ namespace maphack_external_directx
 						}
 						float x = player.cameraX - 10;
 						float y = player.cameraY+ 15;
-						this.DrawCamera(x, MainWindow.map_height - y, 20f, 20f, player.drawingColor, true);
+						this.DrawCamera(x, MainWindow.map_height - y, 20f, 20f, player.number == GameData.LocalPlayerNumber ? Color.White : player.drawingColor, true);
 					}
 				}
 			}
@@ -982,7 +984,7 @@ namespace maphack_external_directx
 
 		private void DrawUnitPositionsOnMap()
 		{
-			float MaximumRadius = 10f / MainWindow.minimap_scale;
+			float MaximumRadius = 10f;
 			float MinimumRadius = 1f / MainWindow.minimap_scale;
 			float AddToRadius = 1f / MainWindow.minimap_scale;
 
@@ -1030,7 +1032,7 @@ namespace maphack_external_directx
 				float uY = MainWindow.map_height - unit.Y;
 				bool uDetect = unit.Detector;
 				bool uCloak = unit.Cloaked;
-				Color uColor = GameData.player_colors[uOwner];
+				Color uColor = uOwner == GameData.LocalPlayerNumber ? Player.SelfColor : GameData.player_colors[uOwner];
 				float uDepth = unit.FinalDepth;
 
 				if (uCloak)
@@ -1649,7 +1651,7 @@ namespace maphack_external_directx
 			try
 			{
 				int CL;
-				if(!this.device.CheckCooperativeLevel(out CL) && CL == (int)ResultCode.DeviceNotReset)
+				if(this.device == null || (!this.device.CheckCooperativeLevel(out CL) && CL == (int)ResultCode.DeviceNotReset))
 				{
 					CreateOrResetDevice();
 					this.device.CheckCooperativeLevel(out CL);
@@ -1704,20 +1706,13 @@ namespace maphack_external_directx
 		{
 			get
 			{
-				try
+				if (System.Environment.OSVersion.Version.Major < 6)
 				{
-					if (System.Environment.OSVersion.Version.Major < 6)
-					{
-						return false;
-					}
-					int enabled = 0;
-					DwmIsCompositionEnabled(ref enabled);
-					if (enabled == 0)
-					{
-						return false;
-					}
+					return false;
 				}
-				catch
+				int enabled = 0;
+				DwmIsCompositionEnabled(ref enabled);
+				if (enabled == 0)
 				{
 					return false;
 				}

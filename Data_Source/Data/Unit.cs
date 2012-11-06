@@ -64,11 +64,11 @@ namespace Data
 				{
 					if (Units.ContainsKey(i))
 					{
+						Units[i].Update();
 						if (Units[i].Outdated)
 							Units.Remove(i);
 						else
 						{
-							Units[i].Update();
 							if (!Units[i].isAlive)
 								Units.Remove(i);
 							continue;
@@ -122,6 +122,22 @@ namespace Data
 		private byte[] _Data;
 		private ReaderWriterLockSlim _DataLock;
 
+		public static double Distance(Unit A, Unit B)
+		{
+			/*getting all the numbers first since it's far less efficient to read them again than to make a copy*/
+			double AX = A.locationX;
+			double AY = A.locationY;
+			double BX = B.locationX;
+			double BY = B.locationY;
+
+			return Math.Sqrt((AX - BX) * (AX - BX) + (AY - BY) * (AY - BY)); //standard distance formula
+		}
+
+		public double Distance(Unit Other)
+		{
+			return Distance(this, Other);
+		}
+
 		public void Update()
 		{
 			if(_DataLock.TryEnterWriteLock(50))
@@ -156,8 +172,18 @@ namespace Data
 		{
 			get
 			{
-				ushort newTU = (ushort)GameData.offsets.ReadArrayElementMember(ORNames.Units, Index, ORNames.times_used);
-				return timesUsed != newTU;
+				_DataLock.EnterReadLock();
+				ushort newTU = (ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.times_used, _Data);
+				if (timesUsed != newTU)
+				{
+					_DataLock.ExitReadLock();
+					return true;
+				}
+
+				uint NewModel = (uint)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.unit_model, _Data);
+				_DataLock.ExitReadLock();
+
+				return NewModel != modelPtr;
 			}
 		}
 		public Unit PreviousUnit
@@ -395,9 +421,9 @@ namespace Data
 			get
 			{
 				_DataLock.EnterReadLock();
-				byte ReturnVal = (byte)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.isImmobile, _Data);
+				bool ReturnVal = (bool)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.isImmobile, _Data);
 				_DataLock.ExitReadLock();
-				return ReturnVal != 0;
+				return ReturnVal;
 			}
 		}
 		public TargetFilter targetFilterFlags
@@ -657,6 +683,11 @@ namespace Data
 				_DataLock.ExitReadLock();
 				return ReturnVal;
 			}
+		}
+
+		public override int GetHashCode()
+		{
+			return (int)_ID;
 		}
 
 		public override string ToString()
