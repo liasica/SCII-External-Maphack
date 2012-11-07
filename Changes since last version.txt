@@ -1,13 +1,21 @@
 *GLOBAL CHANGES*
+*Added Updater and the options to use it.
 *Added the option to choose between normal colors and team colors.
 *Changed the local player's color to the normal green, instead of the true color.
 
 *CHANGES TO MODULES*
-None
+Updater:
+*Added this module.
 
 *CHANGES AFFECTING INDIVIDUAL CLASSES*
 Program:
 *Changed the error message if DWM is disabled.
+*Added CheckUpdates.
+*Changed Main to allow checking of updates on startup.
+
+Options:
+*Added another tab page for updates.
+*Added the option to check for updates at startup.
 
 OffsetReader:
 *Parse now opens Offsets.xml with different settings to avoid denying access to another thread or program.
