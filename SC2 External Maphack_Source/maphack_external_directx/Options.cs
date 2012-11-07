@@ -54,6 +54,9 @@ namespace maphack_external_directx
 		private Button button1;
 		private CheckBox chk0Radius;
 		private CheckBox checkBoxTeamColors;
+		private TabPage tbUpdates;
+		private Button buttonCheckUpdates;
+		private CheckBox chkAutoUpdate;
 		private NumericUpDown udGUI;
 
 		public Options()
@@ -85,6 +88,7 @@ namespace maphack_external_directx
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Options));
 			this.tbOptions = new System.Windows.Forms.TabControl();
 			this.tbDrawing = new System.Windows.Forms.TabPage();
+			this.checkBoxTeamColors = new System.Windows.Forms.CheckBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.cbObserverPanelDrawDirection = new System.Windows.Forms.ComboBox();
 			this.groupBox5 = new System.Windows.Forms.GroupBox();
@@ -126,8 +130,10 @@ namespace maphack_external_directx
 			this.label6 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
 			this.udGUI = new System.Windows.Forms.NumericUpDown();
+			this.tbUpdates = new System.Windows.Forms.TabPage();
+			this.buttonCheckUpdates = new System.Windows.Forms.Button();
+			this.chkAutoUpdate = new System.Windows.Forms.CheckBox();
 			this.btnSave = new System.Windows.Forms.Button();
-			this.checkBoxTeamColors = new System.Windows.Forms.CheckBox();
 			this.tbOptions.SuspendLayout();
 			this.tbDrawing.SuspendLayout();
 			this.groupBox5.SuspendLayout();
@@ -142,6 +148,7 @@ namespace maphack_external_directx
 			((System.ComponentModel.ISupportInitialize)(this.udData)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.udDrawing)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.udGUI)).BeginInit();
+			this.tbUpdates.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tbOptions
@@ -149,6 +156,7 @@ namespace maphack_external_directx
 			this.tbOptions.Controls.Add(this.tbDrawing);
 			this.tbOptions.Controls.Add(this.tbHotkeys);
 			this.tbOptions.Controls.Add(this.tbTimers);
+			this.tbOptions.Controls.Add(this.tbUpdates);
 			this.tbOptions.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.tbOptions.Location = new System.Drawing.Point(0, 0);
 			this.tbOptions.Name = "tbOptions";
@@ -170,6 +178,16 @@ namespace maphack_external_directx
 			this.tbDrawing.TabIndex = 0;
 			this.tbDrawing.Text = "Drawing";
 			this.tbDrawing.UseVisualStyleBackColor = true;
+			// 
+			// checkBoxTeamColors
+			// 
+			this.checkBoxTeamColors.AutoSize = true;
+			this.checkBoxTeamColors.Location = new System.Drawing.Point(226, 183);
+			this.checkBoxTeamColors.Name = "checkBoxTeamColors";
+			this.checkBoxTeamColors.Size = new System.Drawing.Size(85, 17);
+			this.checkBoxTeamColors.TabIndex = 6;
+			this.checkBoxTeamColors.Text = "Team Colors";
+			this.checkBoxTeamColors.UseVisualStyleBackColor = true;
 			// 
 			// label4
 			// 
@@ -637,6 +655,39 @@ namespace maphack_external_directx
             0,
             0});
 			// 
+			// tbUpdates
+			// 
+			this.tbUpdates.Controls.Add(this.buttonCheckUpdates);
+			this.tbUpdates.Controls.Add(this.chkAutoUpdate);
+			this.tbUpdates.Location = new System.Drawing.Point(4, 22);
+			this.tbUpdates.Name = "tbUpdates";
+			this.tbUpdates.Size = new System.Drawing.Size(319, 310);
+			this.tbUpdates.TabIndex = 3;
+			this.tbUpdates.Text = "Updates";
+			this.tbUpdates.UseVisualStyleBackColor = true;
+			// 
+			// buttonCheckUpdates
+			// 
+			this.buttonCheckUpdates.Location = new System.Drawing.Point(8, 37);
+			this.buttonCheckUpdates.Name = "buttonCheckUpdates";
+			this.buttonCheckUpdates.Size = new System.Drawing.Size(162, 23);
+			this.buttonCheckUpdates.TabIndex = 1;
+			this.buttonCheckUpdates.Text = "Check for updates";
+			this.buttonCheckUpdates.UseVisualStyleBackColor = true;
+			this.buttonCheckUpdates.Click += new System.EventHandler(this.buttonCheckUpdates_Click);
+			// 
+			// chkAutoUpdate
+			// 
+			this.chkAutoUpdate.AutoSize = true;
+			this.chkAutoUpdate.Checked = true;
+			this.chkAutoUpdate.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.chkAutoUpdate.Location = new System.Drawing.Point(8, 14);
+			this.chkAutoUpdate.Name = "chkAutoUpdate";
+			this.chkAutoUpdate.Size = new System.Drawing.Size(163, 17);
+			this.chkAutoUpdate.TabIndex = 0;
+			this.chkAutoUpdate.Text = "Check for updates on startup";
+			this.chkAutoUpdate.UseVisualStyleBackColor = true;
+			// 
 			// btnSave
 			// 
 			this.btnSave.Dock = System.Windows.Forms.DockStyle.Bottom;
@@ -647,16 +698,6 @@ namespace maphack_external_directx
 			this.btnSave.Text = "Save";
 			this.btnSave.UseVisualStyleBackColor = true;
 			this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-			// 
-			// checkBoxTeamColors
-			// 
-			this.checkBoxTeamColors.AutoSize = true;
-			this.checkBoxTeamColors.Location = new System.Drawing.Point(226, 183);
-			this.checkBoxTeamColors.Name = "checkBoxTeamColors";
-			this.checkBoxTeamColors.Size = new System.Drawing.Size(85, 17);
-			this.checkBoxTeamColors.TabIndex = 6;
-			this.checkBoxTeamColors.Text = "Team Colors";
-			this.checkBoxTeamColors.UseVisualStyleBackColor = true;
 			// 
 			// Options
 			// 
@@ -694,6 +735,8 @@ namespace maphack_external_directx
 			((System.ComponentModel.ISupportInitialize)(this.udData)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.udDrawing)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.udGUI)).EndInit();
+			this.tbUpdates.ResumeLayout(false);
+			this.tbUpdates.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -715,6 +758,13 @@ namespace maphack_external_directx
 			if (file.Exists())
 			{
 				file.Load();
+				try
+				{
+					this.chkAutoUpdate.Checked = bool.Parse(file["OptionsUpdates"]["chkAutoUpdate"]);
+				}
+				catch
+				{
+				}
 				try
 				{
 					this.udGUI.Value = int.Parse(file["OptionsTimers"]["udGUI"]);
@@ -880,7 +930,16 @@ namespace maphack_external_directx
 				}
 				File.Create(MainWindow.settings_path).Close();
 			}
+
 			IniSection section = new IniSection();
+			if (file.HasSection("OptionsUpdates"))
+			{
+				file.Remove("OptionsUpdates");
+			}
+			section.Add("chkAutoUpdate", this.chkAutoUpdate.Checked.ToString());
+			file.Add("OptionsUpdates", section);
+
+			section = new IniSection();
 			if (file.HasSection("OptionsDrawing"))
 			{
 				file.Remove("OptionsDrawing");
@@ -946,6 +1005,11 @@ namespace maphack_external_directx
 				MainWindow.HUDs[1].frame.Location = new Point(MainWindow.minimap_location_x - (ClientRect.Left - WindowRect.Left), MainWindow.minimap_location_y - (ClientRect.Top - WindowRect.Top));
 				MainWindow.HUDs[1].frame.ClientSize = new Size(MainWindow.minimap_size_x, MainWindow.minimap_size_y);
 			}
+		}
+
+		private void buttonCheckUpdates_Click(object sender, EventArgs e)
+		{
+			Program.CheckUpdates();
 		}
 	}
 }

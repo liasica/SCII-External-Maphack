@@ -258,6 +258,12 @@
       <DependentUpon>Trainer.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Updater\Updater.csproj">
+      <Project>{39D1FFBF-E727-4E3F-A507-F920F6E4BD13}</Project>
+      <Name>Updater</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent />

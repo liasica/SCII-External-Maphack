@@ -18,6 +18,30 @@ namespace maphack_external_directx
 		public static string ApplicationTitle = "SC2 External Maphack";
 		public static string ApplicationVersion = "?.?.?.?";
 
+		public static void CheckUpdates(bool NoUpdateMessage = false)
+		{
+			Updater.UpdateInfo[] info = Updater.UpdateChecker.UpdatesAvailable();
+			if (info.Length == 0)
+			{
+				MessageBox.Show("No updates are available at this time.", "Checking Updates", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				return;
+			}
+			else
+			{
+				if (MessageBox.Show("Updates are available. Do you want to open the updater?", "Checking Updates", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
+				{
+					string CurrentFile = Assembly.GetExecutingAssembly().Location;
+					string UpdaterFile = Path.GetDirectoryName(CurrentFile) + "\\Updater.exe";
+					ProcessStartInfo StartInfo = new ProcessStartInfo(UpdaterFile);
+					StartInfo.UseShellExecute = true;
+
+					Process.Start(StartInfo);
+					Application.Exit();
+					Application.DoEvents();
+				}
+			}
+		}
+
 		private static void OnUnhandledException(Object sender, UnhandledExceptionEventArgs e)
 		{
 			WT.ReportCrash((Exception)e.ExceptionObject, "oops!");
@@ -36,6 +60,20 @@ namespace maphack_external_directx
 
 			try
 			{
+				Ini.IniFile file = new Ini.IniFile(MainWindow.settings_path);
+				if (file.Exists())
+				{
+					file.Load();
+					try
+					{
+						if (bool.Parse(file["OptionsUpdates"]["chkAutoUpdate"]))
+							CheckUpdates();
+					}
+					catch
+					{
+					}
+				}
+
 				if (!DirectX_HUDs.AeroEnabled)
 					MessageBox.Show("Desktop Window Manager (DWM) is not enabled. Without DWM, the DirectX overlays used by this program will have a significant performance penalty and may not work properly.\n\nDWM is only available on Windows Vista and later, and requires the Aero theme.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 				runApplication();
