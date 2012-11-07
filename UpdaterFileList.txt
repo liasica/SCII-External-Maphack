@@ -1,0 +1,2 @@
+SC2 External Maphack.exe|CR|cbd51a4d463710730a5200a1d1840266|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/SC2%20External%20Maphack.exe
+SC2 External Maphack.exe.config|CR|eac78a3fe06a1255a7652d88da48ec77|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/SC2%20External%20Maphack.exe.config
