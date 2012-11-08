@@ -71,6 +71,7 @@ namespace maphack_external_directx
 					}
 					catch
 					{
+						CheckUpdates();
 					}
 				}
 

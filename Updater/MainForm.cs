@@ -23,10 +23,15 @@ namespace Updater
 			InitializeComponent();
 
 			UpdateInfo[] AvailableUpdates = UpdateChecker.UpdatesAvailable();
+
+			if (AvailableUpdates.Length == 0)
+			{
+				DoneUpdating = true;
+				buttonGetUpdates.Text = "No updates. Start SCIIEMH";
+			}
+
 			foreach (UpdateInfo info in AvailableUpdates)
 			{
-				listViewUpdates.BeginUpdate();
-
 				ListViewItem item = new ListViewItem(info.LocalFile);
 				string action = "";
 				if (info.Operations.Contains('D'))
@@ -52,8 +57,7 @@ namespace Updater
 				item.Tag = info;
 				item.Checked = true;
 				listViewUpdates.Items.Add(item);
-
-				listViewUpdates.EndUpdate();
+				Application.DoEvents();
 			}
 		}
 
