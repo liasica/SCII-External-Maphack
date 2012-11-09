@@ -107,7 +107,6 @@ namespace Updater
 
 				Application.DoEvents();
 				Program.Update(info.LocalFile, info.URL, dl);
-				progressBarDownload.Value = 0;
 				Application.DoEvents();
 
 			}

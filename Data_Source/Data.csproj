@@ -441,6 +441,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Data\UnitModelListTypes.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MpqTool_Source\MpqTool.csproj">
@@ -448,9 +449,7 @@
       <Name>MpqTool</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent />

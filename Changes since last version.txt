@@ -1,43 +1,15 @@
 *GLOBAL CHANGES*
-*Added Updater and the options to use it.
-*Added the option to choose between normal colors and team colors.
-*Changed the local player's color to the normal green, instead of the true color.
+None
 
 *CHANGES TO MODULES*
-Updater:
-*Added this module.
+None
 
 *CHANGES AFFECTING INDIVIDUAL CLASSES*
 Program:
-*Changed the error message if DWM is disabled.
-*Added CheckUpdates.
-*Changed Main to allow checking of updates on startup.
+*Removed the call to Application.DoEvents in CheckUpdates. This was causing an exception later on.
 
-Options:
-*Added another tab page for updates.
-*Added the option to check for updates at startup.
-
-OffsetReader:
-*Parse now opens Offsets.xml with different settings to avoid denying access to another thread or program.
-
-Unit:
-*Units will now be updated before checking if they're invalid. And that check will use the updated data, instead of reading directly from SC2.
-*Added the distance methods.
-*Units will now be considered outdated if their model pointer changes. Hopefully this will update everything correctly for transforming units like Siege Tanks, Vikings and anything that burrows.
-*Aded GetHashCode based on the ID, to allow use as a key in a dictionary or hash set.
-
-Player:
-*Added static properties to get the local player, and neutral player.
-*Added a Reset method to reset the local and neutral players.
-*Added an option, UseTeamColors, to choose between normal colors and green, yellow, red based on alliance.
-*Some changes to the drawingColor property to allow the new team colors option.
-
-DirectX_HUDs:
-*AeroEnabled no longer catches and ignores exceptions. Now it should not keep returning false with no explanation.
-*Before every refresh, it will make sure device is not null before trying to draw anything.
-*The maximum minimap radius for a unit is now in game units, not screen units.
-*The minimap now draws the local player's units in the normal green, and camera in white.
-*when loading settings, whitespace at the beginning and end of a line is now ignored.
+Updater:
+*Too many changes to mention them all.
 
 *CHANGES TO OFFSETS.XML*
 None

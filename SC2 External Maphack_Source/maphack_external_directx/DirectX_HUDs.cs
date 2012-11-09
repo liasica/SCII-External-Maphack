@@ -147,11 +147,6 @@ namespace maphack_external_directx
 
 		private void DirectX_HUDs_FormClosed(object sender, FormClosedEventArgs e)
 		{
-			if (this._HUDType == HUDType.Map)
-			{
-				Rectangle MinimapRect = base.RectangleToScreen(base.ClientRectangle);
-				//SaveMapSettings(MinimapRect.X, MinimapRect.Y, MinimapRect.Width, MinimapRect.Height); //SavePositionAndSize() below should cover it.
-			}
 			this.SavePositionAndSize();
 			this.device.Dispose();
 			base.Dispose();
@@ -179,8 +174,6 @@ namespace maphack_external_directx
 		{
 			this.frame.Show();
 			Program.MainWindow.Activate();
-			//if (this._HUDType != HUDType.Map)
-				//this.frame.loadHUDLocation();
 		}
 
 		private void DirectX_HUDs_SizeChanged(object sender, EventArgs e)
@@ -199,22 +192,10 @@ namespace maphack_external_directx
 					}
 				}
 			}
-			if (this._HUDType == HUDType.Map)
-			{
-				Rectangle NewClientRect = base.RectangleToScreen(base.ClientRectangle);
-				//MainWindow.minimap_size_x = NewClientRect.Width;
-				//MainWindow.minimap_size_y = NewClientRect.Height;
-			}
 		}
 
 		private void DirectX_HUDs_PositionChanged(object sender, EventArgs e)
 		{
-			if (this._HUDType == HUDType.Map)
-			{
-				Rectangle NewClientRect = base.RectangleToScreen(base.ClientRectangle);
-				//MainWindow.minimap_location_x = NewClientRect.X;
-				//MainWindow.minimap_location_y = NewClientRect.Y;
-			}
 		}
 
 		private void DirectX_HUDs_VisibleChanged(object sender, EventArgs e)
@@ -1568,11 +1549,6 @@ namespace maphack_external_directx
 
 				this.frame.Location = new Point(this.DesiredClientRect.X - (ClientRect.X - WindowRect.X), this.DesiredClientRect.Y - (ClientRect.Y - WindowRect.Y));
 				this.frame.ClientSize = this.DesiredClientRect.Size;
-				
-				if (this._HUDType == HUDType.Map)
-				{
-					//this.loadMapSettings(ini); // This shouldn't be needed anymore, now that we have LoadPositionAndSize().
-				}
 			}
 		}
 
