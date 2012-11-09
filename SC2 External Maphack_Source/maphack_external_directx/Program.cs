@@ -18,13 +18,14 @@ namespace maphack_external_directx
 		public static string ApplicationTitle = "SC2 External Maphack";
 		public static string ApplicationVersion = "?.?.?.?";
 
-		public static void CheckUpdates(bool NoUpdateMessage = false)
+		public static bool CheckUpdates(bool NoUpdateMessage = false)
 		{
 			Updater.UpdateInfo[] info = Updater.UpdateChecker.UpdatesAvailable();
 			if (info.Length == 0)
 			{
-				MessageBox.Show("No updates are available at this time.", "Checking Updates", MessageBoxButtons.OK, MessageBoxIcon.Information);
-				return;
+				if(NoUpdateMessage)
+					MessageBox.Show("No updates are available at this time.", "Checking Updates", MessageBoxButtons.OK, MessageBoxIcon.Information);
+				return false;
 			}
 			else
 			{
@@ -37,8 +38,9 @@ namespace maphack_external_directx
 
 					Process.Start(StartInfo);
 					Application.Exit();
-					Application.DoEvents();
+					return true;
 				}
+				return false;
 			}
 		}
 
@@ -67,11 +69,13 @@ namespace maphack_external_directx
 					try
 					{
 						if (bool.Parse(file["OptionsUpdates"]["chkAutoUpdate"]))
-							CheckUpdates();
+							if (CheckUpdates())
+								return;
 					}
 					catch
 					{
-						CheckUpdates();
+						if (CheckUpdates())
+							return;
 					}
 				}
 

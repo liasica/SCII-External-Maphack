@@ -1009,7 +1009,7 @@ namespace maphack_external_directx
 
 		private void buttonCheckUpdates_Click(object sender, EventArgs e)
 		{
-			Program.CheckUpdates();
+			Program.CheckUpdates(true);
 		}
 	}
 }

@@ -20,22 +20,15 @@ namespace Updater
 		public string URL;
 		public string Operations;
 		public int CurrentSize;
-		public int NewSize
-		{
-			get
-			{
-				if(string.IsNullOrWhiteSpace(URL) || Operations.Contains('D'))
-					return -1;
-				return Downloader.GetSize(URL);
-			}
-		}
+		public int NewSize;
 
-		public UpdateInfo(string localfile, string url, string operations, int currentsize)
+		public UpdateInfo(string localfile, string url, string operations, int currentsize, int newsize)
 		{
 			LocalFile = localfile;
 			URL = url;
 			Operations = operations;
 			CurrentSize = currentsize;
+			NewSize = newsize;
 		}
 	}
 	/// <summary>
@@ -44,6 +37,20 @@ namespace Updater
 	/// </summary>
 	public static class UpdateChecker
 	{
+		private static int LineComparer(string x, string y)
+		{
+			string[] SplitX = x.Split('|');
+			string[] SplitY = y.Split('|');
+
+			bool XIsLinked = SplitX[1].Contains('L');
+			bool YIsLinked = SplitY[1].Contains('L');
+
+			if (XIsLinked == YIsLinked)
+				return 0;
+			else
+				return XIsLinked ? 1 : -1;
+		}
+
 		/// <summary>
 		/// Checks for available updates and returns an array of filenames that have updates avaiable.
 		/// </summary>
@@ -57,12 +64,14 @@ namespace Updater
 			if (IndexFile == null || IndexFile.Length == 0)
 				return ReturnVal.ToArray();
 
-			string[] FileList = Encoding.UTF8.GetString(IndexFile).Replace("\r", "").Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+			List<string> FileList = Encoding.UTF8.GetString(IndexFile).Replace("\r", "").Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).ToList();
 			string CurrentFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + '\\';
+
+			FileList.Sort(LineComparer);
 			foreach (string s in FileList)
 			{
 				string[] file = s.Split('|');
-				if (file.Length < 4)
+				if (file.Length < 5)
 					continue;
 
 				bool exists = File.Exists(CurrentFolder + file[0]);
@@ -70,31 +79,69 @@ namespace Updater
 				{
 					if (exists)
 					{
-						ReturnVal.Add(new UpdateInfo(file[0], file[3], "D", -1));
+						int NewSize;
+						if (!int.TryParse(file[4], out NewSize))
+							NewSize = 0;
+						ReturnVal.Add(new UpdateInfo(file[0], file[3], "D", -1, NewSize));
 					}
 					continue;
 				}
 
 				if (!exists)
 				{
-					ReturnVal.Add(new UpdateInfo(file[0], file[3], "C", -1));
+					int NewSize;
+					if (!int.TryParse(file[4], out NewSize))
+						NewSize = -1;
+					ReturnVal.Add(new UpdateInfo(file[0], file[3], "C", -1, NewSize));
 				}
 				else
 				{
+					byte[] buffer;
 					using (FileStream fs = new FileStream(CurrentFolder + file[0], FileMode.Open, FileAccess.Read, FileShare.Read))
 					{
-						byte[] buffer = new byte[fs.Length];
+						buffer = new byte[fs.Length];
 						fs.Read(buffer, 0, (int)fs.Length);
-
-						MD5 md5 = MD5.Create();
-						byte[] md5Result = md5.ComputeHash(buffer);
-						string md5ResultAsString = string.Empty;
-						foreach(byte b in md5Result)
-							md5ResultAsString += b.ToString("x2");
-
-						if (md5ResultAsString != file[2].ToLower())
-							ReturnVal.Add(new UpdateInfo(file[0], file[3], "R", buffer.Length));
 					}
+
+					if(file[1].Contains('V'))
+					{
+						FileVersionInfo version = FileVersionInfo.GetVersionInfo(CurrentFolder + file[0]);
+						if (version.FileVersion != file[2])
+						{
+							int NewSize;
+							if (!int.TryParse(file[4], out NewSize))
+								NewSize = -1;
+							ReturnVal.Add(new UpdateInfo(file[0], file[3], "R", buffer.Length, NewSize));
+						}
+						continue;
+					}
+
+					if (file[1].Contains('L'))
+					{
+						if (ReturnVal.Exists(x => x.LocalFile.ToLower() == file[2].ToLower()))
+						{
+							int NewSize;
+							if (!int.TryParse(file[4], out NewSize))
+								NewSize = -1;
+							ReturnVal.Add(new UpdateInfo(file[0], file[3], "R", buffer.Length, NewSize));
+						}
+						continue;
+					}
+
+					MD5 md5 = MD5.Create();
+					byte[] md5Result = md5.ComputeHash(buffer);
+					string md5ResultAsString = string.Empty;
+					foreach (byte b in md5Result)
+						md5ResultAsString += b.ToString("x2");
+
+					if (md5ResultAsString != file[2].ToLower())
+					{
+						int NewSize;
+						if (!int.TryParse(file[4], out NewSize))
+							NewSize = -1;
+						ReturnVal.Add(new UpdateInfo(file[0], file[3], "R", buffer.Length, NewSize));
+					}
+
 				}
 			}
 
@@ -113,8 +160,6 @@ namespace Updater
 			bool Done = false;
 			foreach (string s in args)
 			{
-				MessageBox.Show(s);
-
 				string arg = s.ToLower();
 				if (arg.StartsWith("--us--"))
 				{
