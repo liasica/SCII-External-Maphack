@@ -263,6 +263,7 @@ namespace Updater
 			string CurrentFile = Assembly.GetExecutingAssembly().Location;
 			string TempFile = Path.GetDirectoryName(CurrentFile) + "\\Updater.exe";
 
+			Delete(TempFile);
 			File.Copy(CurrentFile, TempFile, true);
 
 			ProcessStartInfo info = new ProcessStartInfo(TempFile, "--DUS--");
