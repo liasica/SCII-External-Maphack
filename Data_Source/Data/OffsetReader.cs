@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,55 +25,92 @@ namespace Data
 
 	static class UpdateFile
 	{
+		static object Lock = new object();
+
 		public static void Update(string Filename)
 		{
-			XDocument File = XDocument.Load(Filename);
-			File.Root.Attribute("Version").Value = GameData.SC2Version;
-			IEnumerable<XElement> Current =
-				from el in File.Root.Elements("Array")
-				where el.Attribute("Name").Value == "Players"
-				select el;
-			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.PlayerStruct().ToString("X");
-			Current =
-				from el in File.Root.Elements("Array")
-				where el.Attribute("Name").Value == "Units"
-				select el;
-			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.UnitStruct().ToString("X");
-			Current =
-				from el in File.Root.Elements("Struct")
-				where el.Attribute("Name").Value == "Timer"
-				select el;
-			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.Timer().ToString("X");
-			Current =
-				from el in File.Root.Elements("Struct")
-				where el.Attribute("Name").Value == "Timer2"
-				select el;
-			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.Timer2().ToString("X");
-			Current =
-				from el in File.Root.Elements("Struct")
-				where el.Attribute("Name").Value == "MapInfo"
-				select el;
-			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.MapInfoPtr().ToString("X");
-			Current =
-				from el in File.Root.Elements("Struct")
-				where el.Attribute("Name").Value == "Player"
-				select el;
-			Current.ElementAt(0).Attribute("Size").Value = "0x" + GameData.ps.PlayerStructSize().ToString("X");
-			Current =
-				from el in File.Root.Elements("Struct")
-				where el.Attribute("Name").Value == "LocalPlayer"
-				select el;
-			Current.ElementAt(0).Attribute("Address").Value = "0x" + GameData.ps.LocalPlayerNumber().ToString("X");
+			lock (Lock) //There will be significant problems if multiple threads try to write the new file at the same time. Todo: Skip the update on all but the first thread.
+			{
+				int BaseAddress = 0;
+				foreach (ProcessModule module in GameData.SC2Process.Modules)
+				{
+					if (module.ModuleName.Equals("SC2.exe", StringComparison.OrdinalIgnoreCase))
+					{
+						BaseAddress = (int)module.BaseAddress;
+						break;
+					}
+				}
 
-			try
-			{
-				File.Save(Filename);
-			}
-			catch (IOException)
-			{
-				System.Windows.Forms.MessageBox.Show("Failed to save Offsets.xml after updating it. It may be in use by another process, or the program may not have permission to write to that location. \nPlease close any other programs that may be using it and start SCIIEMH again.",
-					"Failed to update offsets", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-				System.Windows.Forms.Application.Exit();
+				XDocument File = XDocument.Load(Filename);
+				File.Root.Attribute("Version").Value = GameData.SC2Version;
+				IEnumerable<XElement> Current =
+					from el in File.Root.Elements("Array")
+					where el.Attribute("Name").Value == "Players"
+					select el;
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.PlayerStruct() - BaseAddress).ToString("X");
+				Current =
+					from el in File.Root.Elements("Array")
+					where el.Attribute("Name").Value == "Units"
+					select el;
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.UnitStruct() - BaseAddress).ToString("X");
+				Current =
+					from el in File.Root.Elements("Array")
+					where el.Attribute("Name").Value == "CurrentSelections"
+					select el;
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.PlayerSelection() - BaseAddress).ToString("X");
+				Current =
+					from el in File.Root.Elements("Array")
+					where el.Attribute("Name").Value == "GalaxyDataTable"
+					select el;
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.GalaxyDataTable() - BaseAddress).ToString("X");
+				Current =
+					from el in File.Root.Elements("Struct")
+					where el.Attribute("Name").Value == "Timer"
+					select el;
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.Timer() - BaseAddress).ToString("X");
+				Current =
+					from el in File.Root.Elements("Struct")
+					where el.Attribute("Name").Value == "Timer2"
+					select el;
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.Timer2() - BaseAddress).ToString("X");
+				Current =
+					from el in File.Root.Elements("Struct")
+					where el.Attribute("Name").Value == "MapBounds"
+					select el;
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.MapBounds() - BaseAddress).ToString("X");
+				Current =
+					from el in File.Root.Elements("Struct")
+					where el.Attribute("Name").Value == "MapInfoPtr"
+					select el;
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.MapInfoPtr() - BaseAddress).ToString("X");
+				Current =
+					from el in File.Root.Elements("Struct")
+					where el.Attribute("Name").Value == "Player"
+					select el;
+				Current.ElementAt(0).Attribute("Size").Value = "0x" + GameData.ps.PlayerStructSize().ToString("X");
+				Current =
+					from el in File.Root.Elements("Struct")
+					where el.Attribute("Name").Value == "LocalPlayer"
+					select el;
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.LocalPlayerNumber() - BaseAddress).ToString("X");
+				Current =
+					from el in File.Root.Elements("Struct")
+					where el.Attribute("Name").Value == "Selection"
+					select el;
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.LocalSelection() - BaseAddress).ToString("X");
+
+				try
+				{
+					File.Save(Filename);
+					OffsetReader temp = new OffsetReader(Filename);
+					temp.File.Save(Filename);
+				}
+				catch (IOException)
+				{
+					System.Windows.Forms.MessageBox.Show("Failed to save Offsets.xml after updating it. It may be in use by another process, or the program may not have permission to write to that location. \nPlease close any other programs that may be using it and start SCIIEMH again.",
+						"Failed to update offsets", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+					System.Windows.Forms.Application.Exit();
+				}
 			}
 		}
 	}
@@ -89,6 +127,8 @@ namespace Data
 		}
 
 		XDocument _File;
+		public XDocument File
+		{ get { return _File; } }
 		XElement _BaseElement;
 		Dictionary<ORNames, ORArray> _Arrays;
 		Dictionary<ORNames, ORStruct> _Structs;
@@ -116,6 +156,18 @@ namespace Data
 			UpdateFile.Update(_Filename);
 		}
 
+		public int GetAddressOfDataItem(int ItemID)
+		{
+			byte[] buffer;
+			if (ItemID != 0 && ItemID != 65535 && (ushort)ItemID < 0x8000)
+			{
+				buffer = ReadArrayElement(ORNames.GalaxyDataTable, (ushort)ItemID);
+				if ((ushort)ReadStructMember(ORNames.GalaxyTableEntry, ORNames.times_used, buffer) == (ushort)(ItemID >> 16))
+					return (int)(uint)ReadStructMember(ORNames.GalaxyTableEntry, ORNames.data_pointer, buffer);
+			}
+			return 0;
+		}
+
 		public int GetStructSize(ORNames Struct)
 		{
 			return _Structs[Struct].size;
@@ -123,6 +175,14 @@ namespace Data
 		public int GetStructAddress(ORNames Struct)
 		{
 			return _Structs[Struct].address;
+		}
+		public int GetStructStartOffset(ORNames Struct)
+		{
+			return _Structs[Struct].startOffset;
+		}
+		public int GetStructEndOffset(ORNames Struct)
+		{
+			return _Structs[Struct].endOffset;
 		}
 
 		public Type GetStructMemberType(ORNames Struct, ORNames Member)
@@ -226,10 +286,16 @@ namespace Data
 		{
 			if(Address <= 0)
 				Address = GetStructAddress(Struct);
-			int Size = GetStructSize(Struct);
+			int StartOffset = GetStructStartOffset(Struct);
+			int EndOffset = GetStructEndOffset(Struct);
+			int TotalSize = GetStructSize(Struct);
+			int UsedSize = EndOffset - StartOffset;
 
-			byte[] buffer = new byte[Size];
-			mem.ReadMemory((IntPtr)Address, buffer.Length, out buffer);
+			if (TotalSize < UsedSize + StartOffset)
+				TotalSize = UsedSize + StartOffset;
+
+			byte[] buffer;
+			mem.ReadMemory((IntPtr)Address, TotalSize, out buffer);
 			return buffer;
 		}
 
@@ -438,28 +504,40 @@ namespace Data
 		public int offset
 		{ get; set; }
 		
-		public ORStructMember(XElement data, Dictionary<ORNames, ORStructMember> others)
+		public ORStructMember(XElement data, ORStruct parent)
 		{
 			name = (ORNames)Enum.Parse(typeof(ORNames), data.Attribute("Name").Value);
 			offset = 0;
 
 			string Offset = data.Attribute("Offset").Value;
 			if (!Offset.Contains('+'))
+			{
 				offset = ImprovedParse.Parse(Offset);
+				data.SetAttributeValue("AbsoluteOffset", null);
+			}
 			else
 			{
 				string[] Split = Offset.Split('+');
 				if (Split.Length == 2)
 				{
 					int BaseOffset = 0;
-					if(others.ContainsKey((ORNames)Enum.Parse(typeof(ORNames), Split[0])))
-						BaseOffset = others[(ORNames)Enum.Parse(typeof(ORNames), Split[0])].offset;
+					if (parent.members.ContainsKey((ORNames)Enum.Parse(typeof(ORNames), Split[0])))
+						BaseOffset = parent.members[(ORNames)Enum.Parse(typeof(ORNames), Split[0])].offset;
 
 					offset = BaseOffset + ImprovedParse.Parse(Split[1]);
+					data.SetAttributeValue("AbsoluteOffset", "0x" + offset.ToString("X"));
 				}
 			}
 
+			
+
 			int Size = ImprovedParse.Parse(data.Attribute("Size").Value);
+
+			if (offset < parent.startOffset)
+				parent.startOffset = offset;
+			if (offset + Size > parent.endOffset)
+				parent.endOffset = offset + Size;
+
 			string Type = data.Attribute("Type").Value;
 			size = Size;
 			if (data.Attribute("Count") != null)
@@ -546,21 +624,47 @@ namespace Data
 		{ get; set; }
 		public int address
 		{ get; set; }
+		public int startOffset
+		{ get; set; }
+		public int endOffset
+		{ get; set; }
 		public Dictionary<ORNames, ORStructMember> members
 		{ get; set; }
 
 		public ORStruct(XElement data)
 		{
+			startOffset = int.MaxValue;
+			endOffset = int.MinValue;
+
 			name = (ORNames)Enum.Parse(typeof(ORNames), data.Attribute("Name").Value);
 			size = ImprovedParse.Parse(data.Attribute("Size").Value);
 			if (data.Attribute("Address") != null)
-				address = ImprovedParse.Parse(data.Attribute("Address").Value);
+			{
+				string temp = data.Attribute("Address").Value;
+				int PlusPos = -1;
+				if ((PlusPos = temp.LastIndexOf('+')) >= 0)
+				{
+					address = ImprovedParse.Parse(temp.Substring(PlusPos + 1));
+
+					string ModuleName = temp.Substring(0, PlusPos);
+					foreach(ProcessModule module in GameData.SC2Process.Modules)
+					{
+						if (module.ModuleName.Equals(ModuleName, StringComparison.OrdinalIgnoreCase))
+						{
+							address += (int)module.BaseAddress;
+							break;
+						}
+					}
+				}
+				else
+					address = ImprovedParse.Parse(data.Attribute("Address").Value);
+			}
 			else
 				address = 0;
 			members = new Dictionary<ORNames, ORStructMember>();
 			foreach (XElement member in data.Elements("Member"))
 			{
-				members.Add((ORNames)Enum.Parse(typeof(ORNames), member.Attribute("Name").Value), new ORStructMember(member, members));
+				members.Add((ORNames)Enum.Parse(typeof(ORNames), member.Attribute("Name").Value), new ORStructMember(member, this));
 			}
 		}
 	}
@@ -580,8 +684,27 @@ namespace Data
 		{
 			name = (ORNames)Enum.Parse(typeof(ORNames), data.Attribute("Name").Value);
 			size = ImprovedParse.Parse(data.Attribute("Size").Value);
-			address = ImprovedParse.Parse(data.Attribute("Address").Value);
 			type = (ORNames)Enum.Parse(typeof(ORNames), data.Attribute("Type").Value);
+
+			string temp = data.Attribute("Address").Value;
+			int PlusPos = -1;
+			if ((PlusPos = temp.LastIndexOf('+')) >= 0)
+			{
+				address = ImprovedParse.Parse(temp.Substring(PlusPos + 1));
+
+				string ModuleName = temp.Substring(0, PlusPos);
+				foreach (ProcessModule module in GameData.SC2Process.Modules)
+				{
+					if (module.ModuleName.Equals(ModuleName, StringComparison.OrdinalIgnoreCase))
+					{
+						address += (int)module.BaseAddress;
+						break;
+					}
+				}
+			}
+			else
+				address = ImprovedParse.Parse(data.Attribute("Address").Value);
+
 		}
 	}
 }

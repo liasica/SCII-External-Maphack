@@ -8,6 +8,25 @@ namespace Data
 	using System.Runtime.InteropServices;
 	using System.Text;
 
+	[Flags]
+	public enum StateFlags : uint
+	{
+		ShowScore = 0x40,
+		NoXPGain = 0x80,
+		ShowWorldTip = 0x100,
+		FidgetingEnabled = 0x200,
+		DisplayInLeaderPanel = 0x400,
+		DisplayInViewMenu = 0x800,
+		ChargesPaused = 0x1000,
+		CooldownsPaused = 0x2000,
+		DisplayGameResult = 0x4000,
+		FoodIgnored = 0x8000,
+		MineralCostIgnored = 0x10000,
+		VespeneCostIgnored = 0x20000,
+		TerrazineCostIgnored = 0x40000,
+		CustomCostIgnored = 0x80000
+	}
+
 	[StructLayout(LayoutKind.Sequential)]
 	public class Player
 	{
@@ -51,25 +70,33 @@ namespace Data
 
 		private int _number;
 		private uint _memoryAddress;
-		private string _accountNumber;
+		private string _Handle;
+		private int _HandleLength;
+		private string _NameWithTag;
 		private string _name;
 		private int _nameLength;
+		private string _ClanTag;
+		private int _ClanTagLength;
 		private Race _race;
 
 		public Player(int Number)
 		{
 			_number = Number;
 
-			string AccountNumber = "";
-			if (number < 16)
-				AccountNumber = (String)GameData.offsets.ReadArrayElementMember(ORNames.AccountNumbers, number, ORNames.id_string);
-			if (!AccountNumber.Contains("-S2-"))
-				AccountNumber = "(none)";
-
-			_accountNumber = AccountNumber;
-			_name = (string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.name);
-			_nameLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.name_length);
 			_memoryAddress = (uint)GameData.offsets.GetArrayElementAddress(ORNames.Players, number);
+			
+			_nameLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.name_length);
+			_name = ((string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.name)).Substring(0, _nameLength);
+			_NameWithTag = _name;
+
+			_ClanTagLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.ClanTagLength);
+			_ClanTag = ((string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.ClanTag)).Substring(0, _ClanTagLength);
+			if (_ClanTagLength > 0)
+				_NameWithTag = "[" + _ClanTag + "] " + _name;
+
+			_HandleLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.HandleLength);
+			_Handle = ((string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.Handle)).Substring(0, _HandleLength);
+			
 
 			uint num = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.racePointer) + 4, typeof(uint));
 			byte[] buffer;
@@ -119,6 +146,13 @@ namespace Data
 			get
 			{
 				return (PlayerStatus)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.active);
+			}
+		}
+		public StateFlags State
+		{
+			get
+			{
+				return (StateFlags)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.StateFlags);
 			}
 		}
 		public VictoryStatus victoryStatus
@@ -231,9 +265,21 @@ namespace Data
 		{
 			get
 			{
+				return _NameWithTag;
+			}
+		}
+		public string NameWithoutClanTag
+		{
+			get
+			{
 				return _name;
 			}
 		}
+		public string ClanTag
+		{ get { return _ClanTag; } }
+		public int ClanTagLength
+		{ get { return _ClanTagLength; } }
+
 		public Race race
 		{
 			get
@@ -372,7 +418,7 @@ namespace Data
 		{
 			get
 			{
-				return _accountNumber;
+				return _Handle;
 			}
 		}
 

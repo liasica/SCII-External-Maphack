@@ -38,16 +38,16 @@ namespace Data
 				throw new IndexOutOfRangeException("PlayerSelections: PlayerNumber was " + PlayerNumber.ToString());
 
 			CurrentSelection = new Selection(GameData.offsets.GetArrayElementAddress(ORNames.CurrentSelections, PlayerNumber));
-			ControlGroups[0] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerGroups, PlayerNumber, ORNames.Group1));
-			ControlGroups[1] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerGroups, PlayerNumber, ORNames.Group2));
-			ControlGroups[2] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerGroups, PlayerNumber, ORNames.Group3));
-			ControlGroups[3] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerGroups, PlayerNumber, ORNames.Group4));
-			ControlGroups[4] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerGroups, PlayerNumber, ORNames.Group5));
-			ControlGroups[5] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerGroups, PlayerNumber, ORNames.Group6));
-			ControlGroups[6] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerGroups, PlayerNumber, ORNames.Group7));
-			ControlGroups[7] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerGroups, PlayerNumber, ORNames.Group8));
-			ControlGroups[8] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerGroups, PlayerNumber, ORNames.Group9));
-			ControlGroups[9] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerGroups, PlayerNumber, ORNames.Group10));
+			ControlGroups[0] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerControlGroups, PlayerNumber, ORNames.Group1));
+			ControlGroups[1] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerControlGroups, PlayerNumber, ORNames.Group2));
+			ControlGroups[2] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerControlGroups, PlayerNumber, ORNames.Group3));
+			ControlGroups[3] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerControlGroups, PlayerNumber, ORNames.Group4));
+			ControlGroups[4] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerControlGroups, PlayerNumber, ORNames.Group5));
+			ControlGroups[5] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerControlGroups, PlayerNumber, ORNames.Group6));
+			ControlGroups[6] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerControlGroups, PlayerNumber, ORNames.Group7));
+			ControlGroups[7] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerControlGroups, PlayerNumber, ORNames.Group8));
+			ControlGroups[8] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerControlGroups, PlayerNumber, ORNames.Group9));
+			ControlGroups[9] = new Selection(GameData.offsets.GetArrayElementMemberAddress(ORNames.PlayerControlGroups, PlayerNumber, ORNames.Group10));
 		}
 
 		public Selection CurrentSelection;

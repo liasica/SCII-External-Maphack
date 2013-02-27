@@ -75,7 +75,21 @@ namespace Data
 				return _offsets;
 			}
 		}
-		public static MapData mapDat;
+		static MapData _mapDat;
+		public static MapData mapDat
+		{
+			get
+			{
+				if (_mapDat == null)
+					_mapDat = new MapData(getMapData().mapInfo.filePath);
+				return _mapDat;
+			}
+			set
+			{
+				_mapDat = value;
+			}
+		}
+
 		private static ReadWriteMemory _mem;
 		private static PatternScan _ps;
 		private static string _SC2FilePath;
@@ -95,6 +109,8 @@ namespace Data
 			get
 			{
 				byte num = (byte)GameData.offsets.ReadStructMember(ORNames.LocalPlayer, ORNames.LocalPlayer);
+				if(num >= 16)
+					num = (byte)GameData.offsets.ReadStructMember(ORNames.LocalPlayer, ORNames.ReplayWatchedPlayer);
 				return num < 16 ? num : 0;
 			}
 		}
@@ -129,7 +145,7 @@ namespace Data
 			return Rectangle.Empty;
 		}
 
-		public static Map getMapData()
+		public static Map getMapData() //Todo: Clean up this pile of crap!
 		{
 			uint num;
 			Map map = new Map();
@@ -150,20 +166,23 @@ namespace Data
 			info.edgeBottom = (int) Math.Round((double) (((double) info.edgeBottom) / 4096.0));
 			info.playableX = info.edgeRight - info.edgeLeft;
 			info.playableY = info.edgeTop - info.edgeBottom;*/
-			num = (uint)offsets.ReadStructMember(ORNames.MapInfo, ORNames.dynamic_pointer);
+			num = (uint)offsets.ReadStructMember(ORNames.MapInfoPtr, ORNames.Pointer);
 			if (num == 0)
 			{
 				map.mapInfo = new MapInfo();
 				return map;
 			}
+			byte[] data = offsets.ReadStruct(ORNames.MapInfoStruct, (int)num);
+
 			map_information_s _s = new map_information_s();
 			_s = (map_information_s) mem.ReadMemory(num, typeof(map_information_s));
-			info.filePath = _s.FilePath;
-			info.filePath2 = _s.FilePath2;
-			info.name = _s.Name;
+
+			info.filePath = ((string)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.Filename, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.FilenameLength, data));
+			info.filePath2 = ((string)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.Filename2, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.Filename2Length, data));
+			info.name = ((string)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.Name, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.NameLength, data));
 			info.author = _s.Author;
 			info.descriptionBasic = _s.DescriptionBasic;
-			info.desciptionExtended = _s.DescriptionExtended;
+			info.desciptionExtended = ((string)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.Description, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.DescriptionLength, data));
 			map.mapInfo = info;
 			return map;
 		}
@@ -331,43 +350,11 @@ namespace Data
 			}
 		}
 
-		public static int MapEdgeBottom2
-		{
-			get
-			{
-				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapInfo, ORNames.bottom_precise) + 0.5);
-			}
-		}
-
-		public static int MapEdgeLeft2
-		{
-			get
-			{
-				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapInfo, ORNames.left_precise) + 0.5);
-			}
-		}
-
-		public static int MapEdgeRight2
-		{
-			get
-			{
-				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapInfo, ORNames.right_precise) + 0.5);
-			}
-		}
-
-		public static int MapEdgeTop2
-		{
-			get
-			{
-				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapInfo, ORNames.top_precise) + 0.5);
-			}
-		}
-
 		public static int MapEdgeBottom
 		{
 			get
 			{
-				return (int)offsets.ReadStructMember(ORNames.MapInfo, ORNames.bottom);
+				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapBounds, ORNames.bottom_precise) + 0.5);
 			}
 		}
 
@@ -375,7 +362,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)offsets.ReadStructMember(ORNames.MapInfo, ORNames.left);
+				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapBounds, ORNames.left_precise) + 0.5);
 			}
 		}
 
@@ -383,7 +370,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)offsets.ReadStructMember(ORNames.MapInfo, ORNames.right);
+				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapBounds, ORNames.right_precise) + 0.5);
 			}
 		}
 
@@ -391,39 +378,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)offsets.ReadStructMember(ORNames.MapInfo, ORNames.top);
-			}
-		}
-
-		public static int MapFullHeight
-		{
-			get
-			{
-				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapInfo, ORNames.full_height) + 0.5);
-			}
-		}
-
-		public static int MapFullWidth
-		{
-			get
-			{
-				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapInfo, ORNames.full_width) + 0.5);
-			}
-		}
-
-		public static int MapPlayableHeight2
-		{
-			get
-			{
-				return (MapEdgeTop2 - MapEdgeBottom2);
-			}
-		}
-
-		public static int MapPlayableWidth2
-		{
-			get
-			{
-				return (MapEdgeRight2 - MapEdgeLeft2);
+				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapBounds, ORNames.top_precise) + 0.5);
 			}
 		}
 
@@ -440,6 +395,22 @@ namespace Data
 			get
 			{
 				return (MapEdgeRight - MapEdgeLeft);
+			}
+		}
+
+		public static int MapFullHeight //Todo: find the correct value and make this return it.
+		{
+			get
+			{
+				return MapPlayableHeight;
+			}
+		}
+
+		public static int MapFullWidth //Todo: find the correct value and make this return it.
+		{
+			get
+			{
+				return MapPlayableWidth;
 			}
 		}
 

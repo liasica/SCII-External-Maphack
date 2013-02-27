@@ -4,6 +4,10 @@ namespace Data
 
 	public enum TargetFilter : ulong
 	{
+		Outer =					0x0000800000000000,
+		Unstoppable =			0x0000400000000000,
+		Summoned =				0x0000200000000000,
+		Stunned =				0x0000100000000000,
 		Radar =					0x0000080000000000,
 		Detector =				0x0000040000000000,
 		Passive =				0x0000020000000000,
@@ -17,7 +21,7 @@ namespace Data
 		Dead =					0x0000000200000000,
 		UnderConstruction =		0x0000000100000000,
 		Stasis =				0x0000000080000000,
-		Unknown40000000 =		0x0000000040000000,
+		Visible =				0x0000000040000000,
 		Cloaked =				0x0000000020000000,
 		Buried =				0x0000000010000000,
 		PreventReveal =			0x0000000008000000,
@@ -43,11 +47,11 @@ namespace Data
 		Light =					0x0000000000000080,
 		Ground =				0x0000000000000040,
 		Air =					0x0000000000000020,
-		Unknown10 =				0x0000000000000010,
-		Unknown08 =				0x0000000000000008,
-		Unknown04 =				0x0000000000000004,
-		Unknown02 =				0x0000000000000002,
-		Unknown01 =				0x0000000000000001
+		Enemy =					0x0000000000000010,
+		Neutral =				0x0000000000000008,
+		Ally =					0x0000000000000004,
+		Player =				0x0000000000000002,
+		Self =					0x0000000000000001
 	}
 
 	public static class TFToString

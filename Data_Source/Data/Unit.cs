@@ -5,7 +5,60 @@ namespace Data
 	using System.Runtime.InteropServices;
 	using System.Threading;
 
-	[StructLayout(LayoutKind.Sequential)]
+	public class QueuedCommand
+	{
+		uint _Address;
+		byte[] _Data;
+		public uint NextCommandPtr
+		{ get { return (uint)GameData.offsets.ReadStructMember(ORNames.QueuedCommand, ORNames.pNextCommand, _Data); } }
+		
+		public QueuedCommand(uint Address)
+		{
+			_Address = Address;
+			_Data = null;
+			Update();
+		}
+		public void Update()
+		{
+			_Data = GameData.offsets.ReadStruct(ORNames.QueuedCommand, (int)_Address);
+		}
+	}
+
+	public class CommandQueue
+	{
+		Unit _Unit;
+		List<QueuedCommand> _Queue;
+		public List<QueuedCommand> Queue
+		{ get { return _Queue; } }
+		public Unit Unit
+		{ get { return _Unit; } }
+		public int Count
+		{ get { return _Queue.Count; } }
+
+		public CommandQueue(Unit unit)
+		{
+			_Unit = unit;
+			_Queue = new List<QueuedCommand>();
+			Update();
+		}
+		public void Update()
+		{
+			List<QueuedCommand> NewQueue = new List<QueuedCommand>();
+			uint ptr = _Unit.commandQueuePointer;
+			if (ptr != 0)
+				ptr = (uint)GameData.mem.ReadMemory(ptr, typeof(uint)) & 0xFFFFFFFE;
+			
+			for(int i = 0; (ptr & 1) == 0 && i < 5000; i++) //i is to avoid an infinite loop if something goes wrong.
+			{
+				QueuedCommand temp = new QueuedCommand(ptr & 0xFFFFFFFE);
+				NewQueue.Add(temp);
+				ptr = temp.NextCommandPtr;
+			}
+			_Queue = NewQueue;
+		}
+
+	}
+
 	public class Unit
 	{
 		private static object _lock = new object();
@@ -120,6 +173,8 @@ namespace Data
 		private ushort _Index;
 		private ushort _unitType;
 		private byte[] _Data;
+		private uint _modelPtr;
+		private CommandQueue _CmdQueue;
 		private ReaderWriterLockSlim _DataLock;
 
 		public static double Distance(Unit A, Unit B)
@@ -144,6 +199,22 @@ namespace Data
 			{
 				_Data = GameData.offsets.ReadArrayElement(ORNames.Units, Index);
 				_DataLock.ExitWriteLock();
+				
+				_DataLock.EnterReadLock();
+				
+				if (commandQueuePointer != 0)
+					_CmdQueue = new CommandQueue(this);
+				else
+					_CmdQueue = null;
+
+				uint tempPtr = (uint)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.unit_model, _Data);
+				if (_modelPtr != tempPtr)
+				{
+					_modelPtr = tempPtr;
+					_textID = string.Empty;
+					_name = string.Empty;
+				}
+				_DataLock.ExitReadLock();
 			}
 		}
 
@@ -164,6 +235,7 @@ namespace Data
 			_Data = new byte[1];
 			Update();
 
+			_modelPtr = (uint)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.unit_model, _Data);
 			_ID = (uint)((ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.times_used, _Data) + ((ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.token, _Data) << 16));
 			_DataLock.ExitWriteLock();
 		}
@@ -174,16 +246,9 @@ namespace Data
 			{
 				_DataLock.EnterReadLock();
 				ushort newTU = (ushort)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.times_used, _Data);
-				if (timesUsed != newTU)
-				{
-					_DataLock.ExitReadLock();
-					return true;
-				}
-
-				uint NewModel = (uint)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.unit_model, _Data);
 				_DataLock.ExitReadLock();
 
-				return NewModel != modelPtr;
+				return timesUsed != newTU;
 			}
 		}
 		public Unit PreviousUnit
@@ -273,63 +338,86 @@ namespace Data
 		{
 			get
 			{
-				_DataLock.EnterReadLock();
-				uint ReturnVal = (uint)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.unit_model, _Data);
-				_DataLock.ExitReadLock();
-				return ReturnVal;
+				if (_modelPtr == 0)
+				{
+					_DataLock.EnterReadLock();
+					_modelPtr = (uint)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.unit_model, _Data);
+					_DataLock.ExitReadLock();
+				}
+				return _modelPtr;
 			}
 		}
-		public string name
+		public string name //Todo: Make this look a little less messy...
 		{
 			get
 			{
 				if (_name == string.Empty && modelPtr != 0)
 				{
-					string UINameAsText = null;
-					uint NameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, (int)(modelPtr << 5)), typeof(uint));
-					if (NameDataAddress != 0 && NameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
-					{	
-						uint pUINameAddress = (uint)GameData.mem.ReadMemory(NameDataAddress + 0x1c, typeof(uint));
-						if (pUINameAddress != 0 && pUINameAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+					string NameAsText = null;
+					uint pNameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, (int)(modelPtr << 5)) & 0xFFFFFFFE, typeof(uint)) & 0xFFFFFFFE;
+					if (pNameDataAddress != 0 && pNameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+					{
+						uint NameDataAddress = (uint)GameData.mem.ReadMemory(pNameDataAddress, typeof(uint)) & 0xFFFFFFFE;
+						if (NameDataAddress != 0 && pNameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
 						{
-							uint UINameLength = (uint)GameData.mem.ReadMemory(pUINameAddress + 0x8, typeof(uint));
-							uint UINameAddress = pUINameAddress + 0x10;
-
-							if (((byte)GameData.mem.ReadMemory(pUINameAddress + 12, typeof(byte)) & 4) != 0) //sometimes the string is right in this struct, other times it's a pointer.
-								UINameAddress = (uint)GameData.mem.ReadMemory(pUINameAddress + 16, typeof(uint));
-
-							if (UINameAddress != 0 && UINameLength > 0 && UINameLength < 1024) //it needs an upper limit incase the length is garbage.
+							NameDataAddress = (uint)GameData.mem.ReadMemory(NameDataAddress + 0x1C, typeof(uint)) & 0xFFFFFFFE;
+							if (NameDataAddress != 0 && pNameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
 							{
-								byte[] UINameAsBytes = new byte[UINameLength];
-								GameData.mem.ReadMemory((IntPtr)UINameAddress, (int)UINameLength, out UINameAsBytes);
-								UINameAsText = System.Text.Encoding.UTF8.GetString(UINameAsBytes);
+								NameDataAddress = (uint)GameData.mem.ReadMemory(NameDataAddress, typeof(uint)) & 0xFFFFFFFE;
+								if (NameDataAddress != 0 && pNameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+								{
+									NameDataAddress += 8;
+									uint NameLength = (uint)GameData.mem.ReadMemory(NameDataAddress, typeof(uint));
+									uint NameFlags = (uint)GameData.mem.ReadMemory(NameDataAddress + 4, typeof(uint));
+									if (NameLength < 1024) //it needs an upper limit incase the length is garbage.
+									{
+										byte[] NameAsBytes = new byte[NameLength];
+										if ((NameFlags & 4) == 0)
+											NameDataAddress += 8;
+										else
+											NameDataAddress = (uint)GameData.mem.ReadMemory(NameDataAddress + 8, typeof(uint)) & 0xFFFFFFFE;
+
+										GameData.mem.ReadMemory((IntPtr)NameDataAddress, (int)NameLength, out NameAsBytes);
+										NameAsText = System.Text.Encoding.UTF8.GetString(NameAsBytes);
+									}
+								}
 							}
 						}
 					}
-					if (UINameAsText == null)
-						UINameAsText = string.Empty;
+					if (NameAsText == null)
+						NameAsText = string.Empty;
 
-					_name = UINameAsText;
+					_name = NameAsText;
 				}
 				return _name;
 			}
 		}
-		public string textID
+		public string textID //Todo: Make this look a little less messy...
 		{
 			get
 			{
 				if (_textID == string.Empty && modelPtr != 0)
 				{
 					string NameAsText = null;
-					uint NameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, (int)(modelPtr << 5)), typeof(uint));
-					if (NameDataAddress != 0 && NameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+					uint pNameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, (int)(modelPtr << 5)) & 0xFFFFFFFE, typeof(uint)) & 0xFFFFFFFE;
+					if (pNameDataAddress != 0 && pNameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
 					{
-						uint NameLength = (uint)GameData.mem.ReadMemory(NameDataAddress, typeof(uint));
-						if (NameLength > 10 && NameLength < 1024) //it needs an upper limit incase the length is garbage.
+						uint NameDataAddress = (uint)GameData.mem.ReadMemory(pNameDataAddress, typeof(uint)) & 0xFFFFFFFE;
+						if (NameDataAddress != 0 && pNameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
 						{
-							byte[] NameAsBytes = new byte[NameLength];
-							GameData.mem.ReadMemory((IntPtr)NameDataAddress + 0x24, (int)NameLength, out NameAsBytes);
-							NameAsText = System.Text.Encoding.UTF8.GetString(NameAsBytes).Remove(0, 10);
+							uint NameLength = (uint)GameData.mem.ReadMemory(NameDataAddress, typeof(uint));
+							uint NameFlags = (uint)GameData.mem.ReadMemory(NameDataAddress + 4, typeof(uint));
+							if (NameLength >= 10 && NameLength < 1024) //it needs an upper limit incase the length is garbage.
+							{
+								byte[] NameAsBytes = new byte[NameLength];
+								if ((NameFlags & 4) == 0)
+									NameDataAddress += 8;
+								else
+									NameDataAddress = (uint)GameData.mem.ReadMemory(NameDataAddress + 8, typeof(uint)) & 0xFFFFFFFE;
+								
+								GameData.mem.ReadMemory((IntPtr)NameDataAddress, (int)NameLength, out NameAsBytes);
+								NameAsText = System.Text.Encoding.UTF8.GetString(NameAsBytes).Remove(0, 10);
+							}
 						}
 					}
 					if (NameAsText == null)
@@ -349,6 +437,37 @@ namespace Data
 					_minimapRadius = (fixed32)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.minimap_radius, (int)(modelPtr << 5));
 				}
 				return _minimapRadius;
+			}
+		}
+
+		public fixed32 LifeExpected
+		{
+			get
+			{
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.LifeExpected, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
+			}
+		}
+		public fixed32 ShieldsExpected
+		{
+			get
+			{
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.ShieldExpected, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
+			}
+		}
+		public fixed32 EnergyExpected
+		{
+			get
+			{
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.EnergyExpected, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
 			}
 		}
 		public fixed32 timeScale
@@ -421,7 +540,8 @@ namespace Data
 			get
 			{
 				_DataLock.EnterReadLock();
-				bool ReturnVal = (bool)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.isImmobile, _Data);
+				byte temp = (byte)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.unknownFlags, _Data);
+				bool ReturnVal = (temp & 0x10) != 0 || (bool)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.isImmobile, _Data);
 				_DataLock.ExitReadLock();
 				return ReturnVal;
 			}
@@ -560,6 +680,16 @@ namespace Data
 				return ReturnVal;
 			}
 		}
+		public fixed32 Height
+		{
+			get
+			{
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.Height, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
+			}
+		}
 
 		public fixed32 destinationX
 		{
@@ -655,16 +785,27 @@ namespace Data
 			}
 		}
 
-		public int moveSpeed
+		public fixed32 moveSpeed
 		{
 			get
 			{
 				_DataLock.EnterReadLock();
-				int ReturnVal = (int)((uint)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.move_speed, _Data));
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.move_speed, _Data);
 				_DataLock.ExitReadLock();
 				return ReturnVal;
 			}
 		}
+		public fixed32 Acceleration
+		{
+			get
+			{
+				_DataLock.EnterReadLock();
+				fixed32 ReturnVal = (fixed32)GameData.offsets.ReadStructMember(ORNames.Unit, ORNames.Acceleration, _Data);
+				_DataLock.ExitReadLock();
+				return ReturnVal;
+			}
+		}
+
 		public uint memoryLocation
 		{
 			get
@@ -684,6 +825,8 @@ namespace Data
 				return ReturnVal;
 			}
 		}
+		public CommandQueue commandQueue
+		{ get { return _CmdQueue; } }
 
 		public override int GetHashCode()
 		{

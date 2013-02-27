@@ -29,8 +29,6 @@ namespace Data
 			if (IgnoreList.Contains(DatabaseItem))
 				return "";
 
-			if (GameData.mapDat == null)
-				GameData.mapDat = new MapData(GameData.getMapData().mapInfo.filePath);
 
 			if (File.Exists(GameData.mapDat.FileName))
 			{

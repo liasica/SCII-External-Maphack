@@ -8,10 +8,12 @@ namespace PatternScanner
 	using Utilities.MemoryHandling;
 	public class PatternScan
 	{
+		private uint _GalaxyDataTable;
 		private uint _Timer;
 		private uint _Timer2;
 		private uint _LocalPlayerNumber;
 		private uint _LocalSelection;
+		private uint _MapBounds;
 		private uint _MapInfoPtr;
 		private uint _PlayerSelection;
 		private uint _PlayerStruct;
@@ -47,7 +49,7 @@ namespace PatternScanner
 
 		public List<uint> FindDataRegionPatterns(byte[] pattern, string mask)
 		{
-			uint startAddress = 0x800000;
+			uint startAddress = (uint)this.Process.MainModule.BaseAddress;
 			return this.FindDataRegionPatterns(startAddress, pattern, mask);
 		}
 
@@ -99,6 +101,24 @@ namespace PatternScanner
 			return list;
 		}
 
+		public uint GalaxyDataTable()
+		{
+			if (this.Process == null)
+			{
+				return 0;
+			}
+			if (this._GalaxyDataTable == 0)
+			{
+				byte[] bPattern = new byte[] { 0x8D, 0x04, 0x40, 0x03, 0xC0, 0x8B, 0xD1, 0x03, 0xC0, 0xC1, 0xEA, 0x10, 0x66, 0x3B, 0x90, 0, 0, 0, 0 };
+				uint num = this.Process.FindPattern(bPattern, "xxxxxxxxxxxxxxx????");
+				if (num != (uint)this.Process.MainModule.BaseAddress)
+				{
+					this._GalaxyDataTable = this.Process.ReadUInt(num + 15);
+				}
+			}
+			return this._GalaxyDataTable;
+		}
+
 		public uint Timer() //the source for Galaxy_GameGetMissionTime
 		{
 			if (this.Process == null)
@@ -108,12 +128,15 @@ namespace PatternScanner
 			if (this._Timer == 0)
 			{
 				byte[] bPattern = new byte[] { 
-					0x8B, 0x00, 0x8B, 0x0D, 0xE4, 0xAC, 0x65, 0x02, 0x81, 0x05, 0xC8, 0xAC, 0x65, 0x02, 0x00, 0x01, 0x00, 0x00, 0x01, 0x0D, 0xDC, 0xAC, 0x65, 0x02, 0xF7, 0x05, 0x8C, 0xAC, 0x65, 0x02, 0x00, 0x02, 0x00, 0x00, 0xA3, 0xD0, 0xB1, 0x69, 0x01, 0x75, 0x0A, 0x81, 0x05, 0xCC, 0xAC, 0x65, 0x02, 0x00, 0x01, 0x00, 0x00, 0xC7, 0x05, 0xF4, 0xAC, 0x65, 0x02, 0x01, 0x00, 0x00, 0x00
+					0x81, 0x05, 0, 0, 0, 0, 0x00, 0x01, 0x00, 0x00, 0xA3, 0, 0, 0, 0, 0xA1,
+					0, 0, 0, 0, 0x03, 0x05, 0, 0, 0, 0, 0xF7, 0x05, 0, 0, 0, 0,
+					0x00, 0x02, 0x00, 0x00, 0xA3, 0, 0, 0, 0, 0, 0, 0x81, 0x05, 0, 0, 0,
+					0, 0x00, 0x01, 0x00, 0x00
 				 };
-				uint num = this.Process.FindPattern(bPattern, "xxxx????xx????xxxxxx????xx????xxxxx????xxxx????xxxxxx????xxxx");
-				if (num != 0x800000)
+				uint num = this.Process.FindPattern(bPattern, "xx????xxxxx????x????xx????xx????xxxxx??????xx????xxxx");
+				if (num != (uint)this.Process.MainModule.BaseAddress)
 				{
-					this._Timer = this.Process.ReadUInt(num + 43);
+					this._Timer = this.Process.ReadUInt(num + 45);
 				}
 			}
 			return this._Timer;
@@ -131,7 +154,7 @@ namespace PatternScanner
 					0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x2B, 0xC1,  0x8B, 0xD8, 0x03, 0xCB, 0x89, 0x0D
 				 };
 				uint num = this.Process.FindPattern(bPattern, "xx????xxxxxxxx");
-				if (num != 0x800000)
+				if (num != (uint)this.Process.MainModule.BaseAddress)
 				{
 					this._Timer2 = this.Process.ReadUInt(num + 2);
 				}
@@ -147,14 +170,12 @@ namespace PatternScanner
 			}
 			if (this._LocalPlayerNumber == 0)
 			{
-				byte[] bPattern = new byte[] { 
-					0x75, 0x11, 0x8a, 13, 0, 0, 0, 0, 0xba, 1, 0, 0, 0, 0xd3, 0xe2, 0xf7, 
-					210, 0x21, 0x10, 0xc3
-				 };
-				uint num = this.Process.FindPattern(bPattern, "xxxx????xxxxxxxxxxxx");
-				if (num != 0x800000)
+				byte[] bPattern = new byte[] { 0xA0, 0, 0, 0, 0, 0xC3, 0xA0, 0, 0, 0, 0, 0xC3};
+				uint num = this.Process.FindPattern(bPattern, "x????xx????x");
+				if (num != (uint)this.Process.MainModule.BaseAddress)
 				{
-					this._LocalPlayerNumber = this.Process.ReadUInt(num + 4);
+					if(this.Process.ReadUInt(num + 7) + 1 == this.Process.ReadUInt(num + 1))
+						this._LocalPlayerNumber = this.Process.ReadUInt(num + 7);
 				}
 			}
 			return this._LocalPlayerNumber;
@@ -168,14 +189,33 @@ namespace PatternScanner
 			}
 			if (this._LocalSelection == 0)
 			{
-				byte[] bPattern = new byte[] { 0x88, 0x45, 0xf4, 0x8d, 0x45, 0xff, 80, 0x56, 0xb9, 0, 0, 0, 0 };
-				uint num = this.Process.FindPattern(bPattern, "xxxxxxxxx????");
-				if (num != 0x800000)
+				byte[] bPattern = new byte[] { 0x53, 0x68, 0, 0, 0, 0, 0x8D, 0x8D, 0x4C, 0xF0, 0xFF, 0xFF };
+				uint num = this.Process.FindPattern(bPattern, "xx????xxxxxx");
+				if (num != (uint)this.Process.MainModule.BaseAddress)
 				{
-					this._LocalSelection = this.Process.ReadUInt(num + 9);
+					this._LocalSelection = this.Process.ReadUInt(num + 2);
 				}
 			}
 			return this._LocalSelection;
+		}
+
+		public uint MapBounds()
+		{
+			if (this.Process == null)
+			{
+				return 0;
+			}
+			if (this._MapBounds == 0)
+			{
+				byte[] bPattern = new byte[] { 0x8B, 0x16, 0x89, 0x15, 0, 0, 0, 0, 0x8B, 0x46, 0x04, 0xA3, 0, 0, 0, 0, 0x8B, 0x4E, 0x08, 0x89, 0x0D, 0, 0, 0, 0, 0x8B, 0x56, 0x0C, 0x89, 0x15, 0, 0, 0, 0 };
+				uint num = this.Process.FindPattern(bPattern, "xxxx????xxxx????xxxxx????xxxxx????");
+				if (num != (uint)this.Process.MainModule.BaseAddress)
+				{
+					this._MapBounds = this.Process.ReadUInt(num + 4);
+				}
+				
+			}
+			return this._MapBounds;
 		}
 
 		public uint MapInfoPtr()
@@ -186,61 +226,34 @@ namespace PatternScanner
 			}
 			if (this._MapInfoPtr == 0)
 			{
-				byte[] bPattern1 = new byte[] {0x75, 0x01, 0x6A, 0x01, 0x8B, 0xF2, 0xE8, 0xD9, 0x58, 0xBE, 0xFF, 0x8B, 0x5D, 0x08, 0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x53, 0x56, 0x57, 0xE8, 0x08, 0x9B, 0xCD, 0xFF, 0x8B, 0x0D, 0xC8, 0xFD, 0x75, 0x01, 0x6A, 0x00, 0x8B, 0xF0, 0xE8, 0xB9, 0x58, 0xBE, 0xFF, 0x85, 0xDB, 0x75, 0x05, 0xE8};
-				uint num1 = this.Process.FindPattern(bPattern1, "?xxxxxx??xxxxxxx????xxxx??xxxx???xxxxxx??xxxxxxx");
-				byte[] bPattern2 = new byte[] {0x0D, 0x8B, 0xC8, 0xE8, 0xD8, 0xAB, 0xCD, 0xFF, 0xA3, 0x50, 0x58, 0x65, 0x02, 0xC3, 0xC7, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xC3, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0x8B, 0x0D, 0x68, 0x58, 0x65, 0x02, 0x85, 0xC9, 0x74, 0x0F, 0xE8, 0xC1, 0xC2, 0x21, 0x00, 0xC7};
-				uint num2 = this.Process.FindPattern(bPattern2, "xxxx??xxx??xxxxx????xxxxxxxxxxxxxx????xxxxx??xxx");
-				byte[] bPattern3 = new byte[] {0xE8, 0x53, 0x96, 0xCD, 0xFF, 0x56, 0xE8, 0x1D, 0x53, 0xE7, 0xFF, 0x83, 0xC4, 0x04, 0xC7, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x5E, 0xC3, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0x55, 0x8B, 0xEC, 0x51, 0x53, 0x56, 0xBA, 0x01};
-				uint num3 = this.Process.FindPattern(bPattern3, "x??xxxx???xxxxxx????xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-				if (num1 != 0x800000)
-					num1 = this.Process.ReadUInt(num1 + 16);
-				else
-					num1 = 0;
-				if (num2 != 0x800000)
-					num2 = this.Process.ReadUInt(num2 + 16);
-				else
-					num2 = 0;
-				if (num3 != 0x800000)
-					num3 = this.Process.ReadUInt(num3 + 16);
-				else
-					num3 = 0;
+				byte[] bPattern = new byte[] { 0x8B, 0x0D, 0, 0, 0, 0, 0x56, 0xE8, 0, 0, 0, 0, 0x8B, 0x0D, 0, 0, 0, 0, 0x8B, 0xF1 };
+				uint num = this.Process.FindPattern(bPattern, "xx????xx????xx????xx");
+				if (num != (uint)this.Process.MainModule.BaseAddress)
+				{
+					if(this.Process.ReadUInt(num + 2) == this.Process.ReadUInt(num + 14))
+						this._MapInfoPtr = this.Process.ReadUInt(num + 2);
+				}
 
-				if (num1 != 0 && (num1 == num2 || num1 == num3))
-					this._MapInfoPtr = num1;
-				else if (num2 != 0 && num2 == num3)
-					this._MapInfoPtr = num2;
-				else if (num1 != 0)
-					this._MapInfoPtr = num1;
-				else if (num2 != 0)
-					this._MapInfoPtr = num2;
-				else if (num3 != 0)
-					this._MapInfoPtr = num3;
-				else
-					this._MapInfoPtr = 0;
 			}
 			return this._MapInfoPtr;
 		}
 
 		public uint PlayerSelection()
 		{
-			/*if (this.Process == null)
+			if (this.Process == null)
 			{
 				return 0;
 			}
 			if (this._PlayerSelection == 0)
 			{
-				byte[] bPattern = new byte[] { 
-					15, 0xb6, 0xc9, 0x8b, 0xc1, 0x69, 0xc9, 0xb0, 0x81, 0, 0, 0x69, 0xc0, 0xf8, 12, 0, 
-					0, 5, 0, 0, 0, 0
-				 };
-				uint num = this.Process.FindPattern(bPattern, "xxxxxxxxxxxxxxxxxx????");
-				if (num != 0x800000)
+				byte[] bPattern = new byte[] { 0x0F, 0xB6, 0xC1, 0x69, 0xC0, 0x60, 0x1B, 0x00, 0x00, 0x05, 0, 0, 0, 0, 0xC3 };
+				uint num = this.Process.FindPattern(bPattern, "xxxxxxxxxx????x");
+				if (num != (uint)this.Process.MainModule.BaseAddress)
 				{
-					this._PlayerSelection = this.Process.ReadUInt(num + 0x12);
+					this._PlayerSelection = this.Process.ReadUInt(num + 10);
 				}
-			}*/
-			return 0;
-			//return this._PlayerSelection;
+			}
+			return this._PlayerSelection;
 		}
 
 		public uint PlayerStruct()
@@ -253,8 +266,9 @@ namespace PatternScanner
 			{
 				byte[] bPattern = new byte[] { 15, 0xb6, 0xc1, 0x69, 0xc0, 0, 0, 0, 0, 5, 0, 0, 0, 0 };
 				uint num = this.Process.FindPattern(bPattern, "xxxxx??xxx????");
-				if (num != 0x800000)
+				if (num != (uint)this.Process.MainModule.BaseAddress)
 				{
+					this._PlayerStructSize = this.Process.ReadUShort(num + 5);
 					this._PlayerStruct = this.Process.ReadUInt(num + 10);
 				}
 			}
@@ -271,9 +285,10 @@ namespace PatternScanner
 			{
 				byte[] bPattern = new byte[] { 15, 0xb6, 0xc1, 0x69, 0xc0, 0, 0, 0, 0, 5, 0, 0, 0, 0 };
 				uint num = this.Process.FindPattern(bPattern, "xxxxx??xxx????");
-				if (num != 0x800000)
+				if (num != (uint)this.Process.MainModule.BaseAddress)
 				{
 					this._PlayerStructSize = this.Process.ReadUShort(num + 5);
+					this._PlayerStruct = this.Process.ReadUInt(num + 10);
 				}
 			}
 			return this._PlayerStructSize;
@@ -290,7 +305,7 @@ namespace PatternScanner
 				Console.WriteLine("Player Struct: 0x" + string.Format("{0:X}", this.PlayerStruct()));
 				Console.WriteLine("Player Struct Size: 0x" + string.Format("{0:X}", this.PlayerStructSize()));
 				Console.WriteLine("Unit Struct: 0x" + string.Format("{0:X}", this.UnitStruct()));
-				Console.WriteLine("Map Information Pointer: 0x" + string.Format("{0:X}", this.MapInfoPtr()));
+				Console.WriteLine("Map Information Pointer: 0x" + string.Format("{0:X}", this.MapBounds()));
 				Console.WriteLine("Player Selection: 0x" + string.Format("{0:X}", this.PlayerSelection()));
 				Console.WriteLine("Local Selection: 0x" + string.Format("{0:X}", this.LocalSelection()));
 			}
@@ -333,12 +348,12 @@ namespace PatternScanner
 			{
 				byte[] bPattern = new byte[] { 0xc1, 0xe0, 6, 5, 0, 0, 0, 0, 0x33 };
 				uint num = this.Process.FindPattern(bPattern, "xxxx????x");
-				if (num == 0x800000)
+				if (num == (uint)this.Process.MainModule.BaseAddress)
 				{
 					bPattern = new byte[] { 0xc1, 0xe0, 7, 5, 0, 0, 0, 0, 0x33 };
 					num = this.Process.FindPattern(bPattern, "xxxx????x");
 				}
-				if (num != 0x800000)
+				if (num != (uint)this.Process.MainModule.BaseAddress)
 				{
 					this._UnitStruct = this.Process.ReadUInt(num + 4);
 				}

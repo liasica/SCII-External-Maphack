@@ -197,9 +197,6 @@
     <Compile Include="Data\Selection.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Data\control_group_s.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Data\CreepSpeed.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -330,9 +327,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Data\Scale.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Data\selected_units_s.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Data\SpendLocation.cs">

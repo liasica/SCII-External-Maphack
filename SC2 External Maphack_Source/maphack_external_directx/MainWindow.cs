@@ -1013,12 +1013,12 @@ namespace maphack_external_directx
 			Locks.Map.EnterWriteLock();
 			map_width = GameData.MapFullWidth;
 			map_height = GameData.MapFullHeight;
-			playable_map_width = GameData.MapPlayableWidth2;
-			playable_map_height = GameData.MapPlayableHeight2;
-			playable_map_left = GameData.MapEdgeLeft2;
-			playable_map_right = GameData.MapEdgeRight2;
-			playable_map_top = GameData.MapEdgeTop2;
-			playable_map_bottom = GameData.MapEdgeBottom2;
+			playable_map_width = GameData.MapPlayableWidth;
+			playable_map_height = GameData.MapPlayableHeight;
+			playable_map_left = GameData.MapEdgeLeft;
+			playable_map_right = GameData.MapEdgeRight;
+			playable_map_top = GameData.MapEdgeTop;
+			playable_map_bottom = GameData.MapEdgeBottom;
 			int lol = 0;
 			Locks.Map.ExitWriteLock();
 
