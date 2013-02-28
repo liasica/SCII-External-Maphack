@@ -275,6 +275,7 @@ namespace Utilities.WebTools
 			return false;
 		}
 
+
 		public static void CreateGitHubIssue(string title, string message)
 		{
 			try
@@ -310,50 +311,46 @@ namespace Utilities.WebTools
 
 		public static void ReportCrashToGitHub(Exception ex, string appplicationTitle, IntPtr? handleToScreenShot = new IntPtr?(), Size? screenShotSize = new Size?(), bool messageBox = true)
 		{
-			if (ex is FileNotFoundException && ex.Message.Contains("fasmdll_managed.dll") && File.Exists("fasmdll_managed.dll"))
+			try
 			{
-				DialogResult ShowDownloadPage = MessageBox.Show("The module \"fasmdll_managed.dll\" could not be loaded. This is probably because you don't have the Microsoft Visual C++ 2010 Redistributable Package.\nDo you want to open the download page in a web browser?", "Missing File", MessageBoxButtons.YesNo, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
-				if (ShowDownloadPage == DialogResult.Yes)
+				if (ex is FileNotFoundException && ex.Message.Contains("fasmdll_managed.dll") && File.Exists("fasmdll_managed.dll"))
 				{
-					Process.Start("http://www.microsoft.com/download/en/details.aspx?id=5555");
+					DialogResult ShowDownloadPage = MessageBox.Show("The module \"fasmdll_managed.dll\" could not be loaded. This is probably because you don't have the Microsoft Visual C++ 2010 Redistributable Package.\nDo you want to open the download page in a web browser?", "Missing File", MessageBoxButtons.YesNo, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
+					if (ShowDownloadPage == DialogResult.Yes)
+					{
+						Process.Start("http://www.microsoft.com/download/en/details.aspx?id=5555");
+					}
+					return;
 				}
+
+				if ((ex is FileNotFoundException || ex is FileLoadException) && ex.Message.Contains("Microsoft.DirectX.Direct3DX"))
+				{
+					DialogResult ShowDownloadPage = MessageBox.Show("The module \"Microsoft.DirectX.Direct3DX.dll\" could not be loaded. This is probably because you're missing something required by Direct3D.\nInstalling the Microsoft DirectX End-User Runtime should fix the problem.\nDo you want to open the download page in a web browser?", "Missing File", MessageBoxButtons.YesNo, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
+					if (ShowDownloadPage == DialogResult.Yes)
+					{
+						Process.Start("http://www.microsoft.com/en-us/download/details.aspx?id=35");
+					}
+					return;
+				}
+
+				string result = null;
+				if (GitHubIssueExists(ex.Message, ex.ToString()))
+				{
+					result = CrashReportWindow.Show("Unexpected Crash", "This problem has already been reported. However, if you have any additional information that you think may be useful, you can add it and submit a report anyway.", ex);
+					if (!string.IsNullOrWhiteSpace(result) && result != ex.ToString())
+						CreateGitHubIssue(ex.Message, result);
+					else
+						return;
+				}
+
+				result = CrashReportWindow.Show("Unexpected Crash", "Would you like to submit a report? If you have any additional information that you think may be useful, please add it. Then click the Send Crash Report button.", ex);
+				if(!string.IsNullOrWhiteSpace(result))
+					CreateGitHubIssue(ex.Message, result);
+			}
+			finally
+			{
 				Application.Exit();
-				return;
 			}
-
-			if ((ex is FileNotFoundException || ex is FileLoadException) && ex.Message.Contains("Microsoft.DirectX.Direct3DX"))
-			{
-				DialogResult ShowDownloadPage = MessageBox.Show("The module \"Microsoft.DirectX.Direct3DX.dll\" could not be loaded. This is probably because you're missing something required by Direct3D.\nInstalling the Microsoft DirectX End-User Runtime should fix the problem.\nDo you want to open the download page in a web browser?", "Missing File", MessageBoxButtons.YesNo, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
-				if (ShowDownloadPage == DialogResult.Yes)
-				{
-					Process.Start("http://www.microsoft.com/en-us/download/details.aspx?id=35");
-				}
-				Application.Exit();
-				return;
-			}
-		
-
-			if(GitHubIssueExists(ex.Message, ex.ToString()))
-			{
-				MessageBox.Show("Uh oh... It appears we have a crash. This problem has already been reported by somebody else, so please be patient while it is fixed.", "Unexpected Crash", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
-				return;
-			}
-
-		CheeZecake:
-			DialogResult result = MessageBox.Show("Uh oh... It appears we have a crash. Would you like to submit a report? This does not require you to do anyhting more after clicking Yes, and does not contain any information other than what the error was and where in the program it occurred.", "Unexpected Crash", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
-			if (result == DialogResult.Yes)
-			{
-				CreateGitHubIssue(ex.Message, ex.ToString());
-			}
-			if (result == DialogResult.No)
-			{
-				result = MessageBox.Show("Are you sure? I can't fix a problem if I don't know what that problem is. Submitting the crash report is as easy as clicking Cancel and choosing Yes next time.", "Are you sure?", MessageBoxButtons.OKCancel, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
-				if (result == DialogResult.Cancel)
-				{
-					goto CheeZecake;
-				}
-			}
-			Application.Exit();
 		}
 	}
 }

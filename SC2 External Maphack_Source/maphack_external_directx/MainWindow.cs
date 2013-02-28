@@ -148,6 +148,7 @@ namespace maphack_external_directx
 		public MainWindow()
 		{
 			this.InitializeComponent();
+
 			this.Text += " " + version_string;
 
 			if (!Directory.Exists(settings_folder))
