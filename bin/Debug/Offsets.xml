@@ -57,16 +57,28 @@
     <Member Name="num_pages" Type="Unsigned" Size="2" Offset="highlighted_type+2" AbsoluteOffset="0x6" />
     <Member Name="selected_IDs" Type="Unsigned" Size="4" Count="500" Offset="num_pages+2" AbsoluteOffset="0x8" />
   </Struct>
-  <Struct Name="MapBounds" Size="-1" Address="SC2.exe+0x20980D4">
+  <Struct Name="CameraBounds" Size="-1" Address="SC2.exe+0x20980D4">
     <Member Name="left_precise" Type="Fixed" Size="4" Offset="0" />
     <Member Name="bottom_precise" Type="Fixed" Size="4" Offset="left_precise+4" AbsoluteOffset="0x4" />
     <Member Name="right_precise" Type="Fixed" Size="4" Offset="bottom_precise+4" AbsoluteOffset="0x8" />
     <Member Name="top_precise" Type="Fixed" Size="4" Offset="right_precise+4" AbsoluteOffset="0xC" />
   </Struct>
-  <Struct Name="MapInfoPtr" Size="-1" Address="SC2.exe+0x24C42C8">
-    <Member Name="Pointer" Type="Unsigned" Size="4" Offset="0" />
+  <Struct Name="MapInfo" Size="-1" Address="SC2.exe+0x24C42C8">
+    <Member Name="FileInfoPointer" Type="Unsigned" Size="4" Offset="0" />
+    <Member Name="FullWidthI" Type="Signed" Size="4" Offset="0x108"/>
+    <Member Name="FullHeightI" Type="Signed" Size="4" Offset="FullWidthI+4" AbsoluteOffset="0x10C" />
+    <Member Name="FullWidthF" Type="Fixed" Size="4" Offset="FullHeightI+4" AbsoluteOffset="0x110" />
+    <Member Name="FullHeightF" Type="Fixed" Size="4" Offset="FullWidth2F+4" AbsoluteOffset="0x114" />
+    <Member Name="LeftI" Type="Signed" Size="4" Offset="FullHeight2F+4" AbsoluteOffset="0x118" />
+    <Member Name="BottomI" Type="Signed" Size="4" Offset="LeftI+4" AbsoluteOffset="0x11C" />
+    <Member Name="RightI" Type="Signed" Size="4" Offset="BottomI+4" AbsoluteOffset="0x120" />
+    <Member Name="TopI" Type="Signed" Size="4" Offset="RightI+4" AbsoluteOffset="0x124" />
+    <Member Name="LeftF" Type="Fixed" Size="4" Offset="TopI+4" AbsoluteOffset="0x128" />
+    <Member Name="BottomF" Type="Fixed" Size="4" Offset="LeftF+4" AbsoluteOffset="0x12C" />
+    <Member Name="RightF" Type="Fixed" Size="4" Offset="BottomF+4" AbsoluteOffset="0x130" />
+    <Member Name="TopF" Type="Fixed" Size="4" Offset="RightF+4" AbsoluteOffset="0x134" />
   </Struct>
-  <Struct Name="MapInfoStruct" Size="-1">
+  <Struct Name="MapFileInfo" Size="-1">
     <Member Name="FilenameLength" Type="Unsigned" Size="4" Offset="0xC" />
     <Member Name="Filename" Type="String" Size="256" Offset="FilenameLength+8" AbsoluteOffset="0x14" />
     <Member Name="Filename2Length" Type="Unsigned" Size="4" Offset="Filename+0x114" AbsoluteOffset="0x128" />

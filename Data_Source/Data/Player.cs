@@ -86,16 +86,16 @@ namespace Data
 			_memoryAddress = (uint)GameData.offsets.GetArrayElementAddress(ORNames.Players, number);
 			
 			_nameLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.name_length);
-			_name = ((string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.name)).Substring(0, _nameLength);
+			_name = ((string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.name));
 			_NameWithTag = _name;
 
 			_ClanTagLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.ClanTagLength);
-			_ClanTag = ((string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.ClanTag)).Substring(0, _ClanTagLength);
+			_ClanTag = ((string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.ClanTag));
 			if (_ClanTagLength > 0)
 				_NameWithTag = "[" + _ClanTag + "] " + _name;
 
 			_HandleLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.HandleLength);
-			_Handle = ((string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.Handle)).Substring(0, _HandleLength);
+			_Handle = ((string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.Handle));
 			
 
 			uint num = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.racePointer) + 4, typeof(uint));

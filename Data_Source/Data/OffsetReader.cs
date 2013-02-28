@@ -75,12 +75,12 @@ namespace Data
 				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.Timer2() - BaseAddress).ToString("X");
 				Current =
 					from el in File.Root.Elements("Struct")
-					where el.Attribute("Name").Value == "MapBounds"
+					where el.Attribute("Name").Value == "CameraBounds"
 					select el;
 				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.MapBounds() - BaseAddress).ToString("X");
 				Current =
 					from el in File.Root.Elements("Struct")
-					where el.Attribute("Name").Value == "MapInfoPtr"
+					where el.Attribute("Name").Value == "MapInfo"
 					select el;
 				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.MapInfoPtr() - BaseAddress).ToString("X");
 				Current =
@@ -323,7 +323,11 @@ namespace Data
 				int Length = GetStructMemberSize(Struct, Member);
 				byte[] buffer = new byte[Length];
 				mem.ReadMemory((IntPtr)(GetStructMemberOffset(Struct, Member) + Address), buffer.Length, out buffer);
-				return System.Text.Encoding.UTF8.GetString(buffer).TrimEnd('\0');
+				string ReturnValS = Encoding.UTF8.GetString(buffer);
+				int NullPos = ReturnValS.IndexOf('\0');
+				if(NullPos >= 0)
+					ReturnValS = ReturnValS.Remove(NullPos);
+				return ReturnValS;
 			}
 
 			int Count = GetStructMemberCount(Struct, Member);
@@ -369,7 +373,13 @@ namespace Data
 			}
 
 			if (type == StringType)
-				return System.Text.Encoding.UTF8.GetString(Data, Offset, Size).TrimEnd('\0');
+			{
+				string ReturnValS = Encoding.UTF8.GetString(Data, Offset, Size);
+				int NullPos = ReturnValS.IndexOf('\0');
+				if (NullPos >= 0)
+					ReturnValS = ReturnValS.Remove(NullPos);
+				return ReturnValS;
+			}
 			if(Count <= 0)
 				return ReadWriteMemory.RawDeserialize(Data, Offset, type);
 

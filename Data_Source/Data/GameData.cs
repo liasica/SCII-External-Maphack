@@ -166,23 +166,23 @@ namespace Data
 			info.edgeBottom = (int) Math.Round((double) (((double) info.edgeBottom) / 4096.0));
 			info.playableX = info.edgeRight - info.edgeLeft;
 			info.playableY = info.edgeTop - info.edgeBottom;*/
-			num = (uint)offsets.ReadStructMember(ORNames.MapInfoPtr, ORNames.Pointer);
+			num = (uint)offsets.ReadStructMember(ORNames.MapInfo, ORNames.FileInfoPointer);
 			if (num == 0)
 			{
 				map.mapInfo = new MapInfo();
 				return map;
 			}
-			byte[] data = offsets.ReadStruct(ORNames.MapInfoStruct, (int)num);
+			byte[] data = offsets.ReadStruct(ORNames.MapFileInfo, (int)num);
 
 			map_information_s _s = new map_information_s();
 			_s = (map_information_s) mem.ReadMemory(num, typeof(map_information_s));
 
-			info.filePath = ((string)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.Filename, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.FilenameLength, data));
-			info.filePath2 = ((string)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.Filename2, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.Filename2Length, data));
-			info.name = ((string)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.Name, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.NameLength, data));
+			info.filePath = ((string)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Filename, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.FilenameLength, data));
+			info.filePath2 = ((string)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Filename2, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Filename2Length, data));
+			info.name = ((string)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Name, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.NameLength, data));
 			info.author = _s.Author;
 			info.descriptionBasic = _s.DescriptionBasic;
-			info.desciptionExtended = ((string)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.Description, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapInfoStruct, ORNames.DescriptionLength, data));
+			info.desciptionExtended = ((string)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Description, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.DescriptionLength, data));
 			map.mapInfo = info;
 			return map;
 		}
@@ -354,7 +354,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapBounds, ORNames.bottom_precise) + 0.5);
+				return (int)Math.Round((fixed32)offsets.ReadStructMember(ORNames.CameraBounds, ORNames.bottom_precise) - 4);
 			}
 		}
 
@@ -362,7 +362,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapBounds, ORNames.left_precise) + 0.5);
+				return (int)Math.Round((fixed32)offsets.ReadStructMember(ORNames.CameraBounds, ORNames.left_precise) - 7);
 			}
 		}
 
@@ -370,7 +370,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapBounds, ORNames.right_precise) + 0.5);
+				return (int)Math.Round((fixed32)offsets.ReadStructMember(ORNames.CameraBounds, ORNames.right_precise) + 7);
 			}
 		}
 
@@ -378,7 +378,7 @@ namespace Data
 		{
 			get
 			{
-				return (int)((fixed32)offsets.ReadStructMember(ORNames.MapBounds, ORNames.top_precise) + 0.5);
+				return (int)Math.Round((fixed32)offsets.ReadStructMember(ORNames.CameraBounds, ORNames.top_precise) + 4);
 			}
 		}
 
@@ -398,19 +398,19 @@ namespace Data
 			}
 		}
 
-		public static int MapFullHeight //Todo: find the correct value and make this return it.
+		public static int MapFullHeight
 		{
 			get
 			{
-				return MapPlayableHeight;
+				return (int)offsets.ReadStructMember(ORNames.MapInfo, ORNames.FullHeightI);
 			}
 		}
 
-		public static int MapFullWidth //Todo: find the correct value and make this return it.
+		public static int MapFullWidth
 		{
 			get
 			{
-				return MapPlayableWidth;
+				return (int)offsets.ReadStructMember(ORNames.MapInfo, ORNames.FullWidthI);
 			}
 		}
 
@@ -584,6 +584,7 @@ namespace Data
 					if (processesByName.Length != 0)
 					{
 						_SC2Process = processesByName[processesByName.Length - 1];
+						_SC2Version = null;
 						_SC2Handle = IntPtr.Zero;
 						_mem = null;
 					}
