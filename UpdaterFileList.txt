@@ -2,7 +2,7 @@
 2cs-API.pdb|L|2cs-API.dll|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/2cs-API.pdb|87552
 BlackMagic.dll|V|1.0.0.0|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/BlackMagic.dll|37888
 BlackMagic.pdb|L|BlackMagic.dll|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/BlackMagic.pdb|130560
-Data.dll|V|1.1.1.0|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Data.dll|167936
+Data.dll|V|1.1.2.0|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Data.dll|167936
 Data.pdb|L|Data.dll|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Data.pdb|228864
 fasmdll_managed.dll|C|33499f628c829afbfc34b9dc0ed87471|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/fasmdll_managed.dll|135680
 fasmdll_managed.pdb|L|fasmdll_managed.dll|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/fasmdll_managed.pdb|404480

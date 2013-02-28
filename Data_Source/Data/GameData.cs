@@ -177,12 +177,12 @@ namespace Data
 			map_information_s _s = new map_information_s();
 			_s = (map_information_s) mem.ReadMemory(num, typeof(map_information_s));
 
-			info.filePath = ((string)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Filename, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.FilenameLength, data));
-			info.filePath2 = ((string)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Filename2, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Filename2Length, data));
-			info.name = ((string)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Name, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.NameLength, data));
+			info.filePath = (string)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Filename, data);
+			info.filePath2 = (string)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Filename2, data);
+			info.name = (string)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Name, data);
 			info.author = _s.Author;
 			info.descriptionBasic = _s.DescriptionBasic;
-			info.desciptionExtended = ((string)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Description, data)).Substring(0, (int)(uint)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.DescriptionLength, data));
+			info.desciptionExtended = (string)offsets.ReadStructMember(ORNames.MapFileInfo, ORNames.Description, data);
 			map.mapInfo = info;
 			return map;
 		}
