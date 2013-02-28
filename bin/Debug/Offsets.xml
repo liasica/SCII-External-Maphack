@@ -68,8 +68,8 @@
     <Member Name="FullWidthI" Type="Signed" Size="4" Offset="0x108"/>
     <Member Name="FullHeightI" Type="Signed" Size="4" Offset="FullWidthI+4" AbsoluteOffset="0x10C" />
     <Member Name="FullWidthF" Type="Fixed" Size="4" Offset="FullHeightI+4" AbsoluteOffset="0x110" />
-    <Member Name="FullHeightF" Type="Fixed" Size="4" Offset="FullWidth2F+4" AbsoluteOffset="0x114" />
-    <Member Name="LeftI" Type="Signed" Size="4" Offset="FullHeight2F+4" AbsoluteOffset="0x118" />
+    <Member Name="FullHeightF" Type="Fixed" Size="4" Offset="FullWidthF+4" AbsoluteOffset="0x114" />
+    <Member Name="LeftI" Type="Signed" Size="4" Offset="FullHeightF+4" AbsoluteOffset="0x118" />
     <Member Name="BottomI" Type="Signed" Size="4" Offset="LeftI+4" AbsoluteOffset="0x11C" />
     <Member Name="RightI" Type="Signed" Size="4" Offset="BottomI+4" AbsoluteOffset="0x120" />
     <Member Name="TopI" Type="Signed" Size="4" Offset="RightI+4" AbsoluteOffset="0x124" />
