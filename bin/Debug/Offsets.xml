@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- The "AbsoluteOffset" attribute on Struct Members is the absolute offset if Offset was relative to another Member.
      This attribute is for ease of reading only; changing it won't affect do anything. -->
-<Offsets Version="2.0.4.24944">
-  <Array Name="Players" Type="Player" Size="16" Address="SC2.exe+0x2576240" />
-  <Array Name="Units" Type="Unit" Size="0x4000" Address="SC2.exe+0x25F3780" />
+<Offsets Version="2.0.5.25092">
+  <Array Name="Players" Type="Player" Size="16" Address="SC2.exe+0x2578200" />
+  <Array Name="Units" Type="Unit" Size="0x4000" Address="SC2.exe+0x25F5740" />
   <Array Name="CurrentSelections" Type="Selection" Size="16" Address="SC2.exe+0x0" />
   <Array Name="PlayerControlGroups" Type="ControlGroup" Size="16" Address="SC2.exe+0" />
-  <Array Name="GalaxyDataTable" Type="GalaxyTableEntry" Size="0x8000" Address="SC2.exe+0x1DB5A58" />
-  <Struct Name="Timer" Size="4" Address="SC2.exe+0x24C437C">
+  <Array Name="GalaxyDataTable" Type="GalaxyTableEntry" Size="0x8000" Address="SC2.exe+0x1DB7A18" />
+  <Struct Name="Timer" Size="4" Address="SC2.exe+0x24C633C">
     <Member Name="timer" Type="Fixed" Size="4" Offset="0" />
   </Struct>
-  <Struct Name="Timer2" Size="4" Address="SC2.exe+0x10FC374">
+  <Struct Name="Timer2" Size="4" Address="SC2.exe+0x10FE334">
     <Member Name="timer" Type="Unsigned" Size="4" Offset="0" />
   </Struct>
-  <Struct Name="LocalPlayer" Size="1" Address="SC2.exe+0x10E19C8">
+  <Struct Name="LocalPlayer" Size="1" Address="SC2.exe+0x10E39C8">
     <Member Name="LocalPlayer" Type="Unsigned" Size="1" Offset="0" />
     <Member Name="ReplayWatchedPlayer" Type="Unsigned" Size="1" Offset="1" />
   </Struct>
@@ -23,18 +23,29 @@
   </Struct>
   <Struct Name="QueuedCommand" Size="51">
     <Member Name="pNextCommand" Type="Unsigned" Size="4" Offset="0" />
-    <!-- A Struct of type Command starts at offset 8. Due to limitations of the current OffsetReader system,
-         it has to be read separately from the same data, starting 8 bytes in. Hence the size of 51 -->
+    <!-- A Struct of type Command starts here. I just copied all the members in for this version of OffsetReader. -->
+    <Member Name="AbilityID" Type="Unsigned" Size="4" Offset="pNextCommand+0x1C" AbsoluteOffset="0x1C" />
+    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="AbilityID+4" AbsoluteOffset="0x20" />
+    <Member Name="TargetUnitModelPtr" Type="Unsigned" Size="4" Offset="TargetUnitID+4" AbsoluteOffset="0x24" />
+    <Member Name="TargetX" Type="Fixed" Size="4" Offset="TargetUnitModelPtr+4" AbsoluteOffset="0x28" />
+    <Member Name="TargetY" Type="Fixed" Size="4" Offset="TargetX+4" AbsoluteOffset="0x2C" />
+    <Member Name="TargetZ" Type="Fixed" Size="4" Offset="TargetY+4" AbsoluteOffset="0x30" />
+    <Member Name="Unknown1C" Type="Unsigned" Size="4" Offset="TargetZ+4" AbsoluteOffset="0x34" />
+    <Member Name="TargetFlags" Type="Unsigned" Size="4" Offset="Unknown1C+4" AbsoluteOffset="0x38" />
+    <Member Name="Flags" Type="Unsigned" Size="4" Offset="TargetFlags+4" AbsoluteOffset="0x3C" />
+    <Member Name="AbilityCommand" Type="Unsigned" Size="1" Offset="Flags+4" AbsoluteOffset="0x40" />
+    <Member Name="Player" Type="Unsigned" Size="1" Offset="AbilityCommand+2" AbsoluteOffset="0x42" />
   </Struct>
   <Struct Name="Command" Size="43">
     <Member Name="AbilityID" Type="Unsigned" Size="4" Offset="0" />
-    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="AbilityID+8" AbsoluteOffset="0x8" />
-    <Member Name="TargetUnitModelPtr" Type="Unsigned" Size="4" Offset="TargetUnitID+4" AbsoluteOffset="0xC" />
-    <Member Name="TargetX" Type="Fixed" Size="4" Offset="TargetUnitModelPtr+4" AbsoluteOffset="0x10" />
-    <Member Name="TargetY" Type="Fixed" Size="4" Offset="TargetX+4" AbsoluteOffset="0x14" />
-    <Member Name="TargetZ" Type="Fixed" Size="4" Offset="TargetY+4" AbsoluteOffset="0x18" />
-    <Member Name="Unknown1C" Type="Unsigned" Size="4" Offset="TargetZ+4" AbsoluteOffset="0x1C" />
-    <Member Name="Flags" Type="Unsigned" Size="4" Offset="Unknown1C+4" AbsoluteOffset="0x20" />
+    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="AbilityID+4" AbsoluteOffset="0x4" />
+    <Member Name="TargetUnitModelPtr" Type="Unsigned" Size="4" Offset="TargetUnitID+4" AbsoluteOffset="0x8" />
+    <Member Name="TargetX" Type="Fixed" Size="4" Offset="TargetUnitModelPtr+4" AbsoluteOffset="0xC" />
+    <Member Name="TargetY" Type="Fixed" Size="4" Offset="TargetX+4" AbsoluteOffset="0x10" />
+    <Member Name="TargetZ" Type="Fixed" Size="4" Offset="TargetY+4" AbsoluteOffset="0x14" />
+    <Member Name="Unknown1C" Type="Unsigned" Size="4" Offset="TargetZ+4" AbsoluteOffset="0x18" />
+    <Member Name="TargetFlags" Type="Unsigned" Size="4" Offset="Unknown1C+4" AbsoluteOffset="0x1C" />
+    <Member Name="Flags" Type="Unsigned" Size="4" Offset="TargetFlags+4" AbsoluteOffset="0x20" />
     <Member Name="AbilityCommand" Type="Unsigned" Size="1" Offset="Flags+4" AbsoluteOffset="0x24" />
     <Member Name="Player" Type="Unsigned" Size="1" Offset="AbilityCommand+2" AbsoluteOffset="0x26" />
   </Struct>
@@ -50,22 +61,22 @@
     <Member Name="Group9" Type="Byte" Size="-1" Offset="Group8+0x1B60" AbsoluteOffset="0xDB00" />
     <Member Name="Group10" Type="Byte" Size="-1" Offset="Group9+0x1B60" AbsoluteOffset="0xF660" />
   </Struct>
-  <Struct Name="Selection" Size="0x1B60" Address="SC2.exe+0x2159FD0">
+  <Struct Name="Selection" Size="0x1B60" Address="SC2.exe+0x215BF90">
     <Member Name="num_selected" Type="Unsigned" Size="2" Offset="0x0" />
     <Member Name="num_types_selected" Type="Unsigned" Size="2" Offset="num_selected+2" AbsoluteOffset="0x2" />
     <Member Name="highlighted_type" Type="Unsigned" Size="2" Offset="num_types_selected+2" AbsoluteOffset="0x4" />
     <Member Name="num_pages" Type="Unsigned" Size="2" Offset="highlighted_type+2" AbsoluteOffset="0x6" />
     <Member Name="selected_IDs" Type="Unsigned" Size="4" Count="500" Offset="num_pages+2" AbsoluteOffset="0x8" />
   </Struct>
-  <Struct Name="CameraBounds" Size="-1" Address="SC2.exe+0x20980D4">
+  <Struct Name="CameraBounds" Size="-1" Address="SC2.exe+0x209A094">
     <Member Name="left_precise" Type="Fixed" Size="4" Offset="0" />
     <Member Name="bottom_precise" Type="Fixed" Size="4" Offset="left_precise+4" AbsoluteOffset="0x4" />
     <Member Name="right_precise" Type="Fixed" Size="4" Offset="bottom_precise+4" AbsoluteOffset="0x8" />
     <Member Name="top_precise" Type="Fixed" Size="4" Offset="right_precise+4" AbsoluteOffset="0xC" />
   </Struct>
-  <Struct Name="MapInfo" Size="-1" Address="SC2.exe+0x24C42C8">
+  <Struct Name="MapInfo" Size="-1" Address="SC2.exe+0x24C6288">
     <Member Name="FileInfoPointer" Type="Unsigned" Size="4" Offset="0" />
-    <Member Name="FullWidthI" Type="Signed" Size="4" Offset="0x108"/>
+    <Member Name="FullWidthI" Type="Signed" Size="4" Offset="0x108" />
     <Member Name="FullHeightI" Type="Signed" Size="4" Offset="FullWidthI+4" AbsoluteOffset="0x10C" />
     <Member Name="FullWidthF" Type="Fixed" Size="4" Offset="FullHeightI+4" AbsoluteOffset="0x110" />
     <Member Name="FullHeightF" Type="Fixed" Size="4" Offset="FullWidthF+4" AbsoluteOffset="0x114" />

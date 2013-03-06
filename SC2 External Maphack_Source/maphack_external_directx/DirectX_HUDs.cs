@@ -951,12 +951,42 @@ namespace maphack_external_directx
 				}
 
 			Label_005A:
-				float uDX = unit.destinationX;
+				CommandQueue queue = unit.commandQueue;
+				if(queue == null)
+					continue;
+				float LastX = unit.locationX;
+				float LastY = unit.locationY;
+				foreach (QueuedCommand cmd in queue.Queue)
+				{
+					TargetFlags target = cmd.TargetFlags;
+					float X = LastX;
+					float Y = LastY;
+					if ((target & TargetFlags.TargetIsPoint) != 0)
+					{
+						X = cmd.TargetX;
+						Y = cmd.TargetY;
+					}
+					else if ((target & TargetFlags.TargetIsUnit) != 0)
+					{
+						Unit targetUnit = cmd.TargetUnit;
+						if (targetUnit != null)
+						{
+							X = targetUnit.locationX;
+							Y = targetUnit.locationY;
+						}
+					}
+					else
+						continue;
+					this.DrawLine(LastX, (MainWindow.map_height - LastY), X, (MainWindow.map_height - Y), Color.Yellow, true);
+					LastX = X;
+					LastY = Y;
+				}
+				/*float uDX = unit.destinationX;
 				float uDY = unit.destinationY;
 				if (unit.commandQueuePointer != 0 && (uDX != 0.0) && (uDY != 0.0))
 				{
 					this.DrawLine(unit.locationX, (MainWindow.map_height - unit.locationY), uDX, (MainWindow.map_height - uDY), Color.Yellow, true);
-				}
+				}*/
 				/*float x = unit.locationX + (float) Math.Cos((unit.rotation - 90) * (Math.PI / 180)) * 20;
 				float y = unit.locationY - (float) Math.Sin((unit.rotation - 90) * (Math.PI / 180)) * 20;
 				this.DrawLine(unit.locationX, (MainWindow.map_height - unit.locationY), x, (MainWindow.map_height - y), Color.Lime, true);*/

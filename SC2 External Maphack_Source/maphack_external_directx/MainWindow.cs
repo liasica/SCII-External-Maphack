@@ -24,7 +24,7 @@ namespace maphack_external_directx
 		public static ReaderWriterLockSlim RefreshLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
 		public static Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-		public static string version_string = "v" + version.Major + "." + version.Minor + "." + version.Build;
+		public static string version_string = "v" + version.ToString();
 
 		public static string settings_folder = GameData.path.Length > 0 ? GameData.path.TrimEnd('\\') : Application.ExecutablePath.Remove(Application.ExecutablePath.LastIndexOf('\\'));
 		public static string settings_path = settings_folder + "\\settings.ini";

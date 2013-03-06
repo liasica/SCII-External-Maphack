@@ -220,6 +220,7 @@ namespace Data
 		LeftF,
 		BottomF,
 		RightF,
-		TopF
+		TopF,
+		TargetFlags
 	}
 }
