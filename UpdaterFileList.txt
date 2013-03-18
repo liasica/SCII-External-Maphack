@@ -1,29 +1,29 @@
-2cs-API.dll|V|1.1.0.0|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/2cs-API.dll|118784
-2cs-API.pdb|L|2cs-API.dll|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/2cs-API.pdb|87552
-BlackMagic.dll|V|1.0.0.0|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/BlackMagic.dll|37888
-BlackMagic.pdb|L|BlackMagic.dll|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/BlackMagic.pdb|130560
-Data.dll|V|1.1.4.0|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Data.dll|167936
-Data.pdb|L|Data.dll|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Data.pdb|235008
+2cs-API.dll|C|5e350cd6723eaa4cbd9a9b905bc2f09e|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/2cs-API.dll|118784
+2cs-API.pdb|C|65b66d5d1fc05100ac94ed54d4547ce2|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/2cs-API.pdb|87552
+BlackMagic.dll|C|444e0edd0395df36feb0294f6757a3f2|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/BlackMagic.dll|37888
+BlackMagic.pdb|C|13420a2ab9384575c84549d6cb786624|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/BlackMagic.pdb|130560
+Data.dll|C|1ca34cbef74cbb70167526bb5a4e031b|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Data.dll|167936
+Data.pdb|C|1bfb70aaa23ee269cca337db7ab609a3|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Data.pdb|235008
 fasmdll_managed.dll|C|33499f628c829afbfc34b9dc0ed87471|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/fasmdll_managed.dll|135680
-fasmdll_managed.pdb|L|fasmdll_managed.dll|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/fasmdll_managed.pdb|404480
-ICSharpCode.SharpZipLib.dll|V|0.84.0.0|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/ICSharpCode.SharpZipLib.dll|143360
+fasmdll_managed.pdb|C|04857d361b9e885aab3e480613ae18ad|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/fasmdll_managed.pdb|404480
+ICSharpCode.SharpZipLib.dll|C|2cccadaa3052ceb5b112554f041bcd22|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/ICSharpCode.SharpZipLib.dll|143360
 Microsoft.DirectX.Direct3D.dll|C|7ad4d9fabd109432eed91b359ceae430|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Microsoft.DirectX.Direct3D.dll|473600
 Microsoft.DirectX.Direct3DX.dll|C|25c76c1e29d3e8e7398f0901f558a629|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Microsoft.DirectX.Direct3DX.dll|578560
 Microsoft.DirectX.dll|C|0c453970e89db1c1eb9de087e6eab5ba|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Microsoft.DirectX.dll|223232
-MpqTool.exe|V|0.0.0.0|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/MpqTool.exe|49152
+MpqTool.exe|C|b92cfc226584a219a6447485794dca2a|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/MpqTool.exe|49152
 MpqTool.exe.config|C|e0d80706c31ea90fd5d09fcb3b2d49f9|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/MpqTool.exe.config|144
-MpqTool.pdb|L|MpqTool.exe|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/MpqTool.pdb|91648
+MpqTool.pdb|C|6a175c885b593f9e67e362741a22b7cf|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/MpqTool.pdb|91648
 Offsets.xml|C|95e867f6b70dad407370cba4c707c474|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Offsets.xml|22673
-PatternScan.dll|V|1.1.0.1|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/PatternScan.dll|24576
-PatternScan.pdb|L|PatternScan.dll|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/PatternScan.pdb|28160
-SC2 External Maphack.exe|V|0.14.1.2|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/SC2%20External%20Maphack.exe|860160
+PatternScan.dll|C|64b54654bc43bba256ac48d23fb86dc4|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/PatternScan.dll|24576
+PatternScan.pdb|C|debc7d1babf7e5413e72a0d0f1acd61c|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/PatternScan.pdb|28160
+SC2 External Maphack.exe|C|6654f94040a7e818512ad4f6f2d9e9f8|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/SC2%20External%20Maphack.exe|860160
 SC2 External Maphack.exe.config|C|eac78a3fe06a1255a7652d88da48ec77|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/SC2%20External%20Maphack.exe.config|215
-SC2 External Maphack.pdb|L|SC2 External Maphack.exe|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/SC2%20External%20Maphack.pdb|171520
-SC2RanksAPI.dll|V|0.0.0.0|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/SC2RanksAPI.dll|20480
-SC2RanksAPI.pdb|L|SC2RanksAPI.dll|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/SC2RanksAPI.pdb|19968
-ScreenAPI.dll|V|1.1.0.0|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/ScreenAPI.dll|32768
-ScreenAPI.pdb|L|ScreenAPI.dll|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/ScreenAPI.pdb|44544
-Updater.exe|V|1.1.0.1|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Updater.exe|19968
-Updater.pdb|L|Updater.exe|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Updater.pdb|38400
-Utilities.dll|V|1.1.0.0|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Utilities.dll|192512
-Utilities.pdb|L|Utilities.dll|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Utilities.pdb|257536
+SC2 External Maphack.pdb|C|bdacb051c6aef757acbd6e9e00b52b9d|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/SC2%20External%20Maphack.pdb|171520
+SC2RanksAPI.dll|C|e2eac970d61e86995750cf25bb026e55|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/SC2RanksAPI.dll|20480
+SC2RanksAPI.pdb|C|c41906a189e9b7bcefc6f7508a77ceb6|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/SC2RanksAPI.pdb|19968
+ScreenAPI.dll|C|8054ec7462d19172eeb09ac30ee7123d|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/ScreenAPI.dll|32768
+ScreenAPI.pdb|C|64f8a88658f1c97c3936718916c82b1b|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/ScreenAPI.pdb|44544
+Updater.exe|C|10cd4d0a8ab57f012039058ad3e0407d|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Updater.exe|19968
+Updater.pdb|C|f150a8a9d68849fb5e61499686087f48|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Updater.pdb|38400
+Utilities.dll|C|11c99b7e8f6dbb9b30fe9c24c4d6958f|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Utilities.dll|192512
+Utilities.pdb|C|fef96e7cb7e20f11e684682c9b62530e|https://raw.github.com/MrNukealizer/SCII-External-Maphack/Main/bin/Debug/Utilities.pdb|257536

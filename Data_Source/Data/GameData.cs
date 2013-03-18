@@ -572,6 +572,7 @@ namespace Data
 		public static void ResetProcess()
 		{
 			_SC2Process = null;
+			
 		}
 
 		public static Process SC2Process
@@ -581,12 +582,13 @@ namespace Data
 				if (_SC2Process == null)
 				{
 					Process[] processesByName = Process.GetProcessesByName("SC2");
-					if (processesByName.Length != 0)
+					if (processesByName.Length != 0 && !processesByName[0].HasExited)
 					{
 						_SC2Process = processesByName[processesByName.Length - 1];
 						_SC2Version = null;
 						_SC2Handle = IntPtr.Zero;
-						_mem = null;
+						_mem = new ReadWriteMemory(_SC2Process.Id);
+						_offsets = null;
 					}
 				}
 				return _SC2Process;

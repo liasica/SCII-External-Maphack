@@ -164,100 +164,175 @@ namespace Data
 		}
 	}
 
-	public class Dependency
+	public class Module
 	{
-		string _FileName;
-		string _FilePath;
-		Dictionary<string, DataFile> _DataFiles;
-
+		protected string _FileName;
+		protected string _FilePath;
+		protected string _SubPath;
+		protected List<Module> _Dependencies;
+		protected Dictionary<string, DataFile> _DataFiles;
 		public string FileName
 		{
 			get { return _FileName; }
 		}
-		public string FilePath
+		public string SubPath
 		{
-			get { return _FilePath; }
+			get { return _SubPath; }
+		}
+		public List<Module> Dependencies
+		{
+			get { return _Dependencies; }
 		}
 		public Dictionary<string, DataFile> DataFiles
 		{
 			get { return _DataFiles; }
 		}
 
-		public Dependency()
+		public Module()
 		{
-			_FileName = "";
-			_FilePath = "";
 			_DataFiles = new Dictionary<string, DataFile>();
+			_Dependencies = new List<Module>();
+			_FileName = "";
+			_SubPath = "";
 		}
-		public Dependency(string fileName) : this()
+		public Module(string fileName) : this()
 		{
 			Parse(fileName);
 		}
 		public void Parse(string fileName)
 		{
-			_FileName = fileName;
-			_FilePath = GameData.SC2FilePath.Remove(GameData.SC2FilePath.LastIndexOf("Versions")) + fileName;
-			
-			if (_FileName != "Mods\\Liberty.SC2Mod" && _FileName != "Mods\\LibertyMulti.SC2Mod" && _FileName != "Mods\\Core.SC2Mod"
-				&& _FileName != "Campaigns\\Liberty.SC2Campaign" && _FileName != "Campaigns\\LibertyStory.SC2Campaign")
-			{
-				bool oops = true;
-			}
 			try
 			{
-				MpqManager manager = new MpqManager(_FilePath + "\\Base.SC2Data");
+				if (fileName == null)
+					fileName = string.Empty;
 
-				foreach (MpqEntry entry in manager.MpqArchive)
+				MpqManager manager = null;
+
+				if (File.Exists(fileName))
 				{
-					if (entry.Filename != null && entry.Filename.StartsWith("GameData\\") && entry.Filename.EndsWith(".xml"))
+					manager = new MpqManager(fileName);
+					_FileName = fileName;
+				}
+				else if (Directory.Exists(fileName))
+				{
+					_FileName = fileName;
+				}
+				else
+				{
+					if (fileName.StartsWith("Mods\\") || fileName.StartsWith("Campaigns\\"))
 					{
-						string Name = entry.Filename.Replace("GameData\\", "").Replace(".xml", "");
-						string DataFile = System.Text.Encoding.UTF8.GetString(manager.read(entry.Filename));
-						_DataFiles.Add(Name, new DataFile(Name, DataFile));
+						fileName = GameData.SC2FilePath.Remove(GameData.SC2FilePath.LastIndexOf("Versions")) + fileName;
+						if (File.Exists(fileName))
+						{
+							manager = new MpqManager(fileName);
+							_FileName = fileName;
+						}
+						else if (Directory.Exists(fileName))
+						{
+							_FileName = fileName;
+						}
+					}
+					if (fileName.Contains("Maps\\"))
+					{
+						string Folder = fileName.Remove(fileName.IndexOf("Maps")) + "Campaigns";
+						string Path = fileName.Remove(0, fileName.IndexOf("Maps\\")).Replace('/', '\\') + "\\";
+						foreach (string s in Directory.GetFiles(Folder, "*.SC2Maps", SearchOption.AllDirectories))
+						{
+							manager = new MpqManager(s);
+							if (manager.MpqArchive.FileExists(Path + "DocumentInfo"))
+							{
+								_FileName = s;
+								_SubPath = Path;
+								break;
+							}
+							else
+							{
+								manager.Close();
+								manager = null;
+							}
+						}
 					}
 				}
-				
-				manager.Close();
+
+				if (manager != null)
+				{
+					string DocumentInfo = System.Text.Encoding.UTF8.GetString(manager.read(_SubPath + "DocumentInfo"));
+					XElement DocInfo = XElement.Parse(DocumentInfo);
+
+					foreach (XElement dependency in DocInfo.Element("Dependencies").Elements("Value"))
+					{
+						string Value = dependency.Value;
+						_Dependencies.Add(new Module(Value.Remove(0, Value.IndexOf("file:") + 5).Replace('/', '\\')));
+					}
+				}
+				else if(_FileName.Contains("Swarm") && (File.Exists(_FileName.Replace("Swarm", "Liberty")) || Directory.Exists(_FileName.Replace("Swarm", "Liberty"))))
+					_Dependencies.Add(new Module(_FileName.Replace("Swarm", "Liberty")));
+
+				string GameDataPath = _SubPath + "Base.SC2Data\\GameData\\";
+				if (manager == null && File.Exists(_FileName + "\\Base.SC2Data"))
+				{
+					manager = new MpqManager(_FileName + "\\Base.SC2Data");
+					GameDataPath = _SubPath + "GameData\\";
+				}
+
+				if (manager != null)
+				{
+					foreach (MpqEntry entry in manager.MpqArchive)
+					{
+						if (entry.Filename != null && entry.Filename.StartsWith(GameDataPath) && entry.Filename.EndsWith(".xml"))
+						{
+							string Name = entry.Filename.Replace(GameDataPath, "").Replace(".xml", "");
+							string DataFile = System.Text.Encoding.UTF8.GetString(manager.read(entry.Filename));
+							_DataFiles.Add(Name, new DataFile(Name, DataFile));
+						}
+					}
+
+					manager.Close();
+				}
 			}
-			catch(System.Exception ex)
+			catch (Exception ex)
+			{ }
+		}
+
+		public Dictionary<string, List<DataFile>> GetPrioritizedDataFiles()
+		{
+			Dictionary<string, List<DataFile>> ReturnVal = new Dictionary<string, List<DataFile>>();
+
+			for (int i = _Dependencies.Count - 1; i >= 0; i--)
 			{
-				bool oops = true;
+				Dictionary<string, List<DataFile>> DependencyFiles = _Dependencies[i].GetPrioritizedDataFiles();
+				foreach (string key in DependencyFiles.Keys)
+				{
+					if (!ReturnVal.ContainsKey(key))
+						ReturnVal.Add(key, new List<DataFile>());
+					ReturnVal[key].AddRange(DependencyFiles[key]);
+				}
 			}
+
+			foreach (KeyValuePair<string, DataFile> dataFile in _DataFiles)
+			{
+				if (!ReturnVal.ContainsKey(dataFile.Key))
+					ReturnVal.Add(dataFile.Key, new List<DataFile>());
+
+				ReturnVal[dataFile.Key].Add(dataFile.Value);
+			}
+
+			return ReturnVal;
 		}
 	}
 
-	public class MapData
+	public class MapData : Module
 	{
-		string _FileName;
-		string _SubPath;
-		List<Dependency> _Dependencies;
-		Dictionary<string, DataFile> _RawDataFiles;
 		Dictionary<string, List<DataFile>> _ProcessedDataFiles;
 
-		public string FileName
-		{
-			get { return _FileName; }
-		}
-		public List<Dependency> Dependencies
-		{
-			get { return _Dependencies; }
-		}
-		public Dictionary<string, DataFile> RawDataFiles
-		{
-			get { return _RawDataFiles; }
-		}
 		public Dictionary<string, List<DataFile>> ProcessedDataFiles
 		{
 			get { return _ProcessedDataFiles; }
 		}
 
-		public MapData()
+		public MapData() : base()
 		{
-			_RawDataFiles = new Dictionary<string, DataFile>();
 			_ProcessedDataFiles = new Dictionary<string, List<DataFile>>();
-			_Dependencies = new List<Dependency>();
-			_FileName = "";
-			_SubPath = "";
 		}
 		public MapData(string fileName) : this()
 		{
@@ -265,85 +340,8 @@ namespace Data
 		}
 		public void Parse(string fileName)
 		{
-			if (fileName == null)
-				fileName = string.Empty;
-
-			MpqManager manager = null;
-
-			if (File.Exists(fileName))
-				manager = new MpqManager(fileName);
-			else
-			{
-				if (fileName.Contains("Maps\\Challenges") || fileName.Contains("Maps\\Campaign"))
-				{
-					string Folder = fileName.Remove(fileName.IndexOf("Maps")) + "Campaigns";
-					string Path = fileName.Remove(0, fileName.IndexOf("Maps\\")).Replace('/', '\\') + "\\";
-					foreach (string s in Directory.GetFiles(Folder, "*.SC2Maps", SearchOption.AllDirectories))
-					{
-						manager = new MpqManager(s);
-						if (manager.MpqArchive.FileExists(Path + "DocumentInfo"))
-						{
-							_FileName = s;
-							_SubPath = Path;
-							break;
-						}
-						else
-							manager = null;
-					}
-				}
-			}
-
-			if (manager != null)
-			{
-				string DocumentInfo = System.Text.Encoding.UTF8.GetString(manager.read(_SubPath + "DocumentInfo"));
-				XElement DocInfo = XElement.Parse(DocumentInfo);
-
-				foreach (XElement dependency in DocInfo.Element("Dependencies").Elements("Value"))
-				{
-					string Value = dependency.Value;
-					_Dependencies.Add(new Dependency(Value.Remove(0, Value.IndexOf("file:") + 5).Replace('/', '\\')));
-				}
-
-				foreach (MpqEntry entry in manager.MpqArchive)
-				{
-					if (entry.Filename != null && entry.Filename.StartsWith(_SubPath + "Base.SC2Data\\GameData\\") && entry.Filename.EndsWith(".xml"))
-					{
-						string Name = entry.Filename.Replace(_SubPath + "Base.SC2Data\\GameData\\", "").Replace(".xml", "");
-						string DataFile = System.Text.Encoding.UTF8.GetString(manager.read(entry.Filename));
-						_RawDataFiles.Add(Name, new DataFile(Name, DataFile));
-					}
-				}
-
-				manager.Close();
-			}
-			else
-			{
-				_Dependencies.Add(new Dependency("Mods\\LibertyMulti.SC2Mod"));
-				_Dependencies.Add(new Dependency("Campaigns\\Liberty.SC2Campaign"));
-				_Dependencies.Add(new Dependency("Campaigns\\LibertyStory.SC2Campaign"));
-				_Dependencies.Add(new Dependency("Mods\\Liberty.SC2Mod"));
-				_Dependencies.Add(new Dependency("Mods\\Core.SC2Mod"));
-			}
-
-			for(int i = _Dependencies.Count - 1; i >= 0; i--)
-			{
-				foreach (KeyValuePair<string, DataFile> dataFile in _Dependencies[i].DataFiles)
-				{
-					if (!_ProcessedDataFiles.ContainsKey(dataFile.Key))
-						_ProcessedDataFiles.Add(dataFile.Key, new List<DataFile>());
-
-					_ProcessedDataFiles[dataFile.Key].Add(dataFile.Value);
-				}
-			}
-			
-			foreach (KeyValuePair<string, DataFile> dataFile in _RawDataFiles)
-			{
-				if (!_ProcessedDataFiles.ContainsKey(dataFile.Key))
-					_ProcessedDataFiles.Add(dataFile.Key, new List<DataFile>());
-
-				_ProcessedDataFiles[dataFile.Key].Add(dataFile.Value);
-			}
-
+			base.Parse(fileName);
+			_ProcessedDataFiles = base.GetPrioritizedDataFiles();
 		}
 
 		private static bool SameElement(XElement a, XElement b, bool checkAttributeValues)
@@ -415,6 +413,7 @@ namespace Data
 		
 		public string GetUnitPictureFilename(string unit)
 		{
+
 			string parent = "";
 			string id = "";
 			if (_ProcessedDataFiles.ContainsKey("ActorData"))
