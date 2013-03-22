@@ -20,6 +20,9 @@ namespace PatternScanner
 		private uint _PlayerStructSize;
 		private BlackMagic _process;
 		private uint _UnitStruct;
+		private uint _SelectionFunction;
+		private uint _OrderFunction;
+		private uint _MainLoopHook;
 
 		private void BuildPattern(List<byte> pattern, ref string mask, byte value)
 		{
@@ -293,6 +296,69 @@ namespace PatternScanner
 			}
 			return this._PlayerStructSize;
 		}
+
+		public uint SelectionFunction()
+		{
+			if (this.Process == null)
+			{
+				return 0;
+			}
+			if (this._SelectionFunction == 0)
+			{
+				/*byte[] bPattern = new byte[] { 0x8D, 0x45, 0xFC, 0x50, 0x8D, 0x4D, 0x08, 0xC7, 0x45, 0xFC, 0x1D, 0x00, 0x00, 0x00, 0xE8, 0, 0, 0, 0, 0x6A, 0x01, 0x8A, 0xD3, 0xB9, 0x01, 0x00, 0x00, 0x00 };
+				uint num = this.Process.FindPattern(bPattern, "xxxxxxxxxxxxxxx????xxxxxxxxx");
+				if (num != (uint)this.Process.MainModule.BaseAddress)
+				{
+					this._SelectionFunction = (uint)(num + 19 + this.Process.ReadInt(num + 15));
+				}*/
+
+				byte[] bPattern = new byte[] { 0x55, 0x8B, 0xEC, 0xB8, 0, 0, 0, 0, 0xE8, 0, 0, 0, 0, 0x8A, 0x45, 0x1C, 0x56, 0x8B, 0x75, 0x18, 0x56, 0xE8, 0, 0, 0, 0, 0x85, 0xC0 };
+				uint num = this.Process.FindPattern(bPattern, "xxxx????x????xxxxxxxxx????xx");
+				if (num != (uint)this.Process.MainModule.BaseAddress)
+				{
+					this._SelectionFunction = num;
+				}
+			}
+			return this._SelectionFunction;
+		}
+
+		public uint OrderFunction()
+		{
+			if (this.Process == null)
+			{
+				return 0;
+			}
+			if (this._OrderFunction == 0)
+			{
+				byte[] bPattern = new byte[] { 0x83, 0x3D, 0, 0, 0, 0, 0x00, 0x57, 0x8B, 0xF9, 0x75, 0, 0x8A, 0x47, 0x2A, 0x3A, 0x05, 0, 0, 0, 0, 0x75, 0, 0x8B, 0x47, 0x24,
+					0xA9, 0x00, 0x01, 0x00, 0x00, 0x74, 0, 0xA9, 0x00, 0x00, 0x04, 0x00, 0x75, 0, 0xE8, 0, 0, 0, 0, 0xE8, 0, 0, 0, 0 };
+				uint num = this.Process.FindPattern(bPattern, "xx????xxxxx?xxxxx????x?xxxxxxxxx?xxxxxx?x????x????");
+				if (num != (uint)this.Process.MainModule.BaseAddress)
+				{
+					this._OrderFunction = num;
+				}
+			}
+			return this._OrderFunction;
+		}
+
+		public uint MainLoopHook()
+		{
+			if (this.Process == null)
+			{
+				return 0;
+			}
+			if (this._MainLoopHook == 0)
+			{
+				byte[] bPattern = new byte[] { 0x55, 0x8B, 0xEC, 0x83, 0xEC, 0x1C, 0x53, 0xE8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x6A, 0x00, 0x6A, 0x00, 0x6A, 0x00, 0x6A, 0x00, 0x8D, 0x45, 0xE4, 0x50 };
+				uint num = this.Process.FindPattern(bPattern, "xxxxxxxx??????????xxxxxxxxxxxx");
+				if (num != (uint)this.Process.MainModule.BaseAddress)
+				{
+					this._MainLoopHook = num + 7;
+				}
+			}
+			return this._MainLoopHook;
+		}
+
 
 		public void PrintSC2Patterns()
 		{

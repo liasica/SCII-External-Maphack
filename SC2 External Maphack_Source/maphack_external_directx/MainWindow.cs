@@ -733,7 +733,13 @@ namespace maphack_external_directx
 
 		private void MainWindow_FormClosed(object sender, FormClosedEventArgs e)
 		{
-			Process.GetCurrentProcess().Kill();
+			foreach (DirectX_HUDs hud in HUDs)
+			{
+				if(hud != null && !hud.Closed && !hud.IsDisposed)
+					hud.Close();
+			}
+			Application.Exit();
+			//Process.GetCurrentProcess().Kill();
 		}
 
 		private void PopulatePlayerRows()

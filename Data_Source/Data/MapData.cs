@@ -14,6 +14,7 @@ namespace Data
 		public string DisplayEffectID;
 		public string EffectID;
 		public fixed32 Range;
+		public fixed32 Period;
 		public TargetFilter Required;
 		public TargetFilter Excluded;
 
@@ -22,7 +23,8 @@ namespace Data
 			ID = id;
 			DisplayEffectID = null;
 			EffectID = null;
-			Range = 0;
+			Range = 5;
+			Period = 0.8332;
 			Required = (TargetFilter)0;
 			Excluded = (TargetFilter)0;
 

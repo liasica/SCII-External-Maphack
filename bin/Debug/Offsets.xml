@@ -21,33 +21,34 @@
     <Member Name="times_used" Type="Unsigned" Size="2" Offset="0" />
     <Member Name="data_pointer" Type="Unsigned" Size="4" Offset="times_used+8" AbsoluteOffset="0x8" />
   </Struct>
-  <Struct Name="QueuedCommand" Size="51">
+  <Struct Name="QueuedCommand" Size="-1">
     <Member Name="pNextCommand" Type="Unsigned" Size="4" Offset="0" />
-    <!-- A Struct of type Command starts here. I just copied all the members in for this version of OffsetReader. -->
-    <Member Name="AbilityID" Type="Unsigned" Size="4" Offset="pNextCommand+0x1C" AbsoluteOffset="0x1C" />
-    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="AbilityID+4" AbsoluteOffset="0x20" />
+    <!-- A Struct very similar to Command starts here. It is a bit different though. -->
+    <Member Name="Unknown" Type="Unsigned" Size="4" Offset="pNextCommand+0x1C" AbsoluteOffset="0x1C" />
+    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="Unknown+4" AbsoluteOffset="0x20" />
     <Member Name="TargetUnitModelPtr" Type="Unsigned" Size="4" Offset="TargetUnitID+4" AbsoluteOffset="0x24" />
     <Member Name="TargetX" Type="Fixed" Size="4" Offset="TargetUnitModelPtr+4" AbsoluteOffset="0x28" />
     <Member Name="TargetY" Type="Fixed" Size="4" Offset="TargetX+4" AbsoluteOffset="0x2C" />
     <Member Name="TargetZ" Type="Fixed" Size="4" Offset="TargetY+4" AbsoluteOffset="0x30" />
-    <Member Name="Unknown1C" Type="Unsigned" Size="4" Offset="TargetZ+4" AbsoluteOffset="0x34" />
-    <Member Name="TargetFlags" Type="Unsigned" Size="4" Offset="Unknown1C+4" AbsoluteOffset="0x38" />
+    <Member Name="AbilityID" Type="Unsigned" Size="4" Offset="TargetZ+4" AbsoluteOffset="0x34" />
+    <Member Name="TargetFlags" Type="Unsigned" Size="4" Offset="AbilityID+4" AbsoluteOffset="0x38" />
     <Member Name="Flags" Type="Unsigned" Size="4" Offset="TargetFlags+4" AbsoluteOffset="0x3C" />
     <Member Name="AbilityCommand" Type="Unsigned" Size="1" Offset="Flags+4" AbsoluteOffset="0x40" />
     <Member Name="Player" Type="Unsigned" Size="1" Offset="AbilityCommand+2" AbsoluteOffset="0x42" />
   </Struct>
+  <!-- This is not the Galaxy Command struct. This one is a bit different... -->
   <Struct Name="Command" Size="43">
     <Member Name="AbilityID" Type="Unsigned" Size="4" Offset="0" />
-    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="AbilityID+4" AbsoluteOffset="0x4" />
-    <Member Name="TargetUnitModelPtr" Type="Unsigned" Size="4" Offset="TargetUnitID+4" AbsoluteOffset="0x8" />
-    <Member Name="TargetX" Type="Fixed" Size="4" Offset="TargetUnitModelPtr+4" AbsoluteOffset="0xC" />
-    <Member Name="TargetY" Type="Fixed" Size="4" Offset="TargetX+4" AbsoluteOffset="0x10" />
-    <Member Name="TargetZ" Type="Fixed" Size="4" Offset="TargetY+4" AbsoluteOffset="0x14" />
-    <Member Name="Unknown1C" Type="Unsigned" Size="4" Offset="TargetZ+4" AbsoluteOffset="0x18" />
-    <Member Name="TargetFlags" Type="Unsigned" Size="4" Offset="Unknown1C+4" AbsoluteOffset="0x1C" />
-    <Member Name="Flags" Type="Unsigned" Size="4" Offset="TargetFlags+4" AbsoluteOffset="0x20" />
-    <Member Name="AbilityCommand" Type="Unsigned" Size="1" Offset="Flags+4" AbsoluteOffset="0x24" />
-    <Member Name="Player" Type="Unsigned" Size="1" Offset="AbilityCommand+2" AbsoluteOffset="0x26" />
+    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="AbilityID+8" AbsoluteOffset="0x8" />
+    <Member Name="TargetUnitModelPtr" Type="Unsigned" Size="4" Offset="TargetUnitID+4" AbsoluteOffset="0xC" />
+    <Member Name="TargetX" Type="Fixed" Size="4" Offset="TargetUnitModelPtr+4" AbsoluteOffset="0x10" />
+    <Member Name="TargetY" Type="Fixed" Size="4" Offset="TargetX+4" AbsoluteOffset="0x14" />
+    <Member Name="TargetZ" Type="Fixed" Size="4" Offset="TargetY+4" AbsoluteOffset="0x18" />
+    <Member Name="Unknown" Type="Unsigned" Size="4" Offset="TargetZ+4" AbsoluteOffset="0x1C" />
+    <Member Name="TargetFlags" Type="Unsigned" Size="4" Offset="Unknown+4" AbsoluteOffset="0x20" />
+    <Member Name="Flags" Type="Unsigned" Size="4" Offset="TargetFlags+4" AbsoluteOffset="0x24" />
+    <Member Name="AbilityCommand" Type="Unsigned" Size="1" Offset="Flags+4" AbsoluteOffset="0x28" />
+    <Member Name="Player" Type="Unsigned" Size="1" Offset="AbilityCommand+2" AbsoluteOffset="0x2A" />
   </Struct>
   <Struct Name="ControlGroup" Size="0x111C0" Address="SC2.exe+0">
     <Member Name="Group1" Type="Byte" Size="-1" Offset="0" />

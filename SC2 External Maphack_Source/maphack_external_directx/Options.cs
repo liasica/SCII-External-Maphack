@@ -915,7 +915,7 @@ namespace maphack_external_directx
 			}
 		}
 
-		private void SaveSettings()
+		public void SaveSettings()
 		{
 			IniFile file = new IniFile(MainWindow.settings_path);
 			if (file.Exists())

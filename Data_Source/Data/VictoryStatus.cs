@@ -4,9 +4,10 @@ namespace Data
 
 	public enum VictoryStatus
 	{
-		Playing,
-		Victorious,
-		Defeated
+		Playing = 0,
+		Victorious = 1,
+		Defeated = 2,
+		Tied = 3
 	}
 }
 

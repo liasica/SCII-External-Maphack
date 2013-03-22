@@ -221,6 +221,7 @@ namespace Data
 		BottomF,
 		RightF,
 		TopF,
-		TargetFlags
+		TargetFlags,
+		Unknown
 	}
 }

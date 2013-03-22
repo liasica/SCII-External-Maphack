@@ -170,6 +170,7 @@
     <Compile Include="Data\camera_s.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Data\Commands.cs" />
     <Compile Include="Data\ORNames.cs" />
     <Compile Include="Data\Database.cs" />
     <Compile Include="Data\SC2fixed.cs" />
