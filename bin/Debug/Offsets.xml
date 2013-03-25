@@ -24,14 +24,14 @@
   <Struct Name="QueuedCommand" Size="-1">
     <Member Name="pNextCommand" Type="Unsigned" Size="4" Offset="0" />
     <!-- A Struct very similar to Command starts here. It is a bit different though. -->
-    <Member Name="Unknown" Type="Unsigned" Size="4" Offset="pNextCommand+0x1C" AbsoluteOffset="0x1C" />
-    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="Unknown+4" AbsoluteOffset="0x20" />
+    <Member Name="AbilityID" Type="Unsigned" Size="4" Offset="pNextCommand+0x18" AbsoluteOffset="0x1C" />
+    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="AbilityID+8" AbsoluteOffset="0x20" />
     <Member Name="TargetUnitModelPtr" Type="Unsigned" Size="4" Offset="TargetUnitID+4" AbsoluteOffset="0x24" />
     <Member Name="TargetX" Type="Fixed" Size="4" Offset="TargetUnitModelPtr+4" AbsoluteOffset="0x28" />
     <Member Name="TargetY" Type="Fixed" Size="4" Offset="TargetX+4" AbsoluteOffset="0x2C" />
     <Member Name="TargetZ" Type="Fixed" Size="4" Offset="TargetY+4" AbsoluteOffset="0x30" />
-    <Member Name="AbilityID" Type="Unsigned" Size="4" Offset="TargetZ+4" AbsoluteOffset="0x34" />
-    <Member Name="TargetFlags" Type="Unsigned" Size="4" Offset="AbilityID+4" AbsoluteOffset="0x38" />
+    <Member Name="Unknown" Type="Unsigned" Size="4" Offset="TargetZ+4" AbsoluteOffset="0x34" />
+    <Member Name="TargetFlags" Type="Unsigned" Size="4" Offset="Unknown+4" AbsoluteOffset="0x38" />
     <Member Name="Flags" Type="Unsigned" Size="4" Offset="TargetFlags+4" AbsoluteOffset="0x3C" />
     <Member Name="AbilityCommand" Type="Unsigned" Size="1" Offset="Flags+4" AbsoluteOffset="0x40" />
     <Member Name="Player" Type="Unsigned" Size="1" Offset="AbilityCommand+2" AbsoluteOffset="0x42" />

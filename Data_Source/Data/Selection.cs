@@ -7,14 +7,14 @@ namespace Data
 	[StructLayout(LayoutKind.Sequential)]
 	public struct Selection
 	{
-		private int _Address;
+		private uint _Address;
 		private byte[] _Data;
 
 		public void Update()
 		{
 			_Data = GameData.offsets.ReadStruct(ORNames.Selection, _Address);
 		}
-		public bool WriteToSC2(int Address = -1)
+		public bool WriteToSC2(uint Address = 0)
 		{
 			if (Address <= 0)
 				Address = _Address;
@@ -22,7 +22,7 @@ namespace Data
 		}
 
 
-		public Selection(int Address)
+		public Selection(uint Address)
 		{
 			_Address = Address;
 			_Data = null;
@@ -81,6 +81,9 @@ namespace Data
 			{
 				uint[] RawArray = (uint[])GameData.offsets.ReadStructMember(ORNames.Selection, ORNames.selected_IDs, _Data);
 				List<uint> RawList = new List<uint>(RawArray);
+				int Total = TotalUnits;
+				if (RawList.Count > Total)
+					RawList.RemoveRange(Total, RawList.Count - Total);
 				RawList.RemoveAll(x => x == 0);
 				RawList.TrimExcess();
 				return RawList;

@@ -172,7 +172,7 @@ namespace Data
 				map.mapInfo = new MapInfo();
 				return map;
 			}
-			byte[] data = offsets.ReadStruct(ORNames.MapFileInfo, (int)num);
+			byte[] data = offsets.ReadStruct(ORNames.MapFileInfo, num);
 
 			map_information_s _s = new map_information_s();
 			_s = (map_information_s) mem.ReadMemory(num, typeof(map_information_s));

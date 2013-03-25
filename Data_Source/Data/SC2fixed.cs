@@ -16,6 +16,8 @@ namespace Data
 		{ get { return new fixed32(Int32.MaxValue, true); } }
 		public static fixed32 MinValue
 		{ get { return new fixed32(Int32.MinValue, true); } }
+		public static fixed32 Zero
+		{ get { return new fixed32(0, true); } }
 		public static fixed32 Precision
 		{ get { return new fixed32(1, true); } }
 

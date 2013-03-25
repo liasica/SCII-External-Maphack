@@ -961,6 +961,9 @@ namespace maphack_external_directx
 					TargetFlags target = cmd.TargetFlags;
 					float X = LastX;
 					float Y = LastY;
+					string Ability = cmd.AbilityName;
+					byte Command = cmd.AbilityCommand;
+
 					if ((target & TargetFlags.TargetIsPoint) != 0)
 					{
 						X = cmd.TargetX;
@@ -977,7 +980,21 @@ namespace maphack_external_directx
 					}
 					else
 						continue;
-					this.DrawLine(LastX, (MainWindow.map_height - LastY), X, (MainWindow.map_height - Y), Color.Yellow, true);
+
+					Color LineColor = Color.Yellow;
+					switch (Ability)
+					{
+						case "move":
+							if (Command == 1)
+								LineColor = Color.Blue;
+							else
+								LineColor = Color.Lime;
+							break;
+						case "attack":
+							LineColor = Color.Red;
+							break;
+					}
+					this.DrawLine(LastX, (MainWindow.map_height - LastY), X, (MainWindow.map_height - Y), LineColor, true);
 					LastX = X;
 					LastY = Y;
 				}

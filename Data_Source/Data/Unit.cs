@@ -300,35 +300,19 @@ namespace Data
 				if (_name == string.Empty && modelPtr != 0)
 				{
 					string NameAsText = null;
-					uint pNameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, (int)(modelPtr << 5)) & 0xFFFFFFFE, typeof(uint)) & 0xFFFFFFFE;
-					if (pNameDataAddress != 0 && pNameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+					uint pNameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, modelPtr << 5) & 0xFFFFFFFE, typeof(uint)) & 0xFFFFFFFE;
+					if (pNameDataAddress != 0)
 					{
 						uint NameDataAddress = (uint)GameData.mem.ReadMemory(pNameDataAddress, typeof(uint)) & 0xFFFFFFFE;
-						if (NameDataAddress != 0 && pNameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+						if (NameDataAddress != 0)
 						{
 							NameDataAddress = (uint)GameData.mem.ReadMemory(NameDataAddress + 0x1C, typeof(uint)) & 0xFFFFFFFE;
-							if (NameDataAddress != 0 && pNameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+							if (NameDataAddress != 0)
 							{
 								NameDataAddress = (uint)GameData.mem.ReadMemory(NameDataAddress, typeof(uint)) & 0xFFFFFFFE;
-								if (NameDataAddress != 0 && pNameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+								if (NameDataAddress != 0)
 								{
-									NameDataAddress += 8;
-									uint NameLength = (uint)GameData.mem.ReadMemory(NameDataAddress, typeof(uint));
-									uint NameFlags = (uint)GameData.mem.ReadMemory(NameDataAddress + 4, typeof(uint));
-									if (NameLength < 1024) //it needs an upper limit incase the length is garbage.
-									{
-										byte[] NameAsBytes = new byte[NameLength];
-										if ((NameFlags & 4) == 0)
-											NameDataAddress += 8;
-										else
-											NameDataAddress = (uint)GameData.mem.ReadMemory(NameDataAddress + 8, typeof(uint)) & 0xFFFFFFFE;
-
-										if (NameDataAddress != 0 && pNameDataAddress < Int32.MaxValue)
-										{
-											GameData.mem.ReadMemory((IntPtr)NameDataAddress, (int)NameLength, out NameAsBytes);
-											NameAsText = System.Text.Encoding.UTF8.GetString(NameAsBytes);
-										}
-									}
+									NameAsText = GameData.offsets.ReadString(NameDataAddress + 8);
 								}
 							}
 						}
@@ -348,28 +332,13 @@ namespace Data
 				if (_textID == string.Empty && modelPtr != 0)
 				{
 					string NameAsText = null;
-					uint pNameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, (int)(modelPtr << 5)) & 0xFFFFFFFE, typeof(uint)) & 0xFFFFFFFE;
-					if (pNameDataAddress != 0 && pNameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+					uint pNameDataAddress = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.pName_address, modelPtr << 5) & 0xFFFFFFFE, typeof(uint)) & 0xFFFFFFFE;
+					if (pNameDataAddress != 0)
 					{
 						uint NameDataAddress = (uint)GameData.mem.ReadMemory(pNameDataAddress, typeof(uint)) & 0xFFFFFFFE;
-						if (NameDataAddress != 0 && pNameDataAddress < Int32.MaxValue) //I'm not sure if checking against MaxValue is necessary, but there have been overflows near here.
+						if (NameDataAddress != 0)
 						{
-							uint NameLength = (uint)GameData.mem.ReadMemory(NameDataAddress, typeof(uint));
-							uint NameFlags = (uint)GameData.mem.ReadMemory(NameDataAddress + 4, typeof(uint));
-							if (NameLength >= 10 && NameLength < 1024) //it needs an upper limit incase the length is garbage.
-							{
-								byte[] NameAsBytes = new byte[NameLength];
-								if ((NameFlags & 4) == 0)
-									NameDataAddress += 8;
-								else
-									NameDataAddress = (uint)GameData.mem.ReadMemory(NameDataAddress + 8, typeof(uint)) & 0xFFFFFFFE;
-
-								if (NameDataAddress != 0 && pNameDataAddress < Int32.MaxValue)
-								{
-									GameData.mem.ReadMemory((IntPtr)NameDataAddress, (int)NameLength, out NameAsBytes);
-									NameAsText = System.Text.Encoding.UTF8.GetString(NameAsBytes).Remove(0, 10);
-								}
-							}
+							NameAsText = GameData.offsets.ReadString(NameDataAddress).Remove(0, 10);
 						}
 					}
 					if (NameAsText == null)
@@ -386,7 +355,7 @@ namespace Data
 			{
 				if (_minimapRadius < 0)
 				{
-					_minimapRadius = (fixed32)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.minimap_radius, (int)(modelPtr << 5));
+					_minimapRadius = (fixed32)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.minimap_radius, modelPtr << 5);
 				}
 				return _minimapRadius;
 			}
@@ -472,7 +441,7 @@ namespace Data
 			get
 			{
 				if(_unitType == 0)
-					_unitType = (ushort)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.unit_type, (int)(modelPtr << 5));
+					_unitType = (ushort)GameData.offsets.ReadStructMember(ORNames.UnitModel, ORNames.unit_type, modelPtr << 5);
 				return _unitType;
 			}
 		}

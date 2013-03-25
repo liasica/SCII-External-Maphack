@@ -37,6 +37,9 @@
 	{
 		uint _Address;
 		byte[] _Data;
+		string _AbilityName;
+		uint _AbilityPtrForName;
+
 		public uint NextCommandPtr
 		{ get { return (uint)GameData.offsets.ReadStructMember(ORNames.QueuedCommand, ORNames.pNextCommand, _Data); } }
 
@@ -44,11 +47,13 @@
 		{
 			_Address = Address;
 			_Data = null;
+			_AbilityName = null;
+			_AbilityPtrForName = 0;
 			Update();
 		}
 		public void Update()
 		{
-			_Data = GameData.offsets.ReadStruct(ORNames.QueuedCommand, (int)_Address);
+			_Data = GameData.offsets.ReadStruct(ORNames.QueuedCommand, _Address);
 		}
 		public TargetFlags TargetFlags
 		{ get { return (TargetFlags)(uint)GameData.offsets.ReadStructMember(ORNames.QueuedCommand, ORNames.TargetFlags, _Data); } }
@@ -72,8 +77,25 @@
 		{ get { return (fixed32)GameData.offsets.ReadStructMember(ORNames.QueuedCommand, ORNames.TargetY, _Data); } }
 		public fixed32 TargetZ
 		{ get { return (fixed32)GameData.offsets.ReadStructMember(ORNames.QueuedCommand, ORNames.TargetZ, _Data); } }
-		public uint AbilityID
+		public uint AbilityPointer
 		{ get { return (uint)GameData.offsets.ReadStructMember(ORNames.QueuedCommand, ORNames.AbilityID, _Data); } }
+		public string AbilityName
+		{
+			get
+			{
+				uint ptr = AbilityPointer;
+				if (_AbilityName == null || _AbilityPtrForName != ptr)
+				{
+					uint StringAddress = 0;
+					if (ptr == 0 || (uint)GameData.mem.ReadMemory(ptr, typeof(uint)) == 0 || (StringAddress = (uint)GameData.mem.ReadMemory(ptr + 24, typeof(uint))) == 0)
+						return _AbilityName;
+					_AbilityName = GameData.offsets.ReadString(StringAddress + 4);
+					_AbilityPtrForName = ptr;
+				}
+				return _AbilityName;
+			}
+		}
+
 		public byte AbilityCommand
 		{ get { return (byte)GameData.offsets.ReadStructMember(ORNames.QueuedCommand, ORNames.AbilityCommand, _Data); } }
 		public byte PlayerNumber
@@ -90,11 +112,11 @@
 		}
 		public void Read(uint Address)
 		{
-			_Data = GameData.offsets.ReadStruct(ORNames.Command, (int)Address);
+			_Data = GameData.offsets.ReadStruct(ORNames.Command, Address);
 		}
 		public void Write(uint Address)
 		{
-			GameData.offsets.WriteStruct(ORNames.Command, _Data, (int)Address);
+			GameData.offsets.WriteStruct(ORNames.Command, _Data, Address);
 		}
 
 		public uint AbilityID

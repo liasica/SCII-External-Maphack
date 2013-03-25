@@ -26,6 +26,8 @@ namespace Utilities.MemoryHandling
 		public static extern bool VirtualQueryEx(IntPtr hProcess, UIntPtr lpAddress, out MEMORY_BASIC_INFORMATION lpBuffer, uint dwLength);
 		[DllImport("kernel32.dll")]
 		public static extern bool WriteProcessMemory(IntPtr lpHandle, IntPtr lpAddress, byte[] lpBuffer, int lpSize, out int lpBytesWrote);
+		[DllImport("kernel32.dll")]
+		public static extern bool WriteProcessMemory(IntPtr lpHandle, UIntPtr lpAddress, byte[] lpBuffer, int lpSize, out int lpBytesWrote);
 
 		[DllImport("user32.dll")]
 		public static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);

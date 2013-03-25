@@ -11,15 +11,15 @@ namespace Data
 {
 	static class ImprovedParse
 	{
-		public static int Parse(string value)
+		public static long Parse(string value)
 		{
 			if (value.Contains("0x"))
 			{
 				value = value.Replace("0x", "");
-				return Convert.ToInt32(value, 16);
+				return Convert.ToInt64(value, 16);
 			}
 			else
-				return Convert.ToInt32(value, 10);
+				return Convert.ToInt64(value, 10);
 		}
 	}
 
@@ -31,12 +31,12 @@ namespace Data
 		{
 			lock (Lock) //There will be significant problems if multiple threads try to write the new file at the same time. Todo: Skip the update on all but the first thread.
 			{
-				int BaseAddress = 0;
+				uint BaseAddress = 0;
 				foreach (ProcessModule module in GameData.SC2Process.Modules)
 				{
 					if (module.ModuleName.Equals("SC2.exe", StringComparison.OrdinalIgnoreCase))
 					{
-						BaseAddress = (int)module.BaseAddress;
+						BaseAddress = (uint)module.BaseAddress;
 						break;
 					}
 				}
@@ -156,23 +156,48 @@ namespace Data
 			UpdateFile.Update(_Filename);
 		}
 
-		public int GetAddressOfDataItem(int ItemID)
+		public uint GetAddressOfDataItem(int ItemID)
 		{
 			byte[] buffer;
 			if (ItemID != 0 && ItemID != 65535 && (ushort)ItemID < 0x8000)
 			{
 				buffer = ReadArrayElement(ORNames.GalaxyDataTable, (ushort)ItemID);
 				if ((ushort)ReadStructMember(ORNames.GalaxyTableEntry, ORNames.times_used, buffer) == (ushort)(ItemID >> 16))
-					return (int)(uint)ReadStructMember(ORNames.GalaxyTableEntry, ORNames.data_pointer, buffer);
+					return (uint)ReadStructMember(ORNames.GalaxyTableEntry, ORNames.data_pointer, buffer);
 			}
 			return 0;
+		}
+
+		public string ReadString(uint Address)
+		{
+			if (Address <= 0)
+				return null;
+
+			uint Length = (uint)GameData.mem.ReadMemory(Address, typeof(uint));
+			uint Flags = (uint)GameData.mem.ReadMemory(Address + 4, typeof(uint));
+			uint StringAddress = Address;
+			if (Length < 65536) //it needs an upper limit incase the length is garbage.
+			{
+				byte[] buffer = new byte[Length];
+				if ((Flags & 4) == 0)
+					StringAddress += 8;
+				else
+					StringAddress = (uint)GameData.mem.ReadMemory(StringAddress + 8, typeof(uint));
+
+				if (StringAddress != 0)
+				{
+					GameData.mem.ReadMemory(StringAddress, (int)Length, out buffer);
+					return System.Text.Encoding.UTF8.GetString(buffer);
+				}
+			}
+			return null;
 		}
 
 		public int GetStructSize(ORNames Struct)
 		{
 			return _Structs[Struct].size;
 		}
-		public int GetStructAddress(ORNames Struct)
+		public uint GetStructAddress(ORNames Struct)
 		{
 			return _Structs[Struct].address;
 		}
@@ -195,11 +220,11 @@ namespace Data
 			return _Structs[Struct].members[Member].offset;
 		}
 
-		public int GetStructMemberAddress(ORNames Struct, ORNames Member, int Address = 0)
+		public uint GetStructMemberAddress(ORNames Struct, ORNames Member, uint Address = 0)
 		{
 			if (Address <= 0)
 				Address = GetStructAddress(Struct);
-			return Address + GetStructMemberOffset(Struct, Member);
+			return (uint)(Address + GetStructMemberOffset(Struct, Member));
 		}
 
 		public int GetStructMemberSize(ORNames Struct, ORNames Member)
@@ -227,14 +252,14 @@ namespace Data
 		{
 			return GetArrayCount(Array) * GetArrayElementSize(Array);
 		}
-		public int GetArrayAddress(ORNames Array)
+		public uint GetArrayAddress(ORNames Array)
 		{
 			return _Arrays[Array].address;
 		}
 
-		public int GetArrayElementAddress(ORNames Array, int Index)
+		public uint GetArrayElementAddress(ORNames Array, int Index)
 		{
-			return _Arrays[Array].address + Index * _Structs[GetArrayType(Array)].size;
+			return (uint)(_Arrays[Array].address + Index * _Structs[GetArrayType(Array)].size);
 		}
 
 		public int GetArrayElementSize(ORNames Array)
@@ -242,9 +267,9 @@ namespace Data
 			return _Structs[GetArrayType(Array)].size;
 		}
 
-		public int GetArrayElementMemberAddress(ORNames Array, int Index, ORNames Member)
+		public uint GetArrayElementMemberAddress(ORNames Array, int Index, ORNames Member)
 		{
-			return GetArrayElementAddress(Array, Index) + GetStructMemberOffset(GetArrayType(Array), Member);
+			return (uint)(GetArrayElementAddress(Array, Index) + GetStructMemberOffset(GetArrayType(Array), Member));
 		}
 
 		public Type GetArrayElementMemberType(ORNames Array, ORNames Member)
@@ -282,7 +307,7 @@ namespace Data
 			return WriteStructMember(GetArrayType(Array), Member, NewValue, GetArrayElementAddress(Array, Index));
 		}
 
-		public byte[] ReadStruct(ORNames Struct, int Address = 0)
+		public byte[] ReadStruct(ORNames Struct, uint Address = 0)
 		{
 			if(Address <= 0)
 				Address = GetStructAddress(Struct);
@@ -295,11 +320,11 @@ namespace Data
 				TotalSize = UsedSize + StartOffset;
 
 			byte[] buffer;
-			mem.ReadMemory((IntPtr)Address, TotalSize, out buffer);
+			mem.ReadMemory(Address, TotalSize, out buffer);
 			return buffer;
 		}
 
-		public bool WriteStruct(ORNames Struct, byte[] Data, int Address = 0)
+		public bool WriteStruct(ORNames Struct, byte[] Data, uint Address = 0)
 		{
 			if(Address <= 0)
 				Address = GetStructAddress(Struct);
@@ -308,10 +333,10 @@ namespace Data
 			if (Data.Length != Size)
 				throw new OverflowException("OffsetReader.WriteStruct: Data.Length != Size. Data.Length: " + Data.Length.ToString() + " Size: " + Size.ToString());
 
-			return mem.WriteMemory((IntPtr)Address, Data.Length, ref Data);
+			return mem.WriteMemory(Address, Data.Length, ref Data);
 		}
 
-		public Object ReadStructMember(ORNames Struct, ORNames Member, int Address = 0)
+		public Object ReadStructMember(ORNames Struct, ORNames Member, uint Address = 0)
 		{
 			if (Address <= 0)
 				Address = GetStructAddress(Struct);
@@ -322,7 +347,7 @@ namespace Data
 			{
 				int Length = GetStructMemberSize(Struct, Member);
 				byte[] buffer = new byte[Length];
-				mem.ReadMemory((IntPtr)(GetStructMemberOffset(Struct, Member) + Address), buffer.Length, out buffer);
+				mem.ReadMemory((uint)(GetStructMemberOffset(Struct, Member) + Address), buffer.Length, out buffer);
 				string ReturnValS = Encoding.UTF8.GetString(buffer);
 				int NullPos = ReturnValS.IndexOf('\0');
 				if(NullPos >= 0)
@@ -336,7 +361,7 @@ namespace Data
 
 			int Size = GetStructMemberSize(Struct, Member);
 			byte[] Data = new byte[Size];
-			mem.ReadMemory((IntPtr)Address, Data.Length, out Data);
+			mem.ReadMemory(Address, Data.Length, out Data);
 			Array ReturnVal = Array.CreateInstance(type, Count);
 
 			for (int i = 0; i < Count; i++)
@@ -391,7 +416,7 @@ namespace Data
 			return ReturnVal;
 		}
 
-		public bool WriteStructMember(ORNames Struct, ORNames Member, Object NewValue, int Address = 0)
+		public bool WriteStructMember(ORNames Struct, ORNames Member, Object NewValue, uint Address = 0)
 		{
 			if (Address <= 0 )
 				Address = GetStructAddress(Struct);
@@ -522,7 +547,7 @@ namespace Data
 			string Offset = data.Attribute("Offset").Value;
 			if (!Offset.Contains('+'))
 			{
-				offset = ImprovedParse.Parse(Offset);
+				offset = (int)ImprovedParse.Parse(Offset);
 				data.SetAttributeValue("AbsoluteOffset", null);
 			}
 			else
@@ -534,14 +559,14 @@ namespace Data
 					if (parent.members.ContainsKey((ORNames)Enum.Parse(typeof(ORNames), Split[0])))
 						BaseOffset = parent.members[(ORNames)Enum.Parse(typeof(ORNames), Split[0])].offset;
 
-					offset = BaseOffset + ImprovedParse.Parse(Split[1]);
+					offset = BaseOffset + (int)ImprovedParse.Parse(Split[1]);
 					data.SetAttributeValue("AbsoluteOffset", "0x" + offset.ToString("X"));
 				}
 			}
 
 			
 
-			int Size = ImprovedParse.Parse(data.Attribute("Size").Value);
+			int Size = (int)ImprovedParse.Parse(data.Attribute("Size").Value);
 
 			if (offset < parent.startOffset)
 				parent.startOffset = offset;
@@ -551,7 +576,7 @@ namespace Data
 			string Type = data.Attribute("Type").Value;
 			size = Size;
 			if (data.Attribute("Count") != null)
-				count = ImprovedParse.Parse(data.Attribute("Count").Value);
+				count = (int)ImprovedParse.Parse(data.Attribute("Count").Value);
 			else
 				count = -1;
 			switch (Type)
@@ -632,7 +657,7 @@ namespace Data
 		{ get; set; }
 		public int size
 		{ get; set; }
-		public int address
+		public uint address
 		{ get; set; }
 		public int startOffset
 		{ get; set; }
@@ -647,27 +672,27 @@ namespace Data
 			endOffset = int.MinValue;
 
 			name = (ORNames)Enum.Parse(typeof(ORNames), data.Attribute("Name").Value);
-			size = ImprovedParse.Parse(data.Attribute("Size").Value);
+			size = (int)ImprovedParse.Parse(data.Attribute("Size").Value);
 			if (data.Attribute("Address") != null)
 			{
 				string temp = data.Attribute("Address").Value;
 				int PlusPos = -1;
 				if ((PlusPos = temp.LastIndexOf('+')) >= 0)
 				{
-					address = ImprovedParse.Parse(temp.Substring(PlusPos + 1));
+					address = (uint)ImprovedParse.Parse(temp.Substring(PlusPos + 1));
 
 					string ModuleName = temp.Substring(0, PlusPos);
 					foreach(ProcessModule module in GameData.SC2Process.Modules)
 					{
 						if (module.ModuleName.Equals(ModuleName, StringComparison.OrdinalIgnoreCase))
 						{
-							address += (int)module.BaseAddress;
+							address += (uint)module.BaseAddress;
 							break;
 						}
 					}
 				}
 				else
-					address = ImprovedParse.Parse(data.Attribute("Address").Value);
+					address = (uint)ImprovedParse.Parse(data.Attribute("Address").Value);
 			}
 			else
 				address = 0;
@@ -685,7 +710,7 @@ namespace Data
 		{ get; set; }
 		public int size
 		{ get; set; }
-		public int address
+		public uint address
 		{ get; set; }
 		public ORNames type
 		{ get; set; }
@@ -693,27 +718,27 @@ namespace Data
 		public ORArray(XElement data)
 		{
 			name = (ORNames)Enum.Parse(typeof(ORNames), data.Attribute("Name").Value);
-			size = ImprovedParse.Parse(data.Attribute("Size").Value);
+			size = (int)ImprovedParse.Parse(data.Attribute("Size").Value);
 			type = (ORNames)Enum.Parse(typeof(ORNames), data.Attribute("Type").Value);
 
 			string temp = data.Attribute("Address").Value;
 			int PlusPos = -1;
 			if ((PlusPos = temp.LastIndexOf('+')) >= 0)
 			{
-				address = ImprovedParse.Parse(temp.Substring(PlusPos + 1));
+				address = (uint)ImprovedParse.Parse(temp.Substring(PlusPos + 1));
 
 				string ModuleName = temp.Substring(0, PlusPos);
 				foreach (ProcessModule module in GameData.SC2Process.Modules)
 				{
 					if (module.ModuleName.Equals(ModuleName, StringComparison.OrdinalIgnoreCase))
 					{
-						address += (int)module.BaseAddress;
+						address += (uint)module.BaseAddress;
 						break;
 					}
 				}
 			}
 			else
-				address = ImprovedParse.Parse(data.Attribute("Address").Value);
+				address = (uint)ImprovedParse.Parse(data.Attribute("Address").Value);
 
 		}
 	}

@@ -271,7 +271,7 @@ namespace Utilities.MemoryHandling
 				return false;
 			}
 			byte[] lpBuffer = new byte[4];
-			if (!Imports.ReadProcessMemory(this.m_lpHandle, (IntPtr) memoryLocation, lpBuffer, bufferLength, out lpBytesRead))
+			if (!Imports.ReadProcessMemory(this.m_lpHandle, (UIntPtr) memoryLocation, lpBuffer, bufferLength, out lpBytesRead))
 			{
 				return false;
 			}
@@ -288,7 +288,7 @@ namespace Utilities.MemoryHandling
 				return false;
 			}
 			byte[] lpBuffer = new byte[4];
-			if (!Imports.ReadProcessMemory(this.m_lpHandle, (IntPtr) memoryLocation, lpBuffer, bufferLength, out lpBytesRead))
+			if (!Imports.ReadProcessMemory(this.m_lpHandle, (UIntPtr) memoryLocation, lpBuffer, bufferLength, out lpBytesRead))
 			{
 				return false;
 			}
@@ -312,7 +312,16 @@ namespace Utilities.MemoryHandling
 
 		public bool WriteMemory(uint memoryLocation, int bufferLength, ref byte[] lpBuffer)
 		{
-			return this.WriteMemory((IntPtr) memoryLocation, bufferLength, ref lpBuffer);
+			int lpBytesWrote;
+			if (this.m_lpHandle.ToInt32() == 0)
+			{
+				return false;
+			}
+			if (!Imports.WriteProcessMemory(this.m_lpHandle, (UIntPtr)memoryLocation, lpBuffer, bufferLength, out lpBytesWrote))
+			{
+				return false;
+			}
+			return true;
 		}
 	}
 }
