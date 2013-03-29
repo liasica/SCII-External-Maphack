@@ -131,6 +131,7 @@
     <Compile Include="Data\AbilBuildable.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Data\Abilities.cs" />
     <Compile Include="Data\AbilQueue.cs">
       <SubType>Code</SubType>
     </Compile>

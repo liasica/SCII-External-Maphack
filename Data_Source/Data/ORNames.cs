@@ -175,7 +175,7 @@ namespace Data
 		QueuedCommand,
 		Command,
 		pNextCommand,
-		AbilityID,
+		AbilityPointer,
 		TargetUnitID,
 		TargetUnitModelPtr,
 		TargetX,
@@ -222,6 +222,12 @@ namespace Data
 		RightF,
 		TopF,
 		TargetFlags,
-		Unknown
+		Unknown,
+		AbilTable,
+		Ptr0,
+		Ptr1,
+		Ptr2,
+		NameStringOffset0,
+		NameStringOffset1
 	}
 }

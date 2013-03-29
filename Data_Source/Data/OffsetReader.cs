@@ -98,6 +98,11 @@ namespace Data
 					where el.Attribute("Name").Value == "Selection"
 					select el;
 				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.LocalSelection() - BaseAddress).ToString("X");
+				Current =
+					from el in File.Root.Elements("Struct")
+					where el.Attribute("Name").Value == "AbilTable"
+					select el;
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.AbilTableBasePtr() - BaseAddress).ToString("X");
 
 				try
 				{

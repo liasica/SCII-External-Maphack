@@ -23,6 +23,7 @@ namespace PatternScanner
 		private uint _SelectionFunction;
 		private uint _OrderFunction;
 		private uint _MainLoopHook;
+		private uint _AbilTableBasePtr;
 
 		private void BuildPattern(List<byte> pattern, ref string mask, byte value)
 		{
@@ -305,13 +306,6 @@ namespace PatternScanner
 			}
 			if (this._SelectionFunction == 0)
 			{
-				/*byte[] bPattern = new byte[] { 0x8D, 0x45, 0xFC, 0x50, 0x8D, 0x4D, 0x08, 0xC7, 0x45, 0xFC, 0x1D, 0x00, 0x00, 0x00, 0xE8, 0, 0, 0, 0, 0x6A, 0x01, 0x8A, 0xD3, 0xB9, 0x01, 0x00, 0x00, 0x00 };
-				uint num = this.Process.FindPattern(bPattern, "xxxxxxxxxxxxxxx????xxxxxxxxx");
-				if (num != (uint)this.Process.MainModule.BaseAddress)
-				{
-					this._SelectionFunction = (uint)(num + 19 + this.Process.ReadInt(num + 15));
-				}*/
-
 				byte[] bPattern = new byte[] { 0x55, 0x8B, 0xEC, 0xB8, 0, 0, 0, 0, 0xE8, 0, 0, 0, 0, 0x8A, 0x45, 0x1C, 0x56, 0x8B, 0x75, 0x18, 0x56, 0xE8, 0, 0, 0, 0, 0x85, 0xC0 };
 				uint num = this.Process.FindPattern(bPattern, "xxxx????x????xxxxxxxxx????xx");
 				if (num != (uint)this.Process.MainModule.BaseAddress)
@@ -357,6 +351,24 @@ namespace PatternScanner
 				}
 			}
 			return this._MainLoopHook;
+		}
+
+		public uint AbilTableBasePtr()
+		{
+			if (this.Process == null)
+			{
+				return 0;
+			}
+			if (this._AbilTableBasePtr == 0)
+			{
+				byte[] bPattern = new byte[] { 0xA1, 0, 0, 0, 0, 0x85, 0xC0, 0x75, 0x0A, 0xE8, 0, 0, 0, 0, 0xA1, 0, 0, 0, 0, 0xC3 };
+				uint num = this.Process.FindPattern(bPattern, "x????xxxxx????x????x");
+				if (num != (uint)this.Process.MainModule.BaseAddress)
+				{
+					this._AbilTableBasePtr = this.Process.ReadUInt(num + 1);
+				}
+			}
+			return this._AbilTableBasePtr;
 		}
 
 

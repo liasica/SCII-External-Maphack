@@ -242,6 +242,8 @@ namespace maphack_external_directx
 
 		public void GameStart()
 		{
+			Abilities.Reset();
+			Abilities.BuildAddressTable();
 			Unit.ResetUnits();
 			Player.Reset();
 			GameData.mapDat = new MapData(GameData.getMapData().mapInfo.filePath);

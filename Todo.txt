@@ -1,0 +1,25 @@
+	**Fix memory reading after quitting and restarting SC2.
+	**Make sure OffsetReader handles structs of size -1 correctly.
+	**Check size/position saving for observer and resource panels.
+**Fix/improve minimap auto-sizing.
+
+*See if the updater will ever say updates are available when they're not.
+*Add map info window.
+*Make the overlays stop disappearing.
+*Check possible issues with the restore size of the main window.
+*Add exclude list for minimap and/or observer.
+*Add map-maker alert.
+*Add some kind of trainer synchronization system for multiple players.
+*Fix the minimap not showing for some people.
+*Add a list of changes to the Updater.
+*Make the Updater update itself before anything else.
+*Redo the options form.
+*Add the pattern scans for selections and control groups.
+*Add the pattern scan for GalaxyDataTable.
+*Add the option to change the window title.
+*Fix the minimap being a few pixels off.
+*Add AFK player alert.
+*Remove unused code/files.
+*Merge some assemblies.
+*Set trainer icon.
+*Figure out ControlGroup

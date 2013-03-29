@@ -2,8 +2,6 @@
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Runtime.InteropServices;
-	using System.Threading;
 
 	[Flags]
 	public enum TargetFlags : uint
@@ -37,8 +35,6 @@
 	{
 		uint _Address;
 		byte[] _Data;
-		string _AbilityName;
-		uint _AbilityPtrForName;
 
 		public uint NextCommandPtr
 		{ get { return (uint)GameData.offsets.ReadStructMember(ORNames.QueuedCommand, ORNames.pNextCommand, _Data); } }
@@ -47,8 +43,6 @@
 		{
 			_Address = Address;
 			_Data = null;
-			_AbilityName = null;
-			_AbilityPtrForName = 0;
 			Update();
 		}
 		public void Update()
@@ -78,21 +72,12 @@
 		public fixed32 TargetZ
 		{ get { return (fixed32)GameData.offsets.ReadStructMember(ORNames.QueuedCommand, ORNames.TargetZ, _Data); } }
 		public uint AbilityPointer
-		{ get { return (uint)GameData.offsets.ReadStructMember(ORNames.QueuedCommand, ORNames.AbilityID, _Data); } }
+		{ get { return (uint)GameData.offsets.ReadStructMember(ORNames.QueuedCommand, ORNames.AbilityPointer, _Data); } }
 		public string AbilityName
 		{
 			get
 			{
-				uint ptr = AbilityPointer;
-				if (_AbilityName == null || _AbilityPtrForName != ptr)
-				{
-					uint StringAddress = 0;
-					if (ptr == 0 || (uint)GameData.mem.ReadMemory(ptr, typeof(uint)) == 0 || (StringAddress = (uint)GameData.mem.ReadMemory(ptr + 24, typeof(uint))) == 0)
-						return _AbilityName;
-					_AbilityName = GameData.offsets.ReadString(StringAddress + 4);
-					_AbilityPtrForName = ptr;
-				}
-				return _AbilityName;
+				return Abilities.Names[AbilityPointer];
 			}
 		}
 
@@ -119,10 +104,10 @@
 			GameData.offsets.WriteStruct(ORNames.Command, _Data, Address);
 		}
 
-		public uint AbilityID
+		public uint AbilityPointer
 		{
-			get { return (uint)GameData.offsets.ReadStructMember(ORNames.Command, ORNames.AbilityID, _Data); }
-			set { GameData.offsets.WriteStructMember(ORNames.Command, ORNames.AbilityID, value, ref _Data); }
+			get { return (uint)GameData.offsets.ReadStructMember(ORNames.Command, ORNames.AbilityPointer, _Data); }
+			set { GameData.offsets.WriteStructMember(ORNames.Command, ORNames.AbilityPointer, value, ref _Data); }
 		}
 		public uint TargetUnitID
 		{

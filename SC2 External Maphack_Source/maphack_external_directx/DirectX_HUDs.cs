@@ -1699,12 +1699,19 @@ namespace maphack_external_directx
 
 				try
 				{
-					CreateOrResetDevice();
+					this.device.EndScene();
 				}
-				catch(Exception ex2)
+				catch (Exception)
 				{
-					WT.ReportCrash(ex2, null);
-					WT.ReportCrash(ex, null);
+					try
+					{
+						CreateOrResetDevice();
+					}
+					catch (Exception ex2)
+					{
+						WT.ReportCrash(ex2, null);
+						WT.ReportCrash(ex, null);
+					}
 				}
 			}
 		}

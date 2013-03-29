@@ -21,11 +21,19 @@
     <Member Name="times_used" Type="Unsigned" Size="2" Offset="0" />
     <Member Name="data_pointer" Type="Unsigned" Size="4" Offset="times_used+8" AbsoluteOffset="0x8" />
   </Struct>
+  <Struct Name="AbilTable" Size="-1" Address="SC2.exe+0x10FEB78">
+    <!-- This is not an actual struct. It is basically a collection of offsets used in the process of getting the Ability name/address table. -->
+    <Member Name="Ptr0" Type="Unsigned" Size="4" Offset="0" />
+	<Member Name="Ptr1" Type="Unsigned" Size="4" Offset="0x1C" />
+	<Member Name="Ptr2" Type="Unsigned" Size="4" Offset="0x9C" />
+	<Member Name="NameStringOffset0" Type="Unsigned" Size="4" Offset="0x18" />
+	<Member Name="NameStringOffset1" Type="Unsigned" Size="4" Offset="4" />
+  </Struct>
   <Struct Name="QueuedCommand" Size="-1">
     <Member Name="pNextCommand" Type="Unsigned" Size="4" Offset="0" />
     <!-- A Struct very similar to Command starts here. It is a bit different though. -->
-    <Member Name="AbilityID" Type="Unsigned" Size="4" Offset="pNextCommand+0x18" AbsoluteOffset="0x1C" />
-    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="AbilityID+8" AbsoluteOffset="0x20" />
+    <Member Name="AbilityPointer" Type="Unsigned" Size="4" Offset="pNextCommand+0x18" AbsoluteOffset="0x1C" />
+    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="AbilityPointer+8" AbsoluteOffset="0x20" />
     <Member Name="TargetUnitModelPtr" Type="Unsigned" Size="4" Offset="TargetUnitID+4" AbsoluteOffset="0x24" />
     <Member Name="TargetX" Type="Fixed" Size="4" Offset="TargetUnitModelPtr+4" AbsoluteOffset="0x28" />
     <Member Name="TargetY" Type="Fixed" Size="4" Offset="TargetX+4" AbsoluteOffset="0x2C" />
@@ -38,8 +46,8 @@
   </Struct>
   <!-- This is not the Galaxy Command struct. This one is a bit different... -->
   <Struct Name="Command" Size="43">
-    <Member Name="AbilityID" Type="Unsigned" Size="4" Offset="0" />
-    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="AbilityID+8" AbsoluteOffset="0x8" />
+    <Member Name="AbilityPointer" Type="Unsigned" Size="4" Offset="0" />
+    <Member Name="TargetUnitID" Type="Unsigned" Size="4" Offset="AbilityPointer+8" AbsoluteOffset="0x8" />
     <Member Name="TargetUnitModelPtr" Type="Unsigned" Size="4" Offset="TargetUnitID+4" AbsoluteOffset="0xC" />
     <Member Name="TargetX" Type="Fixed" Size="4" Offset="TargetUnitModelPtr+4" AbsoluteOffset="0x10" />
     <Member Name="TargetY" Type="Fixed" Size="4" Offset="TargetX+4" AbsoluteOffset="0x14" />
@@ -179,7 +187,8 @@
     <Member Name="next_unit" Type="Unsigned" Size="2" Offset="prev_unit+2" AbsoluteOffset="0x6" />
     <Member Name="unit_model" Type="Unsigned" Size="4" Offset="next_unit+2" AbsoluteOffset="0x8" />
     <Member Name="targetFilter_flags" Type="Unsigned" Size="8" Offset="unit_model+12" AbsoluteOffset="0x14" />
-    <Member Name="sub_move_state" Type="Unsigned" Size="1" Offset="targetFilter_flags+13" AbsoluteOffset="0x21" />
+	<Member Name="unknownFlags" Type="Unsigned" Size="1" Offset="targetFilter_flags+12" AbsoluteOffset="0x14" />
+    <Member Name="sub_move_state" Type="Unsigned" Size="1" Offset="unknownFlags+1" AbsoluteOffset="0x21" />
     <Member Name="move_state" Type="Unsigned" Size="1" Offset="sub_move_state+1" AbsoluteOffset="0x22" />
     <Member Name="state" Type="Unsigned" Size="1" Offset="move_state+4" AbsoluteOffset="0x26" />
     <Member Name="player_owner" Type="Unsigned" Size="1" Offset="state+1" AbsoluteOffset="0x27" />

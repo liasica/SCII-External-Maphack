@@ -241,7 +241,7 @@ namespace Utilities.WebTools
 			try
 			{
 				Version Version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
-				string VersionString = "v" + Version.Major + "." + Version.Minor + "." + Version.Build;
+				string VersionString = "v" + Version.ToString();
 				string FormattedTitle = Reformat(title); //not used, but it may help in the future.
 				string FormattedMessage = Reformat(message.Replace(@"C:\Users\Mr. Nukealizer\Documents\Visual Studio 2010\Projects\SC2 External maphack\Git Repo\", ""));
 
