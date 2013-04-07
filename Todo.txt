@@ -1,8 +1,9 @@
-	**Fix memory reading after quitting and restarting SC2.
-	**Make sure OffsetReader handles structs of size -1 correctly.
-	**Check size/position saving for observer and resource panels.
 **Fix/improve minimap auto-sizing.
+**Make the updater check the version of Offsets.xml, instead of just the hash.
 
+*Add win command to trainer.
+*Look into adding kill all enemies to trainer.
+*Look into adding gamespeed control to trainer.
 *See if the updater will ever say updates are available when they're not.
 *Add map info window.
 *Make the overlays stop disappearing.

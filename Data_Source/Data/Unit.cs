@@ -338,7 +338,7 @@ namespace Data
 						uint NameDataAddress = (uint)GameData.mem.ReadMemory(pNameDataAddress, typeof(uint)) & 0xFFFFFFFE;
 						if (NameDataAddress != 0)
 						{
-							NameAsText = GameData.offsets.ReadString(NameDataAddress).Remove(0, 10);
+							NameAsText = GameData.offsets.ReadString(NameDataAddress).Replace("Unit/Name/", "");
 						}
 					}
 					if (NameAsText == null)

@@ -733,12 +733,26 @@ namespace Data
 				address = (uint)ImprovedParse.Parse(temp.Substring(PlusPos + 1));
 
 				string ModuleName = temp.Substring(0, PlusPos);
-				foreach (ProcessModule module in GameData.SC2Process.Modules)
+
+				for(int i = 0; i < GameData.SC2Process.Modules.Count; i++)
 				{
-					if (module.ModuleName.Equals(ModuleName, StringComparison.OrdinalIgnoreCase))
+					try
 					{
-						address += (uint)module.BaseAddress;
-						break;
+						if (GameData.SC2Process.Modules[i].ModuleName.Equals(ModuleName, StringComparison.OrdinalIgnoreCase))
+						{
+							address += (uint)GameData.SC2Process.Modules[i].BaseAddress;
+							break;
+						}
+					}
+					catch (System.ComponentModel.Win32Exception)
+					{
+						//Let's wait a tiny bit of time and try this one more time in case it was just a temporary error.
+						System.Threading.Thread.Sleep(0);
+						if (GameData.SC2Process.Modules[i].ModuleName.Equals(ModuleName, StringComparison.OrdinalIgnoreCase))
+						{
+							address += (uint)GameData.SC2Process.Modules[i].BaseAddress;
+							break;
+						}
 					}
 				}
 			}
