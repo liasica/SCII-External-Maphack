@@ -119,6 +119,8 @@ namespace PatternScanner
 				{
 					this._GalaxyDataTable = this.Process.ReadUInt(num + 15);
 				}
+				else
+					this._GalaxyDataTable = num;
 			}
 			return this._GalaxyDataTable;
 		}
@@ -132,16 +134,16 @@ namespace PatternScanner
 			if (this._Timer == 0)
 			{
 				byte[] bPattern = new byte[] { 
-					0x81, 0x05, 0, 0, 0, 0, 0x00, 0x01, 0x00, 0x00, 0xA3, 0, 0, 0, 0, 0xA1,
-					0, 0, 0, 0, 0x03, 0x05, 0, 0, 0, 0, 0xF7, 0x05, 0, 0, 0, 0,
-					0x00, 0x02, 0x00, 0x00, 0xA3, 0, 0, 0, 0, 0, 0, 0x81, 0x05, 0, 0, 0,
-					0, 0x00, 0x01, 0x00, 0x00
+					0xC1, 0xEA, 0x0A, 0xB9, 0x00, 0x01, 0x00, 0x00, 0x01, 0x0D, 0, 0, 0, 0, 0xF6, 0xD2, 0xA3, 0, 0, 0, 0, 0xF6, 0xC2, 
+					0x01, 0x74, 0x06, 0x01, 0x0D, 0, 0, 0, 0, 0x83, 0x3D, 0, 0, 0, 0, 0x00, 0x56, 0xBE, 0xFF, 0xFF, 0xFF, 0x7F
 				 };
-				uint num = this.Process.FindPattern(bPattern, "xx????xxxxx????x????xx????xx????xxxxx??????xx????xxxx");
+				uint num = this.Process.FindPattern(bPattern, "xxxxxxxxxx????xxx????xxxxxxx????xx????xxxxxxx");
 				if (num != (uint)this.Process.MainModule.BaseAddress)
 				{
-					this._Timer = this.Process.ReadUInt(num + 45);
+					this._Timer = this.Process.ReadUInt(num + 28);
 				}
+				else
+					this._Timer = num;
 			}
 			return this._Timer;
 		}
@@ -162,6 +164,8 @@ namespace PatternScanner
 				{
 					this._Timer2 = this.Process.ReadUInt(num + 2);
 				}
+				else
+					this._Timer2 = num;
 			}
 			return this._Timer2;
 		}
@@ -181,6 +185,8 @@ namespace PatternScanner
 					if(this.Process.ReadUInt(num + 7) + 1 == this.Process.ReadUInt(num + 1))
 						this._LocalPlayerNumber = this.Process.ReadUInt(num + 7);
 				}
+				else
+					this._LocalPlayerNumber = num;
 			}
 			return this._LocalPlayerNumber;
 		}
@@ -199,6 +205,8 @@ namespace PatternScanner
 				{
 					this._LocalSelection = this.Process.ReadUInt(num + 2);
 				}
+				else
+					this._LocalSelection = num;
 			}
 			return this._LocalSelection;
 		}
@@ -217,7 +225,8 @@ namespace PatternScanner
 				{
 					this._MapBounds = this.Process.ReadUInt(num + 4);
 				}
-				
+				else
+					this._MapBounds = num;
 			}
 			return this._MapBounds;
 		}
@@ -237,7 +246,8 @@ namespace PatternScanner
 					if(this.Process.ReadUInt(num + 2) == this.Process.ReadUInt(num + 14))
 						this._MapInfoPtr = this.Process.ReadUInt(num + 2);
 				}
-
+				else
+					this._MapInfoPtr = num;
 			}
 			return this._MapInfoPtr;
 		}
@@ -256,6 +266,8 @@ namespace PatternScanner
 				{
 					this._PlayerSelection = this.Process.ReadUInt(num + 10);
 				}
+				else
+					this._PlayerSelection = num;
 			}
 			return this._PlayerSelection;
 		}
@@ -275,6 +287,8 @@ namespace PatternScanner
 					this._PlayerStructSize = this.Process.ReadUShort(num + 5);
 					this._PlayerStruct = this.Process.ReadUInt(num + 10);
 				}
+				else
+					this._PlayerStruct = num;
 			}
 			return this._PlayerStruct;
 		}
@@ -294,6 +308,8 @@ namespace PatternScanner
 					this._PlayerStructSize = this.Process.ReadUShort(num + 5);
 					this._PlayerStruct = this.Process.ReadUInt(num + 10);
 				}
+				else
+					this._PlayerStructSize = 0;
 			}
 			return this._PlayerStructSize;
 		}
@@ -312,6 +328,8 @@ namespace PatternScanner
 				{
 					this._SelectionFunction = num;
 				}
+				else
+					this._SelectionFunction = num;
 			}
 			return this._SelectionFunction;
 		}
@@ -331,6 +349,8 @@ namespace PatternScanner
 				{
 					this._OrderFunction = num;
 				}
+				else
+					this._OrderFunction = num;
 			}
 			return this._OrderFunction;
 		}
@@ -349,6 +369,8 @@ namespace PatternScanner
 				{
 					this._MainLoopHook = num + 7;
 				}
+				else
+					this._MainLoopHook = num;
 			}
 			return this._MainLoopHook;
 		}
@@ -367,6 +389,8 @@ namespace PatternScanner
 				{
 					this._AbilTableBasePtr = this.Process.ReadUInt(num + 1);
 				}
+				else
+					this._AbilTableBasePtr = num;
 			}
 			return this._AbilTableBasePtr;
 		}

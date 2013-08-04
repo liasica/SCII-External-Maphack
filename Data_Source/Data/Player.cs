@@ -85,37 +85,43 @@ namespace Data
 
 			_memoryAddress = (uint)GameData.offsets.GetArrayElementAddress(ORNames.Players, number);
 			
-			_nameLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.name_length);
+			_nameLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.name_length) >> 2;
 			_name = ((string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.name));
 			_NameWithTag = _name;
 
-			_ClanTagLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.ClanTagLength);
+			_ClanTagLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.ClanTagLength) >> 2;
 			_ClanTag = ((string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.ClanTag));
 			if (_ClanTagLength > 0)
 				_NameWithTag = "[" + _ClanTag + "] " + _name;
 
-			_HandleLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.HandleLength);
+			_HandleLength = (int)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.HandleLength) >> 2;
 			_Handle = ((string)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.Handle));
 			
 
-			uint num = (uint)GameData.mem.ReadMemory((uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.racePointer) + 4, typeof(uint));
-			byte[] buffer;
-			GameData.mem.ReadMemory((uint)num, 4, out buffer);
-			if (buffer == null || buffer.Length <= 0 || buffer[0] == 0)
+			uint num = (uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.racePointer);
+			if (num == 0)
 				_race = Race.Neutral;
 			else
 			{
-				string str2 =  Encoding.UTF8.GetString(buffer).Trim();
-				if (str2 != null)
+				num = (uint)GameData.mem.ReadMemory(num + 4, typeof(uint));
+				byte[] buffer;
+				GameData.mem.ReadMemory((uint)num, 4, out buffer);
+				if (buffer == null || buffer.Length <= 0 || buffer[0] == 0)
+					_race = Race.Neutral;
+				else
 				{
-					if (str2 == "Zerg")
-						_race = Race.Zerg;
-					else if (str2 == "Prot")
-						_race = Race.Protoss;
-					else if (str2 == "Terr")
-						_race = Race.Terran;
-					else
-						_race = Race.Neutral;
+					string str2 = Encoding.UTF8.GetString(buffer).Trim();
+					if (str2 != null)
+					{
+						if (str2 == "Zerg")
+							_race = Race.Zerg;
+						else if (str2 == "Prot")
+							_race = Race.Protoss;
+						else if (str2 == "Terr")
+							_race = Race.Terran;
+						else
+							_race = Race.Neutral;
+					}
 				}
 			}
 		}
@@ -141,7 +147,7 @@ namespace Data
 				return _number;
 			}
 		}
-		public PlayerStatus playerStatus
+		public PlayerStatus playerStatus //TODO: Make sure this and victoryStatus use the right enums.
 		{
 			get
 			{
@@ -155,7 +161,7 @@ namespace Data
 				return (StateFlags)(uint)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.StateFlags);
 			}
 		}
-		public VictoryStatus victoryStatus
+		public VictoryStatus victoryStatus //TODO: Make sure this and playerStatus use the right enums.
 		{
 			get
 			{
@@ -372,7 +378,7 @@ namespace Data
 				return (byte)GameData.offsets.ReadArrayElementMember(ORNames.Players, number, ORNames.team);
 			}
 		}
-		public PlayerType playerType
+		public PlayerType playerType //TODO: This may be broken. I'll have to check.
 		{
 			get
 			{

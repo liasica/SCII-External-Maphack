@@ -13,13 +13,20 @@ namespace Data
 	{
 		public static long Parse(string value)
 		{
-			if (value.Contains("0x"))
+			try
 			{
-				value = value.Replace("0x", "");
-				return Convert.ToInt64(value, 16);
+				if (value.Contains("0x"))
+				{
+					value = value.Replace("0x", "");
+					return Convert.ToInt64(value, 16);
+				}
+				else
+					return Convert.ToInt64(value, 10);
 			}
-			else
-				return Convert.ToInt64(value, 10);
+			catch
+			{
+				return 0;
+			}
 		}
 	}
 
@@ -47,42 +54,42 @@ namespace Data
 					from el in File.Root.Elements("Array")
 					where el.Attribute("Name").Value == "Players"
 					select el;
-				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.PlayerStruct() - BaseAddress).ToString("X");
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + (GameData.ps.PlayerStruct() - BaseAddress).ToString("X");
 				Current =
 					from el in File.Root.Elements("Array")
 					where el.Attribute("Name").Value == "Units"
 					select el;
-				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.UnitStruct() - BaseAddress).ToString("X");
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + (GameData.ps.UnitStruct() - BaseAddress).ToString("X");
 				Current =
 					from el in File.Root.Elements("Array")
 					where el.Attribute("Name").Value == "CurrentSelections"
 					select el;
-				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.PlayerSelection() - BaseAddress).ToString("X");
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + (GameData.ps.PlayerSelection() - BaseAddress).ToString("X");
 				Current =
 					from el in File.Root.Elements("Array")
 					where el.Attribute("Name").Value == "GalaxyDataTable"
 					select el;
-				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.GalaxyDataTable() - BaseAddress).ToString("X");
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + (GameData.ps.GalaxyDataTable() - BaseAddress).ToString("X");
 				Current =
 					from el in File.Root.Elements("Struct")
 					where el.Attribute("Name").Value == "Timer"
 					select el;
-				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.Timer() - BaseAddress).ToString("X");
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + (GameData.ps.Timer() - BaseAddress).ToString("X");
 				Current =
 					from el in File.Root.Elements("Struct")
 					where el.Attribute("Name").Value == "Timer2"
 					select el;
-				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.Timer2() - BaseAddress).ToString("X");
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + (GameData.ps.Timer2() - BaseAddress).ToString("X");
 				Current =
 					from el in File.Root.Elements("Struct")
 					where el.Attribute("Name").Value == "CameraBounds"
 					select el;
-				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.MapBounds() - BaseAddress).ToString("X");
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + (GameData.ps.MapBounds() - BaseAddress).ToString("X");
 				Current =
 					from el in File.Root.Elements("Struct")
 					where el.Attribute("Name").Value == "MapInfo"
 					select el;
-				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.MapInfoPtr() - BaseAddress).ToString("X");
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + (GameData.ps.MapInfoPtr() - BaseAddress).ToString("X");
 				Current =
 					from el in File.Root.Elements("Struct")
 					where el.Attribute("Name").Value == "Player"
@@ -92,17 +99,17 @@ namespace Data
 					from el in File.Root.Elements("Struct")
 					where el.Attribute("Name").Value == "LocalPlayer"
 					select el;
-				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.LocalPlayerNumber() - BaseAddress).ToString("X");
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + (GameData.ps.LocalPlayerNumber() - BaseAddress).ToString("X");
 				Current =
 					from el in File.Root.Elements("Struct")
 					where el.Attribute("Name").Value == "Selection"
 					select el;
-				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.LocalSelection() - BaseAddress).ToString("X");
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + (GameData.ps.LocalSelection() - BaseAddress).ToString("X");
 				Current =
 					from el in File.Root.Elements("Struct")
 					where el.Attribute("Name").Value == "AbilTable"
 					select el;
-				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + Math.Max(0, GameData.ps.AbilTableBasePtr() - BaseAddress).ToString("X");
+				Current.ElementAt(0).Attribute("Address").Value = "SC2.exe+0x" + (GameData.ps.AbilTableBasePtr() - BaseAddress).ToString("X");
 
 				try
 				{
@@ -178,13 +185,13 @@ namespace Data
 			if (Address <= 0)
 				return null;
 
-			uint Length = (uint)GameData.mem.ReadMemory(Address, typeof(uint));
+			uint Length = (uint)GameData.mem.ReadMemory(Address, typeof(uint)) >> 2;
 			uint Flags = (uint)GameData.mem.ReadMemory(Address + 4, typeof(uint));
 			uint StringAddress = Address;
 			if (Length < 65536) //it needs an upper limit incase the length is garbage.
 			{
 				byte[] buffer = new byte[Length];
-				if ((Flags & 4) == 0)
+				if ((Flags & 2) == 0)
 					StringAddress += 8;
 				else
 					StringAddress = (uint)GameData.mem.ReadMemory(StringAddress + 8, typeof(uint));

@@ -4,9 +4,9 @@ namespace Data
 
 	public enum PlayerType
 	{
-		None,
-		User,
-		Computer,
+		None = 0,
+		User = 1,
+		Computer = 2,
 		Neutral,
 		Hostile,
 		Referee,

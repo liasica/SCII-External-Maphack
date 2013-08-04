@@ -1,19 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- The "AbsoluteOffset" attribute on Struct Members is the absolute offset if Offset was relative to another Member.
      This attribute is for ease of reading only; changing it won't affect do anything. -->
-<Offsets Version="2.0.7.25293">
-  <Array Name="Players" Type="Player" Size="16" Address="SC2.exe+0x25771E0" />
-  <Array Name="Units" Type="Unit" Size="0x4000" Address="SC2.exe+0x25F4740" />
-  <Array Name="CurrentSelections" Type="Selection" Size="16" Address="SC2.exe+0xFE980000" />
+<Offsets Version="2.0.10.26585">
+  <Array Name="Players" Type="Player" Size="16" Address="SC2.exe+0x35E6E00" />
+  <Array Name="Units" Type="Unit" Size="0x4000" Address="SC2.exe+0x3665140" />
+  <Array Name="CurrentSelections" Type="Selection" Size="16" Address="SC2.exe+0x0" />
   <Array Name="PlayerControlGroups" Type="ControlGroup" Size="16" Address="SC2.exe+0" />
-  <Array Name="GalaxyDataTable" Type="GalaxyTableEntry" Size="0x8000" Address="SC2.exe+0x1DB6A18" />
-  <Struct Name="Timer" Size="4" Address="SC2.exe+0x24C531C">
+  <Array Name="GalaxyDataTable" Type="GalaxyTableEntry" Size="0x8000" Address="SC2.exe+0x2DFB468" />
+  <Struct Name="Timer" Size="4" Address="SC2.exe+0x3534F44">
     <Member Name="timer" Type="Fixed" Size="4" Offset="0" />
   </Struct>
-  <Struct Name="Timer2" Size="4" Address="SC2.exe+0x10FD334">
+  <Struct Name="Timer2" Size="4" Address="SC2.exe+0x0">
     <Member Name="timer" Type="Unsigned" Size="4" Offset="0" />
   </Struct>
-  <Struct Name="LocalPlayer" Size="1" Address="SC2.exe+0x10E29C8">
+  <Struct Name="LocalPlayer" Size="1" Address="SC2.exe+0x11265D8">
     <Member Name="LocalPlayer" Type="Unsigned" Size="1" Offset="0" />
     <Member Name="ReplayWatchedPlayer" Type="Unsigned" Size="1" Offset="1" />
   </Struct>
@@ -21,11 +21,11 @@
     <Member Name="times_used" Type="Unsigned" Size="2" Offset="0" />
     <Member Name="data_pointer" Type="Unsigned" Size="4" Offset="times_used+8" AbsoluteOffset="0x8" />
   </Struct>
-  <Struct Name="AbilTable" Size="-1" Address="SC2.exe+0x10FDB78">
+  <Struct Name="AbilTable" Size="-1" Address="SC2.exe+0x11420DC">
     <!-- This is not an actual struct. It is basically a collection of offsets used in the process of getting the Ability name/address table. -->
     <Member Name="Ptr0" Type="Unsigned" Size="4" Offset="0" />
     <Member Name="Ptr1" Type="Unsigned" Size="4" Offset="0x1C" />
-    <Member Name="Ptr2" Type="Unsigned" Size="4" Offset="0x9C" />
+    <Member Name="Ptr2" Type="Unsigned" Size="4" Offset="0x94" />
     <Member Name="NameStringOffset0" Type="Unsigned" Size="4" Offset="0x18" />
     <Member Name="NameStringOffset1" Type="Unsigned" Size="4" Offset="4" />
   </Struct>
@@ -70,20 +70,20 @@
     <Member Name="Group9" Type="Byte" Size="-1" Offset="Group8+0x1B60" AbsoluteOffset="0xDB00" />
     <Member Name="Group10" Type="Byte" Size="-1" Offset="Group9+0x1B60" AbsoluteOffset="0xF660" />
   </Struct>
-  <Struct Name="Selection" Size="0x1B60" Address="SC2.exe+0x215AF90">
+  <Struct Name="Selection" Size="0x1B60" Address="SC2.exe+0x31CAB90">
     <Member Name="num_selected" Type="Unsigned" Size="2" Offset="0x0" />
     <Member Name="num_types_selected" Type="Unsigned" Size="2" Offset="num_selected+2" AbsoluteOffset="0x2" />
     <Member Name="highlighted_type" Type="Unsigned" Size="2" Offset="num_types_selected+2" AbsoluteOffset="0x4" />
     <Member Name="num_pages" Type="Unsigned" Size="2" Offset="highlighted_type+2" AbsoluteOffset="0x6" />
     <Member Name="selected_IDs" Type="Unsigned" Size="4" Count="500" Offset="num_pages+2" AbsoluteOffset="0x8" />
   </Struct>
-  <Struct Name="CameraBounds" Size="-1" Address="SC2.exe+0x2099094">
+  <Struct Name="CameraBounds" Size="-1" Address="SC2.exe+0x3108C64">
     <Member Name="left_precise" Type="Fixed" Size="4" Offset="0" />
     <Member Name="bottom_precise" Type="Fixed" Size="4" Offset="left_precise+4" AbsoluteOffset="0x4" />
     <Member Name="right_precise" Type="Fixed" Size="4" Offset="bottom_precise+4" AbsoluteOffset="0x8" />
     <Member Name="top_precise" Type="Fixed" Size="4" Offset="right_precise+4" AbsoluteOffset="0xC" />
   </Struct>
-  <Struct Name="MapInfo" Size="-1" Address="SC2.exe+0x24C5268">
+  <Struct Name="MapInfo" Size="-1" Address="SC2.exe+0x3534E80">
     <Member Name="FileInfoPointer" Type="Unsigned" Size="4" Offset="0" />
     <Member Name="FullWidthI" Type="Signed" Size="4" Offset="0x108" />
     <Member Name="FullHeightI" Type="Signed" Size="4" Offset="FullWidthI+4" AbsoluteOffset="0x10C" />
@@ -115,7 +115,7 @@
     <Member Name="pName_address" Type="Unsigned" Size="4" Offset="0xC" />
     <Member Name="minimap_radius" Type="Fixed" Size="4" Offset="0x39C" />
   </Struct>
-  <Struct Name="Player" Size="0xCE0">
+  <Struct Name="Player" Size="0xDC0">
     <Member Name="active" Type="Unsigned" Size="4" Offset="0" />
     <Member Name="camera_x" Type="Fixed" Size="4" Offset="active+8" AbsoluteOffset="0x8" />
     <Member Name="camera_y" Type="Fixed" Size="4" Offset="camera_x+4" AbsoluteOffset="0xC" />
@@ -126,25 +126,25 @@
     <Member Name="player_type" Type="Unsigned" Size="1" Offset="team+1" AbsoluteOffset="0x1D" />
     <Member Name="status" Type="Unsigned" Size="1" Offset="player_type+1" AbsoluteOffset="0x1E" />
     <Member Name="difficulty" Type="Unsigned" Size="1" Offset="status+2" AbsoluteOffset="0x20" />
-    <Member Name="DamageDealtTime" Type="Fixed" Size="4" Offset="difficulty+24" AbsoluteOffset="0x38" />
-    <Member Name="DamageTakenTime" Type="Fixed" Size="4" Offset="DamageDealtTime+4" AbsoluteOffset="0x3C" />
-    <Member Name="StateFlags" Type="Unsigned" Size="4" Offset="DamageTakenTime+8" AbsoluteOffset="0x44" />
-    <Member Name="time_since_resource_changed" Type="Unsigned" Size="4" Offset="StateFlags+8" AbsoluteOffset="0x4C" />
-    <Member Name="name_length" Type="Unsigned" Size="4" Offset="time_since_resource_changed+92" AbsoluteOffset="0xA8" />
-    <Member Name="name" Type="String" Size="0x50" Offset="name_length+8" AbsoluteOffset="0xB0" />
-    <Member Name="ClanTagLength" Type="Unsigned" Size="4" Offset="name+80" AbsoluteOffset="0x100" />
-    <Member Name="ClanTag" Type="String" Size="0x20" Offset="ClanTagLength+8" AbsoluteOffset="0x108" />
-    <Member Name="racePointer" Type="Unsigned" Size="4" Offset="ClanTag+72" AbsoluteOffset="0x150" />
-    <Member Name="color_index" Type="Unsigned" Size="4" Offset="racePointer+8" AbsoluteOffset="0x158" />
-    <Member Name="supply_limit" Type="Fixed" Size="4" Offset="color_index+4" AbsoluteOffset="0x15C" />
-    <Member Name="credits" Type="Unsigned" Size="4" Offset="supply_limit+4" AbsoluteOffset="0x160" />
-    <Member Name="credits_spent" Type="Unsigned" Size="4" Offset="credits+4" AbsoluteOffset="0x164" />
-    <Member Name="research_points" Type="Unsigned" Size="4" Offset="credits_spent+4" AbsoluteOffset="0x168" />
-    <Member Name="research_points_spent" Type="Unsigned" Size="4" Offset="research_points+4" AbsoluteOffset="0x16C" />
-    <Member Name="HandleLength" Type="Unsigned" Size="4" Offset="research_points_spent+52" AbsoluteOffset="0x1A0" />
-    <Member Name="Handle" Type="String" Size="0x14" Offset="HandleLength+8" AbsoluteOffset="0x1A8" />
-    <Member Name="attack_multiplier" Type="Fixed" Size="4" Offset="Handle+80" AbsoluteOffset="0x1F8" />
-    <Member Name="defense_multiplier" Type="Fixed" Size="4" Offset="attack_multiplier+4" AbsoluteOffset="0x1FC" />
+    <Member Name="DamageDealtTime" Type="Fixed" Size="4" Offset="difficulty+32" AbsoluteOffset="0x40" />
+    <Member Name="DamageTakenTime" Type="Fixed" Size="4" Offset="DamageDealtTime+4" AbsoluteOffset="0x44" />
+    <Member Name="StateFlags" Type="Unsigned" Size="4" Offset="DamageTakenTime+8" AbsoluteOffset="0x4C" />
+    <Member Name="time_since_resource_changed" Type="Unsigned" Size="4" Offset="StateFlags+8" AbsoluteOffset="0x54" />
+    <Member Name="name_length" Type="Unsigned" Size="4" Offset="time_since_resource_changed+92" AbsoluteOffset="0xB0" />
+    <Member Name="name" Type="String" Size="0x50" Offset="name_length+8" AbsoluteOffset="0xB8" />
+    <Member Name="ClanTagLength" Type="Unsigned" Size="4" Offset="name+80" AbsoluteOffset="0x108" />
+    <Member Name="ClanTag" Type="String" Size="0x20" Offset="ClanTagLength+8" AbsoluteOffset="0x110" />
+    <Member Name="racePointer" Type="Unsigned" Size="4" Offset="ClanTag+72" AbsoluteOffset="0x158" />
+    <Member Name="color_index" Type="Unsigned" Size="4" Offset="racePointer+8" AbsoluteOffset="0x160" />
+    <Member Name="supply_limit" Type="Fixed" Size="4" Offset="color_index+4" AbsoluteOffset="0x164" />
+    <Member Name="credits" Type="Unsigned" Size="4" Offset="supply_limit+4" AbsoluteOffset="0x168" />
+    <Member Name="credits_spent" Type="Unsigned" Size="4" Offset="credits+4" AbsoluteOffset="0x16C" />
+    <Member Name="research_points" Type="Unsigned" Size="4" Offset="credits_spent+4" AbsoluteOffset="0x170" />
+    <Member Name="research_points_spent" Type="Unsigned" Size="4" Offset="research_points+4" AbsoluteOffset="0x174" />
+    <Member Name="HandleLength" Type="Unsigned" Size="4" Offset="research_points_spent+68" AbsoluteOffset="0x1B8" />
+    <Member Name="Handle" Type="String" Size="0x14" Offset="HandleLength+8" AbsoluteOffset="0x1C0" />
+    <Member Name="attack_multiplier" Type="Fixed" Size="4" Offset="Handle+80" AbsoluteOffset="0x210" />
+    <Member Name="defense_multiplier" Type="Fixed" Size="4" Offset="attack_multiplier+4" AbsoluteOffset="0x214" />
     <!-- I don't feel like taking the time to update these just yet.
     <Member Name="harvesters_current" Type="Unsigned" Size="4" Offset="defense_multiplier+1064" AbsoluteOffset="0x528" />
     <Member Name="harvesters_built" Type="Unsigned" Size="4" Offset="harvesters_current+16" AbsoluteOffset="0x538" />
@@ -155,17 +155,17 @@
     <Member Name="total_constructing_queue_length" Type="Unsigned" Size="4" Offset="total_constructing+0" AbsoluteOffset="0x578" />
     <Member Name="army_size" Type="Unsigned" Size="4" Offset="total_constructing+8" AbsoluteOffset="0x580" />
 	-->
-    <Member Name="supply_cap" Type="Fixed" Size="4" Offset="defense_multiplier+1588" AbsoluteOffset="0x830" />
-    <Member Name="supply_current" Type="Fixed" Size="4" Offset="supply_cap+24" AbsoluteOffset="0x848" />
-    <Member Name="minerals_current" Type="Unsigned" Size="4" Offset="supply_current+56" AbsoluteOffset="0x880" />
-    <Member Name="vespene_current" Type="Unsigned" Size="4" Offset="minerals_current+8" AbsoluteOffset="0x888" />
-    <Member Name="terrazine_current" Type="Unsigned" Size="4" Offset="vespene_current+8" AbsoluteOffset="0x890" />
-    <Member Name="custom_resource_current" Type="Unsigned" Size="4" Offset="terrazine_current+8" AbsoluteOffset="0x898" />
-    <Member Name="minerals_total" Type="Unsigned" Size="4" Offset="custom_resource_current+8" AbsoluteOffset="0x8A0" />
-    <Member Name="vespene_total" Type="Unsigned" Size="4" Offset="minerals_total+8" AbsoluteOffset="0x8A8" />
-    <Member Name="terrazine_total" Type="Unsigned" Size="4" Offset="vespene_total+8" AbsoluteOffset="0x8B0" />
-    <Member Name="custom_resource_total" Type="Unsigned" Size="4" Offset="terrazine_total+8" AbsoluteOffset="0x8B8" />
-    <!-- I didn't check any of the following yet. Don't rely on them being correct, but they may work. -->
+    <Member Name="supply_cap" Type="Fixed" Size="4" Offset="defense_multiplier+1588" AbsoluteOffset="0x848" />
+    <Member Name="supply_current" Type="Fixed" Size="4" Offset="supply_cap+24" AbsoluteOffset="0x860" />
+    <Member Name="minerals_current" Type="Unsigned" Size="4" Offset="supply_current+64" AbsoluteOffset="0x8A0" />
+    <Member Name="vespene_current" Type="Unsigned" Size="4" Offset="minerals_current+8" AbsoluteOffset="0x8A8" />
+    <Member Name="terrazine_current" Type="Unsigned" Size="4" Offset="vespene_current+8" AbsoluteOffset="0x8B0" />
+    <Member Name="custom_resource_current" Type="Unsigned" Size="4" Offset="terrazine_current+8" AbsoluteOffset="0x8B8" />
+    <Member Name="minerals_total" Type="Unsigned" Size="4" Offset="custom_resource_current+8" AbsoluteOffset="0x8C0" />
+    <Member Name="vespene_total" Type="Unsigned" Size="4" Offset="minerals_total+8" AbsoluteOffset="0x8C8" />
+    <Member Name="terrazine_total" Type="Unsigned" Size="4" Offset="vespene_total+8" AbsoluteOffset="0x8D0" />
+    <Member Name="custom_resource_total" Type="Unsigned" Size="4" Offset="terrazine_total+8" AbsoluteOffset="0x8D8" />
+    <!-- I don't feel like taking the time to update these just yet.
     <Member Name="mineral_rate" Type="Unsigned" Size="4" Offset="custom_resource_total+72" AbsoluteOffset="0x900" />
     <Member Name="vespene_rate" Type="Unsigned" Size="4" Offset="mineral_rate+8" AbsoluteOffset="0x908" />
     <Member Name="terrazine_rate" Type="Unsigned" Size="4" Offset="vespene_rate+8" AbsoluteOffset="0x910" />
@@ -178,6 +178,7 @@
     <Member Name="buildings_lost_mineral_worth" Type="Unsigned" Size="4" Offset="units_lost_mineral_worth+8" AbsoluteOffset="0x970" />
     <Member Name="buildings_lost_vespene_worth" Type="Unsigned" Size="4" Offset="buildings_lost_mineral_worth+8" AbsoluteOffset="0x978" />
     <Member Name="units_lost_vespene_worth" Type="Unsigned" Size="4" Offset="buildings_lost_vespene_worth+16" AbsoluteOffset="0x988" />
+	-->
   </Struct>
   <Struct Name="Unit" Size="0x1c0">
     <Member Name="ID" Type="Unsigned" Size="4" Offset="0" />
@@ -194,58 +195,58 @@
     <Member Name="player_owner" Type="Unsigned" Size="1" Offset="state+1" AbsoluteOffset="0x27" />
     <Member Name="isImmobile" Type="Bool" Size="1" Offset="player_owner+8" AbsoluteOffset="0x2F" />
     <Member Name="isUnturnable" Type="Bool" Size="1" Offset="isImmobile+2" AbsoluteOffset="0x31" />
-    <Member Name="kills" Type="Unsigned" Size="2" Offset="isUnturnable+9" AbsoluteOffset="0x3A" />
-    <Member Name="player_owner2" Type="Unsigned" Size="1" Offset="kills+2" AbsoluteOffset="0x3C" />
-    <Member Name="player_owner3" Type="Unsigned" Size="1" Offset="player_owner2+1" AbsoluteOffset="0x3D" />
-    <Member Name="position_x" Type="Fixed" Size="4" Offset="player_owner3+11" AbsoluteOffset="0x48" />
-    <Member Name="position_y" Type="Fixed" Size="4" Offset="position_x+4" AbsoluteOffset="0x4C" />
-    <Member Name="position_z" Type="Fixed" Size="4" Offset="position_y+4" AbsoluteOffset="0x50" />
-    <Member Name="Height" Type="Fixed" Size="4" Offset="position_z+4" AbsoluteOffset="0x54" />
-    <Member Name="rotation_x" Type="Fixed" Size="4" Offset="Height+8" AbsoluteOffset="0x5C" />
-    <Member Name="rotation_y" Type="Fixed" Size="4" Offset="rotation_x+4" AbsoluteOffset="0x60" />
-    <Member Name="rotation" Type="Fixed" Size="4" Offset="rotation_y+4" AbsoluteOffset="0x64" />
-    <Member Name="randomTimer" Type="Unsigned" Size="4" Offset="rotation+4" AbsoluteOffset="0x68" />
-    <Member Name="death_type" Type="Unsigned" Size="4" Offset="randomTimer+9" AbsoluteOffset="0x71" />
-    <Member Name="destination_x" Type="Fixed" Size="4" Offset="death_type+11" AbsoluteOffset="0x7C" />
-    <Member Name="destination_y" Type="Fixed" Size="4" Offset="destination_x+4" AbsoluteOffset="0x80" />
-    <Member Name="destination_z" Type="Fixed" Size="4" Offset="destination_y+4" AbsoluteOffset="0x84" />
-    <Member Name="last_order" Type="Unsigned" Size="4" Offset="destination_z+8" AbsoluteOffset="0x8C" />
-    <Member Name="destination2_x" Type="Fixed" Size="4" Offset="last_order+4" AbsoluteOffset="0x90" />
-    <Member Name="destination2_y" Type="Fixed" Size="4" Offset="destination2_x+4" AbsoluteOffset="0x94" />
-    <Member Name="start_position_x" Type="Fixed" Size="4" Offset="destination2_y+4" AbsoluteOffset="0x98" />
-    <Member Name="start_position_y" Type="Fixed" Size="4" Offset="start_position_x+4" AbsoluteOffset="0x9C" />
-    <Member Name="destination3_x" Type="Fixed" Size="4" Offset="start_position_y+4" AbsoluteOffset="0xA0" />
-    <Member Name="destination3_y" Type="Fixed" Size="4" Offset="destination3_x+4" AbsoluteOffset="0xA4" />
-    <Member Name="start_position2_x" Type="Fixed" Size="4" Offset="destination3_y+4" AbsoluteOffset="0xA8" />
-    <Member Name="start_position2_y" Type="Fixed" Size="4" Offset="start_position2_x+4" AbsoluteOffset="0xAC" />
-    <Member Name="move_speed" Type="Fixed" Size="4" Offset="start_position2_y+24" AbsoluteOffset="0xC4" />
-    <Member Name="Acceleration" Type="Fixed" Size="4" Offset="move_speed+4" AbsoluteOffset="0xC8" />
-    <Member Name="commandQueue_pointer" Type="Unsigned" Size="4" Offset="Acceleration+8" AbsoluteOffset="0xD0" />
-    <Member Name="abilities_pointer" Type="Unsigned" Size="4" Offset="commandQueue_pointer+8" AbsoluteOffset="0xD8" />
-    <Member Name="health_damage" Type="Fixed" Size="4" Offset="abilities_pointer+56" AbsoluteOffset="0x110" />
-    <Member Name="shield_damage" Type="Fixed" Size="4" Offset="health_damage+4" AbsoluteOffset="0x114" />
-    <Member Name="energy" Type="Fixed" Size="4" Offset="shield_damage+4" AbsoluteOffset="0x118" />
-    <Member Name="bonus_max_health" Type="Fixed" Size="4" Offset="energy+4" AbsoluteOffset="0x11C" />
-    <Member Name="bonus_max_shields" Type="Fixed" Size="4" Offset="bonus_max_health+4" AbsoluteOffset="0x120" />
-    <Member Name="bonus_max_energy" Type="Fixed" Size="4" Offset="bonus_max_shields+4" AbsoluteOffset="0x124" />
-    <Member Name="health_multiplier" Type="Fixed" Size="4" Offset="bonus_max_energy+4" AbsoluteOffset="0x128" />
-    <Member Name="shields_multiplier" Type="Fixed" Size="4" Offset="health_multiplier+4" AbsoluteOffset="0x12C" />
-    <Member Name="energy_multiplier" Type="Fixed" Size="4" Offset="shields_multiplier+4" AbsoluteOffset="0x130" />
-    <Member Name="health_regen_bonus" Type="Fixed" Size="4" Offset="energy_multiplier+4" AbsoluteOffset="0x134" />
-    <Member Name="shield_regen_bonus" Type="Fixed" Size="4" Offset="health_regen_bonus+4" AbsoluteOffset="0x138" />
-    <Member Name="energy_regen_bonus" Type="Fixed" Size="4" Offset="shield_regen_bonus+4" AbsoluteOffset="0x13C" />
-    <Member Name="LifeExpected" Type="Fixed" Size="4" Offset="energy_regen_bonus+12" AbsoluteOffset="0x148" />
-    <Member Name="ShieldExpected" Type="Fixed" Size="4" Offset="LifeExpected+4" AbsoluteOffset="0x14C" />
-    <Member Name="EnergyExpected" Type="Fixed" Size="4" Offset="ShieldExpected+4" AbsoluteOffset="0x150" />
-    <Member Name="lifespan" Type="Unsigned" Size="4" Offset="EnergyExpected+12" AbsoluteOffset="0x15C" />
-    <Member Name="lastAttacked" Type="Unsigned" Size="4" Offset="lifespan+4" AbsoluteOffset="0x160" />
-    <Member Name="time_scale" Type="Fixed" Size="4" Offset="lastAttacked+4" AbsoluteOffset="0x164" />
-    <Member Name="bountyMinerals" Type="Unsigned" Size="4" Offset="time_scale+16" AbsoluteOffset="0x174" />
-    <Member Name="bountyVespene" Type="Unsigned" Size="4" Offset="bountyMinerals+4" AbsoluteOffset="0x178" />
-    <Member Name="bountyTerrazine" Type="Unsigned" Size="4" Offset="bountyVespene+4" AbsoluteOffset="0x17C" />
-    <Member Name="bountyCustom" Type="Unsigned" Size="4" Offset="bountyTerrazine+4" AbsoluteOffset="0x180" />
-    <Member Name="bountyXP" Type="Unsigned" Size="4" Offset="bountyCustom+4" AbsoluteOffset="0x184" />
-    <Member Name="cellX_approx" Type="Unsigned" Size="1" Offset="bountyXP+4" AbsoluteOffset="0x188" />
-    <Member Name="cellY_approx" Type="Unsigned" Size="1" Offset="cellX_approx+1" AbsoluteOffset="0x189" />
+    <Member Name="kills" Type="Unsigned" Size="2" Offset="isUnturnable+13" AbsoluteOffset="0x3E" />
+    <Member Name="player_owner2" Type="Unsigned" Size="1" Offset="kills+2" AbsoluteOffset="0x40" />
+    <Member Name="player_owner3" Type="Unsigned" Size="1" Offset="player_owner2+1" AbsoluteOffset="0x41" />
+    <Member Name="position_x" Type="Fixed" Size="4" Offset="player_owner3+11" AbsoluteOffset="0x4C" />
+    <Member Name="position_y" Type="Fixed" Size="4" Offset="position_x+4" AbsoluteOffset="0x50" />
+    <Member Name="position_z" Type="Fixed" Size="4" Offset="position_y+4" AbsoluteOffset="0x54" />
+    <Member Name="Height" Type="Fixed" Size="4" Offset="position_z+4" AbsoluteOffset="0x58" />
+    <Member Name="rotation_x" Type="Fixed" Size="4" Offset="Height+8" AbsoluteOffset="0x60" />
+    <Member Name="rotation_y" Type="Fixed" Size="4" Offset="rotation_x+4" AbsoluteOffset="0x64" />
+    <Member Name="rotation" Type="Fixed" Size="4" Offset="rotation_y+4" AbsoluteOffset="0x68" />
+    <Member Name="randomTimer" Type="Unsigned" Size="4" Offset="rotation+4" AbsoluteOffset="0x6C" />
+    <Member Name="death_type" Type="Unsigned" Size="4" Offset="randomTimer+9" AbsoluteOffset="0x75" />
+    <Member Name="destination_x" Type="Fixed" Size="4" Offset="death_type+11" AbsoluteOffset="0x80" />
+    <Member Name="destination_y" Type="Fixed" Size="4" Offset="destination_x+4" AbsoluteOffset="0x84" />
+    <Member Name="destination_z" Type="Fixed" Size="4" Offset="destination_y+4" AbsoluteOffset="0x88" />
+    <Member Name="last_order" Type="Unsigned" Size="4" Offset="destination_z+8" AbsoluteOffset="0x90" />
+    <Member Name="destination2_x" Type="Fixed" Size="4" Offset="last_order+4" AbsoluteOffset="0x94" />
+    <Member Name="destination2_y" Type="Fixed" Size="4" Offset="destination2_x+4" AbsoluteOffset="0x98" />
+    <Member Name="start_position_x" Type="Fixed" Size="4" Offset="destination2_y+4" AbsoluteOffset="0x9C" />
+    <Member Name="start_position_y" Type="Fixed" Size="4" Offset="start_position_x+4" AbsoluteOffset="0xA0" />
+    <Member Name="destination3_x" Type="Fixed" Size="4" Offset="start_position_y+4" AbsoluteOffset="0xA4" />
+    <Member Name="destination3_y" Type="Fixed" Size="4" Offset="destination3_x+4" AbsoluteOffset="0xA8" />
+    <Member Name="start_position2_x" Type="Fixed" Size="4" Offset="destination3_y+4" AbsoluteOffset="0xAC" />
+    <Member Name="start_position2_y" Type="Fixed" Size="4" Offset="start_position2_x+4" AbsoluteOffset="0xB0" />
+    <Member Name="move_speed" Type="Fixed" Size="4" Offset="start_position2_y+24" AbsoluteOffset="0xC8" />
+    <Member Name="Acceleration" Type="Fixed" Size="4" Offset="move_speed+4" AbsoluteOffset="0xCC" />
+    <Member Name="commandQueue_pointer" Type="Unsigned" Size="4" Offset="Acceleration+8" AbsoluteOffset="0xD4" />
+    <Member Name="abilities_pointer" Type="Unsigned" Size="4" Offset="commandQueue_pointer+8" AbsoluteOffset="0xDC" />
+    <Member Name="health_damage" Type="Fixed" Size="4" Offset="abilities_pointer+56" AbsoluteOffset="0x114" />
+    <Member Name="shield_damage" Type="Fixed" Size="4" Offset="health_damage+4" AbsoluteOffset="0x118" />
+    <Member Name="energy" Type="Fixed" Size="4" Offset="shield_damage+4" AbsoluteOffset="0x11C" />
+    <Member Name="bonus_max_health" Type="Fixed" Size="4" Offset="energy+4" AbsoluteOffset="0x120" />
+    <Member Name="bonus_max_shields" Type="Fixed" Size="4" Offset="bonus_max_health+4" AbsoluteOffset="0x124" />
+    <Member Name="bonus_max_energy" Type="Fixed" Size="4" Offset="bonus_max_shields+4" AbsoluteOffset="0x128" />
+    <Member Name="health_multiplier" Type="Fixed" Size="4" Offset="bonus_max_energy+4" AbsoluteOffset="0x12C" />
+    <Member Name="shields_multiplier" Type="Fixed" Size="4" Offset="health_multiplier+4" AbsoluteOffset="0x130" />
+    <Member Name="energy_multiplier" Type="Fixed" Size="4" Offset="shields_multiplier+4" AbsoluteOffset="0x134" />
+    <Member Name="health_regen_bonus" Type="Fixed" Size="4" Offset="energy_multiplier+4" AbsoluteOffset="0x138" />
+    <Member Name="shield_regen_bonus" Type="Fixed" Size="4" Offset="health_regen_bonus+4" AbsoluteOffset="0x13C" />
+    <Member Name="energy_regen_bonus" Type="Fixed" Size="4" Offset="shield_regen_bonus+4" AbsoluteOffset="0x140" />
+    <Member Name="LifeExpected" Type="Fixed" Size="4" Offset="energy_regen_bonus+12" AbsoluteOffset="0x14C" />
+    <Member Name="ShieldExpected" Type="Fixed" Size="4" Offset="LifeExpected+4" AbsoluteOffset="0x150" />
+    <Member Name="EnergyExpected" Type="Fixed" Size="4" Offset="ShieldExpected+4" AbsoluteOffset="0x154" />
+    <Member Name="lifespan" Type="Unsigned" Size="4" Offset="EnergyExpected+12" AbsoluteOffset="0x160" />
+    <Member Name="lastAttacked" Type="Unsigned" Size="4" Offset="lifespan+4" AbsoluteOffset="0x164" />
+    <Member Name="time_scale" Type="Fixed" Size="4" Offset="lastAttacked+4" AbsoluteOffset="0x168" />
+    <Member Name="bountyMinerals" Type="Unsigned" Size="4" Offset="time_scale+16" AbsoluteOffset="0x178" />
+    <Member Name="bountyVespene" Type="Unsigned" Size="4" Offset="bountyMinerals+4" AbsoluteOffset="0x17C" />
+    <Member Name="bountyTerrazine" Type="Unsigned" Size="4" Offset="bountyVespene+4" AbsoluteOffset="0x180" />
+    <Member Name="bountyCustom" Type="Unsigned" Size="4" Offset="bountyTerrazine+4" AbsoluteOffset="0x184" />
+    <Member Name="bountyXP" Type="Unsigned" Size="4" Offset="bountyCustom+4" AbsoluteOffset="0x188" />
+    <Member Name="cellX_approx" Type="Unsigned" Size="1" Offset="bountyXP+4" AbsoluteOffset="0x18C" />
+    <Member Name="cellY_approx" Type="Unsigned" Size="1" Offset="cellX_approx+1" AbsoluteOffset="0x18D" />
   </Struct>
 </Offsets>

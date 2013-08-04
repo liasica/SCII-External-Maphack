@@ -2,15 +2,15 @@ namespace Data
 {
 	using System;
 
-	public enum PlayerDifficulty
+	public enum PlayerDifficulty //some of these may be wrong. I just know that easy and medium changed, and changed the rest the same way.
 	{
-		Easy = 1,
-		EmptySlot = 0x20,
-		Hard = 3,
-		Insane = 5,
-		NeutralOrPlayerOrMedium = 2,
-		VeryEasy = 0,
-		VeryHard = 4
+		VeryEasy = 1,
+		Easy = 2,
+		NeutralOrPlayerOrMedium = 3,
+		Hard = 4,
+		VeryHard = 5,
+		Insane = 6,
+		EmptySlot = 0x20
 	}
 }
 
