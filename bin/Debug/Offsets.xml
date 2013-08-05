@@ -85,18 +85,18 @@
   </Struct>
   <Struct Name="MapInfo" Size="-1" Address="SC2.exe+0x3534E80">
     <Member Name="FileInfoPointer" Type="Unsigned" Size="4" Offset="0" />
-    <Member Name="FullWidthI" Type="Signed" Size="4" Offset="0x108" />
-    <Member Name="FullHeightI" Type="Signed" Size="4" Offset="FullWidthI+4" AbsoluteOffset="0x10C" />
-    <Member Name="FullWidthF" Type="Fixed" Size="4" Offset="FullHeightI+4" AbsoluteOffset="0x110" />
-    <Member Name="FullHeightF" Type="Fixed" Size="4" Offset="FullWidthF+4" AbsoluteOffset="0x114" />
-    <Member Name="LeftI" Type="Signed" Size="4" Offset="FullHeightF+4" AbsoluteOffset="0x118" />
-    <Member Name="BottomI" Type="Signed" Size="4" Offset="LeftI+4" AbsoluteOffset="0x11C" />
-    <Member Name="RightI" Type="Signed" Size="4" Offset="BottomI+4" AbsoluteOffset="0x120" />
-    <Member Name="TopI" Type="Signed" Size="4" Offset="RightI+4" AbsoluteOffset="0x124" />
-    <Member Name="LeftF" Type="Fixed" Size="4" Offset="TopI+4" AbsoluteOffset="0x128" />
-    <Member Name="BottomF" Type="Fixed" Size="4" Offset="LeftF+4" AbsoluteOffset="0x12C" />
-    <Member Name="RightF" Type="Fixed" Size="4" Offset="BottomF+4" AbsoluteOffset="0x130" />
-    <Member Name="TopF" Type="Fixed" Size="4" Offset="RightF+4" AbsoluteOffset="0x134" />
+    <Member Name="FullWidthI" Type="Signed" Size="4" Offset="0x118" />
+    <Member Name="FullHeightI" Type="Signed" Size="4" Offset="FullWidthI+4" AbsoluteOffset="0x11C" />
+    <Member Name="FullWidthF" Type="Fixed" Size="4" Offset="FullHeightI+4" AbsoluteOffset="0x120" />
+    <Member Name="FullHeightF" Type="Fixed" Size="4" Offset="FullWidthF+4" AbsoluteOffset="0x124" />
+    <Member Name="LeftI" Type="Signed" Size="4" Offset="FullHeightF+4" AbsoluteOffset="0x128" />
+    <Member Name="BottomI" Type="Signed" Size="4" Offset="LeftI+4" AbsoluteOffset="0x12C" />
+    <Member Name="RightI" Type="Signed" Size="4" Offset="BottomI+4" AbsoluteOffset="0x130" />
+    <Member Name="TopI" Type="Signed" Size="4" Offset="RightI+4" AbsoluteOffset="0x134" />
+    <Member Name="LeftF" Type="Fixed" Size="4" Offset="TopI+4" AbsoluteOffset="0x138" />
+    <Member Name="BottomF" Type="Fixed" Size="4" Offset="LeftF+4" AbsoluteOffset="0x13C" />
+    <Member Name="RightF" Type="Fixed" Size="4" Offset="BottomF+4" AbsoluteOffset="0x140" />
+    <Member Name="TopF" Type="Fixed" Size="4" Offset="RightF+4" AbsoluteOffset="0x144" />
   </Struct>
   <Struct Name="MapFileInfo" Size="-1">
     <Member Name="FilenameLength" Type="Unsigned" Size="4" Offset="0xC" />
@@ -113,7 +113,7 @@
   <Struct Name="UnitModel" Size="-1">
     <Member Name="unit_type" Type="Unsigned" Size="2" Offset="6" />
     <Member Name="pName_address" Type="Unsigned" Size="4" Offset="0xC" />
-    <Member Name="minimap_radius" Type="Fixed" Size="4" Offset="0x39C" />
+    <Member Name="minimap_radius" Type="Fixed" Size="4" Offset="0x3AC" />
   </Struct>
   <Struct Name="Player" Size="0xDC0">
     <Member Name="active" Type="Unsigned" Size="4" Offset="0" />
